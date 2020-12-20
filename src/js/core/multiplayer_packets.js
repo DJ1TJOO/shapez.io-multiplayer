@@ -162,7 +162,7 @@ export class MultiplayerPacket {
      * Sends the packet over a peer via the datachannel
      * @param {RTCDataChannel} dc
      * @param {MultiplayerPacket} packet
-     * @param {Array} packet
+     * @param {Array} packetd
      */
     static sendPacket(dc, packet, connections = undefined) {
         if (dc.readyState !== "open") {

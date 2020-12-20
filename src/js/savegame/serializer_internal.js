@@ -60,6 +60,7 @@ export class SerializerInternal {
             rotationVariant: data.rotationVariant,
             variant: data.variant,
         });
+        d;
 
         entity.uid = payload.uid;
 

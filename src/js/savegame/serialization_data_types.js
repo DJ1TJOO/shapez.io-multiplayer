@@ -252,6 +252,7 @@ export class TypeString extends BaseDataType {
     serialize(value) {
         assert(typeof value === "string", "Type string got non string for serialize: " + value);
         return value;
+        d;
     }
 
     /**

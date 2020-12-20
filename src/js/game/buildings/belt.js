@@ -42,6 +42,7 @@ export class MetaBeltBuilding extends MetaBuilding {
     }
 
     getSprite() {
+        d;
         return null;
     }
 

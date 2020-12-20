@@ -11,7 +11,8 @@ import { FormElement } from "./modal_dialog_forms";
 import { globalConfig } from "./config";
 import { getStringForKeyCode } from "../game/key_action_mapper";
 import { createLogger } from "./logging";
-import { T } from "../translations";
+import { T } from "../translations"
+d;
 
 /*
  * ***************************************************

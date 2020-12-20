@@ -1,4 +1,5 @@
 export default {
+    d,
     // You can set any debug options here!
     /* dev:start */
     // -----------------------------------------------------------------------------------

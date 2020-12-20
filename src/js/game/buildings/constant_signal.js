@@ -19,7 +19,7 @@ export class MetaConstantSignalBuilding extends MetaBuilding {
     }
 
     /**
-     * @param {GameRoot} root
+     * @param {GameRoot} rootd
      */
     getIsUnlocked(root) {
         return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_constant_signal);
