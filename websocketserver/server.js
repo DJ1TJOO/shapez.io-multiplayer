@@ -1,4 +1,12 @@
-const httpServer = require("http").createServer((req, res) => {});
+const https = require("https");
+const fs = require("fs");
+
+const options = {
+    key: fs.readFileSync("key.pem"),
+    cert: fs.readFileSync("cert.pem"),
+};
+
+const httpServer = https.createServer(options, (req, res) => {});
 
 const io = require("socket.io")(httpServer, {
     cors: {
@@ -50,5 +58,5 @@ io.on("connection", function(socket) {
 });
 
 httpServer.listen(8888, () => {
-    console.log("go to ws://localhost:8888");
+    console.log("go to wss://localhost:8888");
 });
