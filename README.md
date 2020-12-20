@@ -2,7 +2,7 @@
 
 This fork adds multiplayer to shapez.io. 
 - Its only in English and Dutch. 
-- There is a multiplayer server hosted at ws://shapezio-multipalyer.thomasbrants.nl.
+- There is a multiplayer server hosted at ws://thomasbrants.nl:8888.
 
 -------------------------------------------------------------------------------------------------
 
