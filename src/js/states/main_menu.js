@@ -635,7 +635,7 @@ export class MainMenuState extends GameState {
 
     onJoinButtonClicked() {
         //host regex
-        const host = /ws:\/\/[a-z]{2,}:[0-9]{4,5}\/?/i;
+        const host = /ws:\/\/[a-z]{2,}.[a-z]{2,}?:[0-9]{4,5}\/?/i;
 
         const hostInput = new FormElementInput({
             id: "hostInput",
@@ -780,7 +780,7 @@ export class MainMenuState extends GameState {
             return;
         }
         //host regex
-        const host = /ws:\/\/[a-z]{2,}:[0-9]{4,5}\/?/i;
+        const host = /ws:\/\/[a-z]{2,}.[a-z]{2,}?:[0-9]{4,5}\/?/i;
 
         const hostInput = new FormElementInput({
             id: "hostInput",
