@@ -218,6 +218,12 @@ dialogs:
     joinMultiplayerGame:
         title: Samenspelen
         desc: Voer de samenspelen code in die je gekregen hebt van de spel leider.
+    joinMultiplayerGameHost:
+        title: Samenspelen
+        desc: Voer de samenspelen server in die je gekregen hebt van de spel leider.
+    createMultiplayerGameHost:
+        title: Multiplayer Game
+        desc: Voer een samenspelen server in.
     multiplayerGameError:
         title: Spel niet gevonden
         desc: Het spel waarbij je mee wilden doen is niet gevonden of bestaat niet.

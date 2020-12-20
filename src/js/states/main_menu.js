@@ -634,113 +634,137 @@ export class MainMenuState extends GameState {
     }
 
     onJoinButtonClicked() {
-        //UUID v4 regex
-        const regex = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
+        //host regex
+        const host = /ws:\/\/[a-z]{2,}:[0-9]{4,5}\/?/i;
 
-        const connectIdInput = new FormElementInput({
-            id: "connectIdInput",
+        const hostInput = new FormElementInput({
+            id: "hostInput",
             label: null,
             placeholder: "",
             defaultValue: "",
-            validator: val => val.match(regex) && trim(val).length > 0,
+            validator: val => val.match(host) && trim(val).length > 0,
         });
-        const dialog = new DialogWithForm({
+        const hostDialog = new DialogWithForm({
             app: this.app,
-            title: T.dialogs.joinMultiplayerGame.title,
-            desc: T.dialogs.joinMultiplayerGame.desc,
-            formElements: [connectIdInput],
+            title: T.dialogs.joinMultiplayerGameHost.title,
+            desc: T.dialogs.joinMultiplayerGameHost.desc,
+            formElements: [hostInput],
             buttons: ["cancel:bad:escape", "ok:good:enter"],
         });
-        this.dialogs.internalShowDialog(dialog);
+        this.dialogs.internalShowDialog(hostDialog);
 
         // When confirmed, create connection
-        dialog.buttonSignals.ok.add(() => {
-            let connectionId = trim(connectIdInput.getValue());
+        hostDialog.buttonSignals.ok.add(() => {
+            var host = trim(hostInput.getValue());
 
-            // @ts-ignore
-            var socket = io("ws://localhost:8888/", { transport: ["websocket"] });
-            var socketId = undefined;
-            socket.on("connect", () => {
-                socket.on("id", id => {
-                    socketId = id;
-                    socket.emit("joinRoom", connectionId, socketId);
-                });
-                socket.on("error", () => {
-                    this.dialogs.showWarning(
-                        T.dialogs.multiplayerGameError.title,
-                        T.dialogs.multiplayerGameError.desc + "<br><br>"
-                    );
-                });
-                socket.on("offer", async data => {
-                    if (data.socketIdSender !== socketId) return;
-                    const config = {
-                        iceServers: [
-                            {
-                                urls: "stun:stun.1.google.com:19302",
-                            },
-                        ],
-                    };
-                    const pc = new RTCPeerConnection(config);
-                    const dc = pc.createDataChannel("game", {
-                        negotiated: true,
-                        id: 0,
+            //UUID v4 regex
+            const uuid = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
+
+            const connectIdInput = new FormElementInput({
+                id: "connectIdInput",
+                label: null,
+                placeholder: "",
+                defaultValue: "",
+                validator: val => val.match(uuid) && trim(val).length > 0,
+            });
+            const dialog = new DialogWithForm({
+                app: this.app,
+                title: T.dialogs.joinMultiplayerGame.title,
+                desc: T.dialogs.joinMultiplayerGame.desc,
+                formElements: [connectIdInput],
+                buttons: ["cancel:bad:escape", "ok:good:enter"],
+            });
+            this.dialogs.internalShowDialog(dialog);
+
+            // When confirmed, create connection
+            dialog.buttonSignals.ok.add(() => {
+                let connectionId = trim(connectIdInput.getValue());
+
+                // @ts-ignore
+                var socket = io(host, { transport: ["websocket"] });
+                var socketId = undefined;
+                socket.on("connect", () => {
+                    socket.on("id", id => {
+                        socketId = id;
+                        socket.emit("joinRoom", connectionId, socketId);
                     });
-                    await pc.setRemoteDescription({
-                        type: "offer",
-                        sdp: data.offer,
+                    socket.on("error", () => {
+                        this.dialogs.showWarning(
+                            T.dialogs.multiplayerGameError.title,
+                            T.dialogs.multiplayerGameError.desc + "<br><br>"
+                        );
                     });
-                    await pc.setLocalDescription(await pc.createAnswer());
-                    pc.onicecandidate = ({ candidate }) => {
-                        if (candidate) return;
-                        socket.emit("answer", {
-                            socketIdReceiver: data.socketIdReceiver,
-                            socketIdSender: data.socketIdSender,
-                            answer: pc.localDescription.sdp,
-                            room: data.room,
+                    socket.on("offer", async data => {
+                        if (data.socketIdSender !== socketId) return;
+                        const config = {
+                            iceServers: [
+                                {
+                                    urls: "stun:stun.1.google.com:19302",
+                                },
+                            ],
+                        };
+                        const pc = new RTCPeerConnection(config);
+                        const dc = pc.createDataChannel("game", {
+                            negotiated: true,
+                            id: 0,
                         });
-                    };
-
-                    var gameDataState = -1;
-                    var gameData = "";
-
-                    var onMessage = ev => {
-                        var packet = JSON.parse(ev.data);
-
-                        //When data ends
-                        if (
-                            packet.type === MultiplayerPacketTypes.FLAG &&
-                            packet.flag === FlagPacketFlags.ENDDATA
-                        ) {
-                            gameDataState = 1;
-                            console.log(gameData);
-                            gameData = JSON.parse(gameData);
-                            var connection = new MultiplayerConnection(pc, dc, gameData);
-                            this.moveToState("MultiplayerState", {
-                                connection,
-                                connectionId,
+                        await pc.setRemoteDescription({
+                            type: "offer",
+                            sdp: data.offer,
+                        });
+                        await pc.setLocalDescription(await pc.createAnswer());
+                        pc.onicecandidate = ({ candidate }) => {
+                            if (candidate) return;
+                            socket.emit("answer", {
+                                socketIdReceiver: data.socketIdReceiver,
+                                socketIdSender: data.socketIdSender,
+                                answer: pc.localDescription.sdp,
+                                room: data.room,
                             });
-                        }
+                        };
 
-                        //When data recieved
-                        if (packet.type === MultiplayerPacketTypes.DATA && gameDataState === 0)
-                            gameData = gameData + packet.data;
+                        var gameDataState = -1;
+                        var gameData = "";
 
-                        //When start data
-                        if (
-                            packet.type === MultiplayerPacketTypes.FLAG &&
-                            packet.flag === FlagPacketFlags.STARTDATA
-                        ) {
-                            gameDataState = 0;
-                            this.loadingOverlay = new GameLoadingOverlay(this.app, this.getDivElement());
-                            this.loadingOverlay.showBasic();
-                        }
-                    };
+                        var onMessage = ev => {
+                            var packet = JSON.parse(ev.data);
 
-                    dc.onmessage = onMessage;
-                    pc.ondatachannel = event => {
-                        let receiveChannel = event.channel;
-                        receiveChannel.onmessage = onMessage;
-                    };
+                            //When data ends
+                            if (
+                                packet.type === MultiplayerPacketTypes.FLAG &&
+                                packet.flag === FlagPacketFlags.ENDDATA
+                            ) {
+                                gameDataState = 1;
+                                console.log(gameData);
+                                gameData = JSON.parse(gameData);
+                                var connection = new MultiplayerConnection(pc, dc, gameData);
+                                this.moveToState("MultiplayerState", {
+                                    connection,
+                                    connectionId,
+                                });
+                            }
+
+                            //When data recieved
+                            if (packet.type === MultiplayerPacketTypes.DATA && gameDataState === 0)
+                                gameData = gameData + packet.data;
+
+                            //When start data
+                            if (
+                                packet.type === MultiplayerPacketTypes.FLAG &&
+                                packet.flag === FlagPacketFlags.STARTDATA
+                            ) {
+                                gameDataState = 0;
+                                this.loadingOverlay = new GameLoadingOverlay(this.app, this.getDivElement());
+                                this.loadingOverlay.showBasic();
+                            }
+                        };
+
+                        dc.onmessage = onMessage;
+                        pc.ondatachannel = event => {
+                            let receiveChannel = event.channel;
+                            receiveChannel.onmessage = onMessage;
+                        };
+                    });
                 });
             });
         });
@@ -755,15 +779,37 @@ export class MainMenuState extends GameState {
             this.showSavegameSlotLimit();
             return;
         }
+        //host regex
+        const host = /ws:\/\/[a-z]{2,}:[0-9]{4,5}\/?/i;
 
-        this.app.analytics.trackUiClick("startgame");
-        this.app.adProvider.showVideoAd().then(() => {
-            const savegame = this.app.savegameMgr.createNewSavegame();
-            this.moveToState("MultiplayerState", {
-                savegame,
+        const hostInput = new FormElementInput({
+            id: "hostInput",
+            label: null,
+            placeholder: "",
+            defaultValue: "",
+            validator: val => val.match(host) && trim(val).length > 0,
+        });
+        const hostDialog = new DialogWithForm({
+            app: this.app,
+            title: T.dialogs.createMultiplayerGameHost.title,
+            desc: T.dialogs.createMultiplayerGameHost.desc,
+            formElements: [hostInput],
+            buttons: ["cancel:bad:escape", "ok:good:enter"],
+        });
+        this.dialogs.internalShowDialog(hostDialog);
+
+        hostDialog.buttonSignals.ok.add(() => {
+            this.app.analytics.trackUiClick("startgame");
+            this.app.adProvider.showVideoAd().then(() => {
+                var host = trim(hostInput.getValue());
+                const savegame = this.app.savegameMgr.createNewSavegame();
+                this.moveToState("MultiplayerState", {
+                    savegame,
+                    host: host,
+                });
+
+                this.app.analytics.trackUiClick("startgame_adcomplete");
             });
-
-            this.app.analytics.trackUiClick("startgame_adcomplete");
         });
     }
 
@@ -771,24 +817,47 @@ export class MainMenuState extends GameState {
      * @param {SavegameMetadata} game
      */
     resumeMultiplayerGame(game) {
-        this.app.analytics.trackUiClick("resume_game");
+        //host regex
+        const host = /ws:\/\/[a-z]{2,}:[0-9]{4,5}\/?/i;
 
-        this.app.adProvider.showVideoAd().then(() => {
-            this.app.analytics.trackUiClick("resume_game_adcomplete");
-            const savegame = this.app.savegameMgr.getSavegameById(game.internalId);
-            savegame
-                .readAsync()
-                .then(() => {
-                    this.moveToState("MultiplayerState", {
-                        savegame,
+        const hostInput = new FormElementInput({
+            id: "hostInput",
+            label: null,
+            placeholder: "",
+            defaultValue: "",
+            validator: val => val.match(host) && trim(val).length > 0,
+        });
+        const hostDialog = new DialogWithForm({
+            app: this.app,
+            title: T.dialogs.createMultiplayerGameHost.title,
+            desc: T.dialogs.createMultiplayerGameHost.desc,
+            formElements: [hostInput],
+            buttons: ["cancel:bad:escape", "ok:good:enter"],
+        });
+        this.dialogs.internalShowDialog(hostDialog);
+
+        hostDialog.buttonSignals.ok.add(() => {
+            this.app.analytics.trackUiClick("resume_game");
+
+            this.app.adProvider.showVideoAd().then(() => {
+                var host = trim(hostInput.getValue());
+                this.app.analytics.trackUiClick("resume_game_adcomplete");
+                const savegame = this.app.savegameMgr.getSavegameById(game.internalId);
+                savegame
+                    .readAsync()
+                    .then(() => {
+                        this.moveToState("MultiplayerState", {
+                            savegame,
+                            host: host,
+                        });
+                    })
+                    .catch(err => {
+                        this.dialogs.showWarning(
+                            T.dialogs.gameLoadFailure.title,
+                            T.dialogs.gameLoadFailure.text + "<br><br>" + err
+                        );
                     });
-                })
-                .catch(err => {
-                    this.dialogs.showWarning(
-                        T.dialogs.gameLoadFailure.title,
-                        T.dialogs.gameLoadFailure.text + "<br><br>" + err
-                    );
-                });
+            });
         });
     }
 }

@@ -52,5 +52,5 @@ io.on("connection", function(socket) {
 });
 
 httpServer.listen(8888, () => {
-    console.log("go to http://localhost:3000");
+    console.log("go to ws://localhost:8888");
 });

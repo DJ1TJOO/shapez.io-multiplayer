@@ -77,6 +77,9 @@ export class GameCreationPayload {
 
         /** @type {MultiplayerConnection|undefined} */
         this.connection;
+
+        /** @type {String|undefined} */
+        this.host;
     }
 }
 
@@ -107,6 +110,9 @@ export class MultiplayerState extends GameState {
 
         /** @type {MultiplayerConnection} */
         this.connection = undefined;
+
+        /** @type {String} */
+        this.host = undefined;
 
         this.boundInputFilter = this.filterInput.bind(this);
 
@@ -468,7 +474,7 @@ export class MultiplayerState extends GameState {
             } else {
                 this.connectionId = uuidv4();
                 // @ts-ignore
-                var socket = io("ws://localhost:8888/", { transport: ["websocket"] });
+                var socket = io(this.host, { transport: ["websocket"] });
                 var socketId = undefined;
 
                 var connections = [];
@@ -723,6 +729,7 @@ export class MultiplayerState extends GameState {
         this.savegame = payload.savegame;
         this.connectionId = payload.connectionId;
         this.connection = payload.connection;
+        this.host = payload.host;
 
         this.loadingOverlay = new GameLoadingOverlay(this.app, this.getDivElement());
         this.loadingOverlay.showBasic();
