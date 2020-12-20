@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: profile/application_settings.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: profile/application_settings.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* typehints:start */
+import { Application } from "../application";
+/* typehints:end */
+
+import { ReadWriteProxy } from "../core/read_write_proxy";
+import { BoolSetting, EnumSetting, RangeSetting, BaseSetting } from "./setting_types";
+import { createLogger } from "../core/logging";
+import { ExplainedResult } from "../core/explained_result";
+import { THEMES, applyGameTheme } from "../game/theme";
+import { T } from "../translations";
+import { LANGUAGES } from "../languages";
+
+const logger = createLogger("application_settings");
+
+/**
+ * @enum {string}
+ */
+export const enumCategories = {
+    general: "general",
+    userInterface: "userInterface",
+    performance: "performance",
+    advanced: "advanced",
+};
+
+export const uiScales = [
+    {
+        id: "super_small",
+        size: 0.6,
+    },
+    {
+        id: "small",
+        size: 0.8,
+    },
+    {
+        id: "regular",
+        size: 1,
+    },
+    {
+        id: "large",
+        size: 1.05,
+    },
+    {
+        id: "huge",
+        size: 1.1,
+    },
+];
+
+export const scrollWheelSensitivities = [
+    {
+        id: "super_slow",
+        scale: 0.25,
+    },
+    {
+        id: "slow",
+        scale: 0.5,
+    },
+    {
+        id: "regular",
+        scale: 1,
+    },
+    {
+        id: "fast",
+        scale: 2,
+    },
+    {
+        id: "super_fast",
+        scale: 4,
+    },
+];
+
+export const movementSpeeds = [
+    {
+        id: "super_slow",
+        multiplier: 0.25,
+    },
+    {
+        id: "slow",
+        multiplier: 0.5,
+    },
+    {
+        id: "regular",
+        multiplier: 1,
+    },
+    {
+        id: "fast",
+        multiplier: 2,
+    },
+    {
+        id: "super_fast",
+        multiplier: 4,
+    },
+    {
+        id: "extremely_fast",
+        multiplier: 8,
+    },
+];
+
+export const autosaveIntervals = [
+    {
+        id: "one_minute",
+        seconds: 60,
+    },
+    {
+        id: "two_minutes",
+        seconds: 120,
+    },
+    {
+        id: "five_minutes",
+        seconds: 5 * 60,
+    },
+    {
+        id: "ten_minutes",
+        seconds: 10 * 60,
+    },
+    {
+        id: "twenty_minutes",
+        seconds: 20 * 60,
+    },
+    {
+        id: "disabled",
+        seconds: null,
+    },
+];
+
+const refreshRateOptions = ["30", "60", "120", "180", "240"];
+
+if (G_IS_DEV) {
+    refreshRateOptions.unshift("10");
+    refreshRateOptions.unshift("5");
+    refreshRateOptions.push("1000");
+    refreshRateOptions.push("2000");
+    refreshRateOptions.push("5000");
+    refreshRateOptions.push("10000");
+}
+
+/** @type {Array&lt;BaseSetting>} */
+export const allApplicationSettings = [
+    new EnumSetting("language", {
+        options: Object.keys(LANGUAGES),
+        valueGetter: key => key,
+        textGetter: key => LANGUAGES[key].name,
+        category: enumCategories.general,
+        restartRequired: true,
+        changeCb: (app, id) => null,
+        magicValue: "auto-detect",
+    }),
+
+    new EnumSetting("uiScale", {
+        options: uiScales.sort((a, b) => a.size - b.size),
+        valueGetter: scale => scale.id,
+        textGetter: scale => T.settings.labels.uiScale.scales[scale.id],
+        category: enumCategories.userInterface,
+        restartRequired: false,
+        changeCb:
+            /**
+             * @param {Application} app
+             */
+            (app, id) => app.updateAfterUiScaleChanged(),
+    }),
+
+    new RangeSetting(
+        "soundVolume",
+        enumCategories.general,
+        /**
+         * @param {Application} app
+         */
+        (app, value) => app.sound.setSoundVolume(value)
+    ),
+    new RangeSetting(
+        "musicVolume",
+        enumCategories.general,
+        /**
+         * @param {Application} app
+         */
+        (app, value) => app.sound.setMusicVolume(value)
+    ),
+
+    new BoolSetting(
+        "fullscreen",
+        enumCategories.general,
+        /**
+         * @param {Application} app
+         */
+        (app, value) => {
+            if (app.platformWrapper.getSupportsFullscreen()) {
+                app.platformWrapper.setFullscreen(value);
+            }
+        },
+        /**
+         * @param {Application} app
+         */ app => app.restrictionMgr.getHasExtendedSettings()
+    ),
+
+    new BoolSetting(
+        "enableColorBlindHelper",
+        enumCategories.general,
+        /**
+         * @param {Application} app
+         */
+        (app, value) => null
+    ),
+
+    new BoolSetting("offerHints", enumCategories.userInterface, (app, value) => {}),
+
+    new EnumSetting("theme", {
+        options: Object.keys(THEMES),
+        valueGetter: theme => theme,
+        textGetter: theme => T.settings.labels.theme.themes[theme],
+        category: enumCategories.userInterface,
+        restartRequired: false,
+        changeCb:
+            /**
+             * @param {Application} app
+             */
+            (app, id) => {
+                applyGameTheme(id);
+                document.documentElement.setAttribute("data-theme", id);
+            },
+        enabledCb: /**
+         * @param {Application} app
+         */ app => app.restrictionMgr.getHasExtendedSettings(),
+    }),
+
+    new EnumSetting("autosaveInterval", {
+        options: autosaveIntervals,
+        valueGetter: interval => interval.id,
+        textGetter: interval => T.settings.labels.autosaveInterval.intervals[interval.id],
+        category: enumCategories.advanced,
+        restartRequired: false,
+        changeCb:
+            /**
+             * @param {Application} app
+             */
+            (app, id) => null,
+    }),
+
+    new EnumSetting("scrollWheelSensitivity", {
+        options: scrollWheelSensitivities.sort((a, b) => a.scale - b.scale),
+        valueGetter: scale => scale.id,
+        textGetter: scale => T.settings.labels.scrollWheelSensitivity.sensitivity[scale.id],
+        category: enumCategories.advanced,
+        restartRequired: false,
+        changeCb:
+            /**
+             * @param {Application} app
+             */
+            (app, id) => app.updateAfterUiScaleChanged(),
+    }),
+
+    new EnumSetting("movementSpeed", {
+        options: movementSpeeds.sort((a, b) => a.multiplier - b.multiplier),
+        valueGetter: multiplier => multiplier.id,
+        textGetter: multiplier => T.settings.labels.movementSpeed.speeds[multiplier.id],
+        category: enumCategories.advanced,
+        restartRequired: false,
+        changeCb: (app, id) => {},
+    }),
+
+    new BoolSetting("enableMousePan", enumCategories.advanced, (app, value) => {}),
+    new BoolSetting("alwaysMultiplace", enumCategories.advanced, (app, value) => {}),
+    new BoolSetting("zoomToCursor", enumCategories.advanced, (app, value) => {}),
+    new BoolSetting("clearCursorOnDeleteWhilePlacing", enumCategories.advanced, (app, value) => {}),
+    new BoolSetting("enableTunnelSmartplace", enumCategories.advanced, (app, value) => {}),
+    new BoolSetting("vignette", enumCategories.userInterface, (app, value) => {}),
+    new BoolSetting("compactBuildingInfo", enumCategories.userInterface, (app, value) => {}),
+    new BoolSetting("disableCutDeleteWarnings", enumCategories.advanced, (app, value) => {}),
+    new BoolSetting("rotationByBuilding", enumCategories.advanced, (app, value) => {}),
+    new BoolSetting("displayChunkBorders", enumCategories.advanced, (app, value) => {}),
+    new BoolSetting("pickMinerOnPatch", enumCategories.advanced, (app, value) => {}),
+    new RangeSetting("mapResourcesScale", enumCategories.advanced, () => null),
+
+    new EnumSetting("refreshRate", {
+        options: refreshRateOptions,
+        valueGetter: rate => rate,
+        textGetter: rate => rate + " Hz",
+        category: enumCategories.performance,
+        restartRequired: false,
+        changeCb: (app, id) => {},
+        enabledCb: /**
+         * @param {Application} app
+         */ app => app.restrictionMgr.getHasExtendedSettings(),
+    }),
+
+    new BoolSetting("lowQualityMapResources", enumCategories.performance, (app, value) => {}),
+    new BoolSetting("disableTileGrid", enumCategories.performance, (app, value) => {}),
+    new BoolSetting("lowQualityTextures", enumCategories.performance, (app, value) => {}),
+    new BoolSetting("simplifiedBelts", enumCategories.performance, (app, value) => {}),
+];
+
+export function getApplicationSettingById(id) {
+    return allApplicationSettings.find(setting => setting.id === id);
+}
+
+class SettingsStorage {
+    constructor() {
+        this.uiScale = "regular";
+        this.fullscreen = G_IS_STANDALONE;
+
+        this.soundVolume = 1.0;
+        this.musicVolume = 1.0;
+
+        this.theme = "light";
+        this.refreshRate = "60";
+        this.scrollWheelSensitivity = "regular";
+        this.movementSpeed = "regular";
+        this.language = "auto-detect";
+        this.autosaveInterval = "two_minutes";
+
+        this.alwaysMultiplace = false;
+        this.offerHints = true;
+        this.enableTunnelSmartplace = true;
+        this.vignette = true;
+        this.compactBuildingInfo = false;
+        this.disableCutDeleteWarnings = false;
+        this.rotationByBuilding = true;
+        this.clearCursorOnDeleteWhilePlacing = true;
+        this.displayChunkBorders = false;
+        this.pickMinerOnPatch = true;
+        this.enableMousePan = true;
+
+        this.enableColorBlindHelper = false;
+
+        this.lowQualityMapResources = false;
+        this.disableTileGrid = false;
+        this.lowQualityTextures = false;
+        this.simplifiedBelts = false;
+        this.zoomToCursor = true;
+        this.mapResourcesScale = 0.5;
+
+        /**
+         * @type {Object.&lt;string, number>}
+         */
+        this.keybindingOverrides = {};
+    }
+}
+
+export class ApplicationSettings extends ReadWriteProxy {
+    constructor(app) {
+        super(app, "app_settings.bin");
+    }
+
+    initialize() {
+        // Read and directly write latest data back
+        return this.readAsync()
+            .then(() => {
+                // Apply default setting callbacks
+                const settings = this.getAllSettings();
+                for (let i = 0; i &lt; allApplicationSettings.length; ++i) {
+                    const handle = allApplicationSettings[i];
+                    handle.apply(this.app, settings[handle.id]);
+                }
+            })
+
+            .then(() => this.writeAsync());
+    }
+
+    save() {
+        return this.writeAsync();
+    }
+
+    // Getters
+
+    /**
+     * @returns {SettingsStorage}
+     */
+    getAllSettings() {
+        return this.currentData.settings;
+    }
+
+    /**
+     * @param {string} key
+     */
+    getSetting(key) {
+        assert(this.getAllSettings().hasOwnProperty(key), "Setting not known: " + key);
+        return this.getAllSettings()[key];
+    }
+
+    getInterfaceScaleId() {
+        if (!this.currentData) {
+            // Not initialized yet
+            return "regular";
+        }
+        return this.getAllSettings().uiScale;
+    }
+
+    getDesiredFps() {
+        return parseInt(this.getAllSettings().refreshRate);
+    }
+
+    getInterfaceScaleValue() {
+        const id = this.getInterfaceScaleId();
+        for (let i = 0; i &lt; uiScales.length; ++i) {
+            if (uiScales[i].id === id) {
+                return uiScales[i].size;
+            }
+        }
+        logger.error("Unknown ui scale id:", id);
+        return 1;
+    }
+
+    getScrollWheelSensitivity() {
+        const id = this.getAllSettings().scrollWheelSensitivity;
+        for (let i = 0; i &lt; scrollWheelSensitivities.length; ++i) {
+            if (scrollWheelSensitivities[i].id === id) {
+                return scrollWheelSensitivities[i].scale;
+            }
+        }
+        logger.error("Unknown scroll wheel sensitivity id:", id);
+        return 1;
+    }
+
+    getMovementSpeed() {
+        const id = this.getAllSettings().movementSpeed;
+        for (let i = 0; i &lt; movementSpeeds.length; ++i) {
+            if (movementSpeeds[i].id === id) {
+                return movementSpeeds[i].multiplier;
+            }
+        }
+        logger.error("Unknown movement speed id:", id);
+        return 1;
+    }
+
+    getAutosaveIntervalSeconds() {
+        const id = this.getAllSettings().autosaveInterval;
+        for (let i = 0; i &lt; autosaveIntervals.length; ++i) {
+            if (autosaveIntervals[i].id === id) {
+                return autosaveIntervals[i].seconds;
+            }
+        }
+        logger.error("Unknown autosave interval id:", id);
+        return 120;
+    }
+
+    getIsFullScreen() {
+        return this.getAllSettings().fullscreen;
+    }
+
+    getKeybindingOverrides() {
+        return this.getAllSettings().keybindingOverrides;
+    }
+
+    getLanguage() {
+        return this.getAllSettings().language;
+    }
+
+    // Setters
+
+    updateLanguage(id) {
+        assert(LANGUAGES[id], "Language not known: " + id);
+        return this.updateSetting("language", id);
+    }
+
+    /**
+     * @param {string} key
+     * @param {string|boolean|number} value
+     */
+    updateSetting(key, value) {
+        for (let i = 0; i &lt; allApplicationSettings.length; ++i) {
+            const setting = allApplicationSettings[i];
+            if (setting.id === key) {
+                if (!setting.validate(value)) {
+                    assertAlways(false, "Bad setting value: " + key);
+                }
+                this.getAllSettings()[key] = value;
+                if (setting.changeCb) {
+                    setting.changeCb(this.app, value);
+                }
+                return this.writeAsync();
+            }
+        }
+        assertAlways(false, "Unknown setting: " + key);
+    }
+
+    /**
+     * Sets a new keybinding override
+     * @param {string} keybindingId
+     * @param {number} keyCode
+     */
+    updateKeybindingOverride(keybindingId, keyCode) {
+        assert(Number.isInteger(keyCode), "Not a valid key code: " + keyCode);
+        this.getAllSettings().keybindingOverrides[keybindingId] = keyCode;
+        return this.writeAsync();
+    }
+
+    /**
+     * Resets a given keybinding override
+     * @param {string} id
+     */
+    resetKeybindingOverride(id) {
+        delete this.getAllSettings().keybindingOverrides[id];
+        return this.writeAsync();
+    }
+    /**
+     * Resets all keybinding overrides
+     */
+    resetKeybindingOverrides() {
+        this.getAllSettings().keybindingOverrides = {};
+        return this.writeAsync();
+    }
+
+    // RW Proxy impl
+    verify(data) {
+        if (!data.settings) {
+            return ExplainedResult.bad("missing key 'settings'");
+        }
+        if (typeof data.settings !== "object") {
+            return ExplainedResult.bad("Bad settings object");
+        }
+
+        const settings = data.settings;
+        for (let i = 0; i &lt; allApplicationSettings.length; ++i) {
+            const setting = allApplicationSettings[i];
+            const storedValue = settings[setting.id];
+            if (!setting.validate(storedValue)) {
+                return ExplainedResult.bad(
+                    "Bad setting value for " +
+                        setting.id +
+                        ": " +
+                        storedValue +
+                        " @ settings version " +
+                        data.version +
+                        " (latest is " +
+                        this.getCurrentVersion() +
+                        ")"
+                );
+            }
+        }
+        return ExplainedResult.good();
+    }
+
+    getDefaultData() {
+        return {
+            version: this.getCurrentVersion(),
+            settings: new SettingsStorage(),
+        };
+    }
+
+    getCurrentVersion() {
+        return 30;
+    }
+
+    /** @param {{settings: SettingsStorage, version: number}} data */
+    migrate(data) {
+        // Simply reset before
+        if (data.version &lt; 5) {
+            data.settings = new SettingsStorage();
+            data.version = this.getCurrentVersion();
+            return ExplainedResult.good();
+        }
+
+        if (data.version &lt; 6) {
+            data.settings.alwaysMultiplace = false;
+            data.version = 6;
+        }
+
+        if (data.version &lt; 7) {
+            data.settings.offerHints = true;
+            data.version = 7;
+        }
+
+        if (data.version &lt; 8) {
+            data.settings.scrollWheelSensitivity = "regular";
+            data.version = 8;
+        }
+
+        if (data.version &lt; 9) {
+            data.settings.language = "auto-detect";
+            data.version = 9;
+        }
+
+        if (data.version &lt; 10) {
+            data.settings.movementSpeed = "regular";
+            data.version = 10;
+        }
+
+        if (data.version &lt; 11) {
+            data.settings.enableTunnelSmartplace = true;
+            data.version = 11;
+        }
+
+        if (data.version &lt; 12) {
+            data.settings.vignette = true;
+            data.version = 12;
+        }
+
+        if (data.version &lt; 13) {
+            data.settings.compactBuildingInfo = false;
+            data.version = 13;
+        }
+
+        if (data.version &lt; 14) {
+            data.settings.disableCutDeleteWarnings = false;
+            data.version = 14;
+        }
+
+        if (data.version &lt; 15) {
+            data.settings.autosaveInterval = "two_minutes";
+            data.version = 15;
+        }
+
+        if (data.version &lt; 16) {
+            // RE-ENABLE this setting, it already existed
+            data.settings.enableTunnelSmartplace = true;
+            data.version = 16;
+        }
+
+        if (data.version &lt; 17) {
+            data.settings.enableColorBlindHelper = false;
+            data.version = 17;
+        }
+
+        if (data.version &lt; 18) {
+            data.settings.rotationByBuilding = true;
+            data.version = 18;
+        }
+
+        if (data.version &lt; 19) {
+            data.settings.lowQualityMapResources = false;
+            data.version = 19;
+        }
+
+        if (data.version &lt; 20) {
+            data.settings.disableTileGrid = false;
+            data.version = 20;
+        }
+
+        if (data.version &lt; 21) {
+            data.settings.lowQualityTextures = false;
+            data.version = 21;
+        }
+
+        if (data.version &lt; 22) {
+            data.settings.clearCursorOnDeleteWhilePlacing = true;
+            data.version = 22;
+        }
+
+        if (data.version &lt; 23) {
+            data.settings.displayChunkBorders = false;
+            data.version = 23;
+        }
+
+        if (data.version &lt; 24) {
+            data.settings.refreshRate = "60";
+        }
+
+        if (data.version &lt; 25) {
+            data.settings.musicVolume = 0.5;
+            data.settings.soundVolume = 0.5;
+
+            // @ts-ignore
+            delete data.settings.musicMuted;
+            // @ts-ignore
+            delete data.settings.soundsMuted;
+            data.version = 25;
+        }
+
+        if (data.version &lt; 26) {
+            data.settings.pickMinerOnPatch = true;
+            data.version = 26;
+        }
+
+        if (data.version &lt; 27) {
+            data.settings.simplifiedBelts = false;
+            data.version = 27;
+        }
+
+        if (data.version &lt; 28) {
+            data.settings.enableMousePan = true;
+            data.version = 28;
+        }
+
+        if (data.version &lt; 29) {
+            data.settings.zoomToCursor = true;
+            data.version = 29;
+        }
+
+        if (data.version &lt; 30) {
+            data.settings.mapResourcesScale = 0.5;
+
+            // Re-enable hints as well
+            data.settings.offerHints = true;
+
+            data.version = 30;
+        }
+
+        return ExplainedResult.good();
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AdinplayAdProvider_AdinplayAdProvider.html">AdinplayAdProvider</a></li><li><a href="AdProviderInterface_AdProviderInterface.html">AdProviderInterface</a></li><li><a href="AtlasDefinition_AtlasDefinition.html">AtlasDefinition</a></li><li><a href="AtlasSprite_AtlasSprite.html">AtlasSprite</a></li><li><a href="BackgroundResourcesLoader_BackgroundResourcesLoader.html">BackgroundResourcesLoader</a></li><li><a href="BaseDataType.html">BaseDataType</a></li><li><a href="BaseGameSpeed_BaseGameSpeed.html">BaseGameSpeed</a></li><li><a href="BaseHUDPart_BaseHUDPart.html">BaseHUDPart</a></li><li><a href="BaseItem.html">BaseItem</a></li><li><a href="BaseMap_BaseMap.html">BaseMap</a></li><li><a href="BaseSavegameInterface_BaseSavegameInterface.html">BaseSavegameInterface</a></li><li><a href="BaseSetting_BaseSetting.html">BaseSetting</a></li><li><a href="BasicSerializableObject_BasicSerializableObject.html">BasicSerializableObject</a></li><li><a href="BeltComponent_BeltComponent.html">BeltComponent</a></li><li><a href="BeltPath.html">BeltPath</a></li><li><a href="BeltSystem.html">BeltSystem</a></li><li><a href="Blueprint_Blueprint.html">Blueprint</a></li><li><a href="BooleanItem_BooleanItem.html">BooleanItem</a></li><li><a href="BufferMaintainer_BufferMaintainer.html">BufferMaintainer</a></li><li><a href="ColorItem_ColorItem.html">ColorItem</a></li><li><a href="Component_Component.html">Component</a></li><li><a href="ConstantSignalComponent_ConstantSignalComponent.html">ConstantSignalComponent</a></li><li><a href="Dialog.html">Dialog</a></li><li><a href="DialogLoading.html">DialogLoading</a></li><li><a href="DialogWithForm_DialogWithForm.html">DialogWithForm</a></li><li><a href="DynamicDomAttach_DynamicDomAttach.html">DynamicDomAttach</a></li><li><a href="DynamicTickrate_DynamicTickrate.html">DynamicTickrate</a></li><li><a href="Entity_Entity.html">Entity</a></li><li><a href="EntityComponentStorage.html">EntityComponentStorage</a></li><li><a href="FormElementItemChooser_FormElementItemChooser.html">FormElementItemChooser</a></li><li><a href="GameCore.html">GameCore</a></li><li><a href="GamedistributionAdProvider_GamedistributionAdProvider.html">GamedistributionAdProvider</a></li><li><a href="GameHUD_GameHUD.html">GameHUD</a></li><li><a href="GameLoadingOverlay_GameLoadingOverlay.html">GameLoadingOverlay</a></li><li><a href="GameLogic_GameLogic.html">GameLogic</a></li><li><a href="GameRoot.html">GameRoot</a></li><li><a href="GameState.html">GameState</a></li><li><a href="GameSystem.html">GameSystem</a></li><li><a href="GameSystemManager_GameSystemManager.html">GameSystemManager</a></li><li><a href="GameSystemWithFilter_GameSystemWithFilter.html">GameSystemWithFilter</a></li><li><a href="GameTime_GameTime.html">GameTime</a></li><li><a href="HubGoals_HubGoals.html">HubGoals</a></li><li><a href="HUDBaseToolbar_HUDBaseToolbar.html">HUDBaseToolbar</a></li><li><a href="HUDBuildingPlacerLogic.html">HUDBuildingPlacerLogic</a></li><li><a href="HUDEntityDebugger.html">HUDEntityDebugger</a></li><li><a href="HUDLayerPreview.html">HUDLayerPreview</a></li><li><a href="HUDPinnedShapes.html">HUDPinnedShapes</a></li><li><a href="HUDShapeStatisticsHandle.html">HUDShapeStatisticsHandle</a></li><li><a href="HUDTutorialVideoOffer.html">HUDTutorialVideoOffer</a></li><li><a href="InputDistributor_InputDistributor.html">InputDistributor</a></li><li><a href="KeyActionMapper_KeyActionMapper.html">KeyActionMapper</a></li><li><a href="Keybinding_Keybinding.html">Keybinding</a></li><li><a href="LeverComponent_LeverComponent.html">LeverComponent</a></li><li><a href="Logger.html">Logger</a></li><li><a href="LogicGateComponent_LogicGateComponent.html">LogicGateComponent</a></li><li><a href="MapChunk_MapChunk.html">MapChunk</a></li><li><a href="MapChunkView_MapChunkView.html">MapChunkView</a></li><li><a href="MapView.html">MapView</a></li><li><a href="MetaBuilding_MetaBuilding.html">MetaBuilding</a></li><li><a href="ProductionAnalytics_ProductionAnalytics.html">ProductionAnalytics</a></li><li><a href="RandomNumberGenerator_RandomNumberGenerator.html">RandomNumberGenerator</a></li><li><a href="RestrictionManager_RestrictionManager.html">RestrictionManager</a></li><li><a href="SavegameSerializer.html">SavegameSerializer</a></li><li><a href="ShapeDefinition_ShapeDefinition.html">ShapeDefinition</a></li><li><a href="ShapeDefinitionManager_ShapeDefinitionManager.html">ShapeDefinitionManager</a></li><li><a href="ShapeItem_ShapeItem.html">ShapeItem</a></li><li><a href="SoundProxy_SoundProxy.html">SoundProxy</a></li><li><a href="SpriteAtlasLink.html">SpriteAtlasLink</a></li><li><a href="StaleAreaDetector_StaleAreaDetector.html">StaleAreaDetector</a></li><li><a href="StateManager.html">StateManager</a></li><li><a href="StaticMapEntityComponent_StaticMapEntityComponent.html">StaticMapEntityComponent</a></li><li><a href="StorageComponent_StorageComponent.html">StorageComponent</a></li><li><a href="TextualGameState.html">TextualGameState</a></li><li><a href="TrailerMaker_TrailerMaker.html">TrailerMaker</a></li><li><a href="TypeArray_TypeArray.html">TypeArray</a></li><li><a href="TypeClass_TypeClass.html">TypeClass</a></li><li><a href="TypeClassData_TypeClassData.html">TypeClassData</a></li><li><a href="TypeClassFromMetaclass_TypeClassFromMetaclass.html">TypeClassFromMetaclass</a></li><li><a href="TypeClassId_TypeClassId.html">TypeClassId</a></li><li><a href="TypeEnum_TypeEnum.html">TypeEnum</a></li><li><a href="TypeFixedClass_TypeFixedClass.html">TypeFixedClass</a></li><li><a href="TypeKeyValueMap_TypeKeyValueMap.html">TypeKeyValueMap</a></li><li><a href="TypeMetaClass_TypeMetaClass.html">TypeMetaClass</a></li><li><a href="TypeNullable_TypeNullable.html">TypeNullable</a></li><li><a href="TypePair_TypePair.html">TypePair</a></li><li><a href="TypeStructuredObject_TypeStructuredObject.html">TypeStructuredObject</a></li><li><a href="UndergroundBeltComponent_UndergroundBeltComponent.html">UndergroundBeltComponent</a></li><li><a href="Vector_Vector.html">Vector</a></li><li><a href="WireComponent_WireComponent.html">WireComponent</a></li><li><a href="WrappedSoundInstance.html">WrappedSoundInstance</a></li></ul><h3>Global</h3><ul><li><a href="global.html#accessNestedPropertyReverse">accessNestedPropertyReverse</a></li><li><a href="global.html#allApplicationSettings">allApplicationSettings</a></li><li><a href="global.html#arrayAllDirections">arrayAllDirections</a></li><li><a href="global.html#arrayDelete">arrayDelete</a></li><li><a href="global.html#arrayDeleteValue">arrayDeleteValue</a></li><li><a href="global.html#arrayUndergroundRotationVariantToMode">arrayUndergroundRotationVariantToMode</a></li><li><a href="global.html#atlasFiles">atlasFiles</a></li><li><a href="global.html#autoDetectLanguageId">autoDetectLanguageId</a></li><li><a href="global.html#buildBuildingCodeCache">buildBuildingCodeCache</a></li><li><a href="global.html#cachebust">cachebust</a></li><li><a href="global.html#capitalizeFirstLetter">capitalizeFirstLetter</a></li><li><a href="global.html#catchErrors">catchErrors</a></li><li><a href="global.html#clamp">clamp</a></li><li><a href="global.html#clearBufferBacklog">clearBufferBacklog</a></li><li><a href="global.html#COLOR_ITEM_SINGLETONS">COLOR_ITEM_SINGLETONS</a></li><li><a href="global.html#compressInt">compressInt</a></li><li><a href="global.html#compressObject">compressObject</a></li><li><a href="global.html#compressObjectInternal">compressObjectInternal</a></li><li><a href="global.html#compressU8WHeader">compressU8WHeader</a></li><li><a href="global.html#computeCrc">computeCrc</a></li><li><a href="global.html#createSimpleShape">createSimpleShape</a></li><li><a href="global.html#decompressInt">decompressInt</a></li><li><a href="global.html#decompressObject">decompressObject</a></li><li><a href="global.html#decompressObjectInternal">decompressObjectInternal</a></li><li><a href="global.html#decompressU8WHeader">decompressU8WHeader</a></li><li><a href="global.html#deserializeSchema">deserializeSchema</a></li><li><a href="global.html#disableImageSmoothing">disableImageSmoothing</a></li><li><a href="global.html#drawRotatedSprite">drawRotatedSprite</a></li><li><a href="global.html#drawSpriteClipped">drawSpriteClipped</a></li><li><a href="global.html#enableImageSmoothing">enableImageSmoothing</a></li><li><a href="global.html#enumAnalyticsDataSource">enumAnalyticsDataSource</a></li><li><a href="global.html#enumAngleToDirection">enumAngleToDirection</a></li><li><a href="global.html#enumBalancerVariants">enumBalancerVariants</a></li><li><a href="global.html#enumCategories">enumCategories</a></li><li><a href="global.html#enumClippedBeltUnderlayType">enumClippedBeltUnderlayType</a></li><li><a href="global.html#enumColorMixingResults">enumColorMixingResults</a></li><li><a href="global.html#enumColors">enumColors</a></li><li><a href="global.html#enumColorsToHexCode">enumColorsToHexCode</a></li><li><a href="global.html#enumColorToShortcode">enumColorToShortcode</a></li><li><a href="global.html#enumCutterVariants">enumCutterVariants</a></li><li><a href="global.html#enumDebugOverlayMode">enumDebugOverlayMode</a></li><li><a href="global.html#enumDebugOverlayModeNext">enumDebugOverlayModeNext</a></li><li><a href="global.html#enumDirection">enumDirection</a></li><li><a href="global.html#enumDirectionToAngle">enumDirectionToAngle</a></li><li><a href="global.html#enumDirectionToVector">enumDirectionToVector</a></li><li><a href="global.html#enumDisplayMode">enumDisplayMode</a></li><li><a href="global.html#enumHubGoalRewards">enumHubGoalRewards</a></li><li><a href="global.html#enumHubGoalRewardsToContentUnlocked">enumHubGoalRewardsToContentUnlocked</a></li><li><a href="global.html#enumInvertedDirections">enumInvertedDirections</a></li><li><a href="global.html#enumItemProcessorRequirements">enumItemProcessorRequirements</a></li><li><a href="global.html#enumItemProcessorTypes">enumItemProcessorTypes</a></li><li><a href="global.html#enumLocalSavegameStatus">enumLocalSavegameStatus</a></li><li><a href="global.html#enumLogicGateType">enumLogicGateType</a></li><li><a href="global.html#enumLogicGateVariants">enumLogicGateVariants</a></li><li><a href="global.html#enumMinerVariants">enumMinerVariants</a></li><li><a href="global.html#enumMouseButton">enumMouseButton</a></li><li><a href="global.html#enumNotificationType">enumNotificationType</a></li><li><a href="global.html#enumPainterVariants">enumPainterVariants</a></li><li><a href="global.html#enumPinSlotType">enumPinSlotType</a></li><li><a href="global.html#enumRotaterVariants">enumRotaterVariants</a></li><li><a href="global.html#enumSavePriority">enumSavePriority</a></li><li><a href="global.html#enumShortcodeToColor">enumShortcodeToColor</a></li><li><a href="global.html#enumShortcodeToSubShape">enumShortcodeToSubShape</a></li><li><a href="global.html#enumSubShape">enumSubShape</a></li><li><a href="global.html#enumSubShapeToShortcode">enumSubShapeToShortcode</a></li><li><a href="global.html#enumTransistorVariants">enumTransistorVariants</a></li><li><a href="global.html#enumTypeToSize">enumTypeToSize</a></li><li><a href="global.html#enumUndergroundBeltMode">enumUndergroundBeltMode</a></li><li><a href="global.html#enumUndergroundBeltVariants">enumUndergroundBeltVariants</a></li><li><a href="global.html#enumUnderlayTypeToClipRect">enumUnderlayTypeToClipRect</a></li><li><a href="global.html#enumVariantToGate">enumVariantToGate</a></li><li><a href="global.html#enumVirtualProcessorVariants">enumVirtualProcessorVariants</a></li><li><a href="global.html#enumWireType">enumWireType</a></li><li><a href="global.html#enumWireVariant">enumWireVariant</a></li><li><a href="global.html#epsilonCompare">epsilonCompare</a></li><li><a href="global.html#extendSchema">extendSchema</a></li><li><a href="global.html#FAKE_BELT_ACCEPTOR_SLOT">FAKE_BELT_ACCEPTOR_SLOT</a></li><li><a href="global.html#FAKE_BELT_EJECTOR_SLOT_BY_DIRECTION">FAKE_BELT_EJECTOR_SLOT_BY_DIRECTION</a></li><li><a href="global.html#fastArrayDelete">fastArrayDelete</a></li><li><a href="global.html#fastArrayDeleteValue">fastArrayDeleteValue</a></li><li><a href="global.html#fastArrayDeleteValueIfContained">fastArrayDeleteValueIfContained</a></li><li><a href="global.html#fillInLinkIntoTranslation">fillInLinkIntoTranslation</a></li><li><a href="global.html#findCode">findCode</a></li><li><a href="global.html#findNiceIntegerValue">findNiceIntegerValue</a></li><li><a href="global.html#findNiceValue">findNiceValue</a></li><li><a href="global.html#formatBigNumber">formatBigNumber</a></li><li><a href="global.html#formatBigNumberFull">formatBigNumberFull</a></li><li><a href="global.html#formatItemsPerSecond">formatItemsPerSecond</a></li><li><a href="global.html#formatSeconds">formatSeconds</a></li><li><a href="global.html#formatSecondsToTimeAgo">formatSecondsToTimeAgo</a></li><li><a href="global.html#freeCanvas">freeCanvas</a></li><li><a href="global.html#freeCanvasBuckets">freeCanvasBuckets</a></li><li><a href="global.html#gBuildingsByCategory">gBuildingsByCategory</a></li><li><a href="global.html#gBuildingVariants">gBuildingVariants</a></li><li><a href="global.html#gComponentRegistry">gComponentRegistry</a></li><li><a href="global.html#generateFileDownload">generateFileDownload</a></li><li><a href="global.html#generateLevelDefinitions">generateLevelDefinitions</a></li><li><a href="global.html#generateMatrixRotations">generateMatrixRotations</a></li><li><a href="global.html#generateUpgrades">generateUpgrades</a></li><li><a href="global.html#getBufferStats">getBufferStats</a></li><li><a href="global.html#getBufferVramUsageBytes">getBufferVramUsageBytes</a></li><li><a href="global.html#getBuildingDataFromCode">getBuildingDataFromCode</a></li><li><a href="global.html#getCodeFromBuildingData">getCodeFromBuildingData</a></li><li><a href="global.html#getDeviceDPI">getDeviceDPI</a></li><li><a href="global.html#getPlatformName">getPlatformName</a></li><li><a href="global.html#getRandomHint">getRandomHint</a></li><li><a href="global.html#getRomanNumber">getRomanNumber</a></li><li><a href="global.html#getSavegameInterface">getSavegameInterface</a></li><li><a href="global.html#getStringForKeyCode">getStringForKeyCode</a></li><li><a href="global.html#gGameSpeedRegistry">gGameSpeedRegistry</a></li><li><a href="global.html#gItemRegistry">gItemRegistry</a></li><li><a href="global.html#GLOBAL_APP">GLOBAL_APP</a></li><li><a href="global.html#indexMapToArray">indexMapToArray</a></li><li><a href="global.html#initBuildingCodesAfterResourcesLoaded">initBuildingCodesAfterResourcesLoaded</a></li><li><a href="global.html#initBuildingsByCategory">initBuildingsByCategory</a></li><li><a href="global.html#internalBuildStringFromArgs">internalBuildStringFromArgs</a></li><li><a href="global.html#ipcRenderer">ipcRenderer</a></li><li><a href="global.html#isAndroid">isAndroid</a></li><li><a href="global.html#isIos">isIos</a></li><li><a href="global.html#isSupportedBrowser">isSupportedBrowser</a></li><li><a href="global.html#isTrueItem">isTrueItem</a></li><li><a href="global.html#isTruthyItem">isTruthyItem</a></li><li><a href="global.html#itemResolverSingleton">itemResolverSingleton</a></li><li><a href="global.html#itemTypes">itemTypes</a></li><li><a href="global.html#LANGUAGES">LANGUAGES</a></li><li><a href="global.html#lastCanvas">lastCanvas</a></li><li><a href="global.html#lastContext">lastContext</a></li><li><a href="global.html#layers">layers</a></li><li><a href="global.html#lerp">lerp</a></li><li><a href="global.html#make2DUndefinedArray">make2DUndefinedArray</a></li><li><a href="global.html#makeButton">makeButton</a></li><li><a href="global.html#makeButtonElement">makeButtonElement</a></li><li><a href="global.html#makeDiv">makeDiv</a></li><li><a href="global.html#makeDivElement">makeDivElement</a></li><li><a href="global.html#makeNewRng">makeNewRng</a></li><li><a href="global.html#makeOffscreenBuffer">makeOffscreenBuffer</a></li><li><a href="global.html#MAX_LABEL_LENGTH">MAX_LABEL_LENGTH</a></li><li><a href="global.html#MAX_QUEUED_CHARGES">MAX_QUEUED_CHARGES</a></li><li><a href="global.html#mixVector">mixVector</a></li><li><a href="global.html#newEmptyMap">newEmptyMap</a></li><li><a href="global.html#ongoingClickDetectors">ongoingClickDetectors</a></li><li><a href="global.html#prepareHighDPIContext">prepareHighDPIContext</a></li><li><a href="global.html#preparePayload">preparePayload</a></li><li><a href="global.html#randomChoice">randomChoice</a></li><li><a href="global.html#randomInt">randomInt</a></li><li><a href="global.html#rebalance">rebalance</a></li><li><a href="global.html#registerBuildingVariant">registerBuildingVariant</a></li><li><a href="global.html#registerCanvas">registerCanvas</a></li><li><a href="global.html#registeredCanvas">registeredCanvas</a></li><li><a href="global.html#removeAllChildren">removeAllChildren</a></li><li><a href="global.html#resizeCanvas">resizeCanvas</a></li><li><a href="global.html#resizeCanvasAndClear">resizeCanvasAndClear</a></li><li><a href="global.html#resizeHighDPICanvas">resizeHighDPICanvas</a></li><li><a href="global.html#rotateDirectionalObject">rotateDirectionalObject</a></li><li><a href="global.html#rotateFlatMatrix3x3">rotateFlatMatrix3x3</a></li><li><a href="global.html#round1Digit">round1Digit</a></li><li><a href="global.html#round1DigitLocalized">round1DigitLocalized</a></li><li><a href="global.html#round2Digits">round2Digits</a></li><li><a href="global.html#round3Digits">round3Digits</a></li><li><a href="global.html#round4Digits">round4Digits</a></li><li><a href="global.html#safeModulo">safeModulo</a></li><li><a href="global.html#savegameInterfaces">savegameInterfaces</a></li><li><a href="global.html#schemaObject">schemaObject</a></li><li><a href="global.html#schemaToJsonSchema">schemaToJsonSchema</a></li><li><a href="global.html#serializeError">serializeError</a></li><li><a href="global.html#serializeEvent">serializeEvent</a></li><li><a href="global.html#serializeSchema">serializeSchema</a></li><li><a href="global.html#setGlobalApp">setGlobalApp</a></li><li><a href="global.html#SHORT_KEY_CACHE">SHORT_KEY_CACHE</a></li><li><a href="global.html#smoothenDpi">smoothenDpi</a></li><li><a href="global.html#smoothPulse">smoothPulse</a></li><li><a href="global.html#startFileChoose">startFileChoose</a></li><li><a href="global.html#statisticsUnitsSeconds">statisticsUnitsSeconds</a></li><li><a href="global.html#stats">stats</a></li><li><a href="global.html#stringifyObjectContainingErrors">stringifyObjectContainingErrors</a></li><li><a href="global.html#typed">typed</a></li><li><a href="global.html#variantsCache">variantsCache</a></li><li><a href="global.html#verifySchema">verifySchema</a></li><li><a href="global.html#waitNextFrame">waitNextFrame</a></li><li><a href="global.html#wireVariants">wireVariants</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Dec 16 2020 10:12:11 GMT+0100 (GMT+01:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

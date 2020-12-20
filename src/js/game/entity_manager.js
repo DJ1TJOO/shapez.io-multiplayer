@@ -1,4 +1,4 @@
-import { arrayDeleteValue, newEmptyMap, fastArrayDeleteValue } from "../core/utils";
+import { arrayDeleteValue, newEmptyMap, fastArrayDeleteValue, fastArrayDelete } from "../core/utils";
 import { Component } from "./component";
 import { GameRoot } from "./root";
 import { Entity } from "./entity";
@@ -6,6 +6,7 @@ import { BasicSerializableObject, types } from "../savegame/serialization";
 import { createLogger } from "../core/logging";
 import { globalConfig } from "../core/config";
 
+const util = require("util");
 const logger = createLogger("entity_manager");
 
 // Manages all entities
@@ -60,8 +61,9 @@ export class EntityManager extends BasicSerializableObject {
      * Registers a new entity
      * @param {Entity} entity
      * @param {number=} uid Optional predefined uid
+     * @param {boolean=} multipalyerPlace Optional predefined uid
      */
-    registerEntity(entity, uid = null) {
+    registerEntity(entity, uid = null, multipalyerPlace = false) {
         if (G_IS_DEV && !globalConfig.debug.disableSlowAsserts) {
             assert(this.entities.indexOf(entity) < 0, `RegisterEntity() called twice for entity ${entity}`);
         }
@@ -87,8 +89,10 @@ export class EntityManager extends BasicSerializableObject {
 
         // Give each entity a unique id
         entity.uid = uid ? uid : this.generateUid();
-        entity.registered = true;
+        if (multipalyerPlace) this.nextUid = uid + 1;
 
+        entity.registered = true;
+        entity.multipalyerPlace = multipalyerPlace;
         this.root.signals.entityAdded.dispatch(entity);
     }
 
@@ -104,8 +108,10 @@ export class EntityManager extends BasicSerializableObject {
      * Call to attach a new component after the creation of the entity
      * @param {Entity} entity
      * @param {Component} component
+     * @param {boolean} multipalyerComponentAdd
      */
-    attachDynamicComponent(entity, component) {
+    attachDynamicComponent(entity, component, multipalyerComponentAdd = false) {
+        entity.multipalyerComponentAdd = multipalyerComponentAdd;
         entity.addComponent(component, true);
         const componentId = /** @type {typeof Component} */ (component.constructor).getId();
         if (this.componentToEntity[componentId]) {
@@ -120,10 +126,12 @@ export class EntityManager extends BasicSerializableObject {
      * Call to remove a component after the creation of the entity
      * @param {Entity} entity
      * @param {typeof Component} component
+     * @param {boolean} multipalyerComponentRemove
      */
-    removeDynamicComponent(entity, component) {
+    removeDynamicComponent(entity, component, multipalyerComponentRemove = false) {
+        entity.multipalyerComponentRemove = multipalyerComponentRemove;
         entity.removeComponent(component, true);
-        const componentId = /** @type {typeof Component} */ (component.constructor).getId();
+        const componentId = component.getId();
 
         fastArrayDeleteValue(this.componentToEntity[componentId], entity);
         this.root.signals.entityComponentRemoved.dispatch(entity);
@@ -208,7 +216,6 @@ export class EntityManager extends BasicSerializableObject {
 
             entity.registered = false;
             entity.destroyed = true;
-
             this.root.signals.entityDestroyed.dispatch(entity);
         }
 
@@ -219,7 +226,7 @@ export class EntityManager extends BasicSerializableObject {
      * Queues an entity for destruction
      * @param {Entity} entity
      */
-    destroyEntity(entity) {
+    destroyEntity(entity, multipalyerDestroy = false) {
         if (entity.destroyed) {
             logger.error("Tried to destroy already destroyed entity:", entity.uid);
             return;
@@ -233,6 +240,7 @@ export class EntityManager extends BasicSerializableObject {
         if (this.destroyList.indexOf(entity) < 0) {
             this.destroyList.push(entity);
             entity.queuedForDestroy = true;
+            entity.multipalyerDestroy = multipalyerDestroy;
             this.root.signals.entityQueuedForDestroy.dispatch(entity);
         } else {
             assert(false, "Trying to destroy entity twice");

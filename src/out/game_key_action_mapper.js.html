@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: game/key_action_mapper.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: game/key_action_mapper.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* typehints:start */
+import { GameRoot } from "./root";
+import { InputReceiver } from "../core/input_receiver";
+import { Application } from "../application";
+/* typehints:end */
+
+import { Signal, STOP_PROPAGATION } from "../core/signal";
+import { IS_MOBILE } from "../core/config";
+import { T } from "../translations";
+function key(str) {
+    return str.toUpperCase().charCodeAt(0);
+}
+
+export const KEYMAPPINGS = {
+    general: {
+        confirm: { keyCode: 13 }, // enter
+        back: { keyCode: 27, builtin: true }, // escape
+    },
+
+    ingame: {
+        menuOpenShop: { keyCode: key("F") },
+        menuOpenStats: { keyCode: key("G") },
+        menuClose: { keyCode: key("Q") },
+
+        toggleHud: { keyCode: 113 }, // F2
+        exportScreenshot: { keyCode: 114 }, // F3PS
+        toggleFPSInfo: { keyCode: 115 }, // F4
+
+        switchLayers: { keyCode: key("E") },
+    },
+
+    navigation: {
+        mapMoveUp: { keyCode: key("W") },
+        mapMoveRight: { keyCode: key("D") },
+        mapMoveDown: { keyCode: key("S") },
+        mapMoveLeft: { keyCode: key("A") },
+        mapMoveFaster: { keyCode: 16 }, //shift
+
+        centerMap: { keyCode: 32 }, // SPACE
+        mapZoomIn: { keyCode: 187, repeated: true }, // "+"
+        mapZoomOut: { keyCode: 189, repeated: true }, // "-"
+
+        createMarker: { keyCode: key("M") },
+    },
+
+    buildings: {
+        // Primary Toolbar
+        belt: { keyCode: key("1") },
+        balancer: { keyCode: key("2") },
+        underground_belt: { keyCode: key("3") },
+        miner: { keyCode: key("4") },
+        cutter: { keyCode: key("5") },
+        rotater: { keyCode: key("6") },
+        stacker: { keyCode: key("7") },
+        mixer: { keyCode: key("8") },
+        painter: { keyCode: key("9") },
+        trash: { keyCode: key("0") },
+
+        // Sandbox
+        item_producer: { keyCode: key("L") },
+
+        // Secondary toolbar
+        storage: { keyCode: key("Y") },
+        reader: { keyCode: key("U") },
+        lever: { keyCode: key("I") },
+        filter: { keyCode: key("O") },
+        display: { keyCode: key("P") },
+
+        // Wires toolbar
+        wire: { keyCode: key("1") },
+        wire_tunnel: { keyCode: key("2") },
+        constant_signal: { keyCode: key("3") },
+        logic_gate: { keyCode: key("4") },
+        virtual_processor: { keyCode: key("5") },
+        analyzer: { keyCode: key("6") },
+        comparator: { keyCode: key("7") },
+        transistor: { keyCode: key("8") },
+    },
+
+    placement: {
+        pipette: { keyCode: key("Q") },
+        rotateWhilePlacing: { keyCode: key("R") },
+        rotateInverseModifier: { keyCode: 16 }, // SHIFT
+        cycleBuildingVariants: { keyCode: key("T") },
+        cycleBuildings: { keyCode: 9 }, // TAB
+        switchDirectionLockSide: { keyCode: key("R") },
+
+        copyWireValue: { keyCode: key("Z") },
+    },
+
+    massSelect: {
+        massSelectStart: { keyCode: 17 }, // CTRL
+        massSelectSelectMultiple: { keyCode: 16 }, // SHIFT
+        massSelectCopy: { keyCode: key("C") },
+        massSelectCut: { keyCode: key("X") },
+        confirmMassDelete: { keyCode: 46 }, // DEL
+        pasteLastBlueprint: { keyCode: key("V") },
+    },
+
+    placementModifiers: {
+        lockBeltDirection: { keyCode: 16 }, // SHIFT
+        placementDisableAutoOrientation: { keyCode: 17 }, // CTRL
+        placeMultiple: { keyCode: 16 }, // SHIFT
+        placeInverse: { keyCode: 18 }, // ALT
+    },
+};
+
+// Assign ids
+for (const categoryId in KEYMAPPINGS) {
+    for (const mappingId in KEYMAPPINGS[categoryId]) {
+        KEYMAPPINGS[categoryId][mappingId].id = mappingId;
+    }
+}
+
+export const KEYCODE_LMB = 1;
+export const KEYCODE_MMB = 2;
+export const KEYCODE_RMB = 3;
+
+/**
+ * Returns a keycode -> string
+ * @param {number} code
+ * @returns {string}
+ */
+export function getStringForKeyCode(code) {
+    // @todo: Refactor into dictionary
+    switch (code) {
+        case KEYCODE_LMB:
+            return "LMB";
+        case KEYCODE_MMB:
+            return "MMB";
+        case KEYCODE_RMB:
+            return "RMB";
+        case 4:
+            return "MB4";
+        case 5:
+            return "MB5";
+        case 8:
+            return "⌫";
+        case 9:
+            return T.global.keys.tab;
+        case 13:
+            return "⏎";
+        case 16:
+            return "⇪";
+        case 17:
+            return T.global.keys.control;
+        case 18:
+            return T.global.keys.alt;
+        case 19:
+            return "PAUSE";
+        case 20:
+            return "CAPS";
+        case 27:
+            return T.global.keys.escape;
+        case 32:
+            return T.global.keys.space;
+        case 33:
+            return "PGUP";
+        case 34:
+            return "PGDOWN";
+        case 35:
+            return "END";
+        case 36:
+            return "HOME";
+        case 37:
+            return "⬅";
+        case 38:
+            return "⬆";
+        case 39:
+            return "➡";
+        case 40:
+            return "⬇";
+        case 44:
+            return "PRNT";
+        case 45:
+            return "INS";
+        case 46:
+            return "DEL";
+        case 93:
+            return "SEL";
+        case 96:
+            return "NUM 0";
+        case 97:
+            return "NUM 1";
+        case 98:
+            return "NUM 2";
+        case 99:
+            return "NUM 3";
+        case 100:
+            return "NUM 4";
+        case 101:
+            return "NUM 5";
+        case 102:
+            return "NUM 6";
+        case 103:
+            return "NUM 7";
+        case 104:
+            return "NUM 8";
+        case 105:
+            return "NUM 9";
+        case 106:
+            return "*";
+        case 107:
+            return "+";
+        case 109:
+            return "-";
+        case 110:
+            return ".";
+        case 111:
+            return "/";
+        case 112:
+            return "F1";
+        case 113:
+            return "F2";
+        case 114:
+            return "F3";
+        case 115:
+            return "F4";
+        case 116:
+            return "F5";
+        case 117:
+            return "F6";
+        case 118:
+            return "F7";
+        case 119:
+            return "F8";
+        case 120:
+            return "F9";
+        case 121:
+            return "F10";
+        case 122:
+            return "F11";
+        case 123:
+            return "F12";
+
+        case 144:
+            return "NUMLOCK";
+        case 145:
+            return "SCRLOCK";
+        case 182:
+            return "COMP";
+        case 183:
+            return "CALC";
+        case 186:
+            return ";";
+        case 187:
+            return "+";
+        case 188:
+            return ",";
+        case 189:
+            return "-";
+        case 190:
+            return ".";
+        case 191:
+            return "/";
+        case 219:
+            return "[";
+        case 220:
+            return "\\";
+        case 221:
+            return "]";
+        case 222:
+            return "'";
+    }
+
+    return (48 &lt;= code &amp;&amp; code &lt;= 57) || (65 &lt;= code &amp;&amp; code &lt;= 90)
+        ? String.fromCharCode(code)
+        : "[" + code + "]";
+}
+
+export class Keybinding {
+    /**
+     *
+     * @param {KeyActionMapper} keyMapper
+     * @param {Application} app
+     * @param {object} param0
+     * @param {number} param0.keyCode
+     * @param {boolean=} param0.builtin
+     * @param {boolean=} param0.repeated
+     */
+    constructor(keyMapper, app, { keyCode, builtin = false, repeated = false }) {
+        assert(keyCode &amp;&amp; Number.isInteger(keyCode), "Invalid key code: " + keyCode);
+        this.keyMapper = keyMapper;
+        this.app = app;
+        this.keyCode = keyCode;
+        this.builtin = builtin;
+        this.repeated = repeated;
+
+        this.signal = new Signal();
+        this.toggled = new Signal();
+    }
+
+    /**
+     * Returns whether this binding is currently pressed
+     * @returns {boolean}
+     */
+    get pressed() {
+        // Check if the key is down
+        if (this.app.inputMgr.keysDown.has(this.keyCode)) {
+            // Check if it is the top reciever
+            const reciever = this.keyMapper.inputReceiver;
+            return this.app.inputMgr.getTopReciever() === reciever;
+        }
+        return false;
+    }
+
+    /**
+     * Adds an event listener
+     * @param {function() : void} receiver
+     * @param {object=} scope
+     */
+    add(receiver, scope = null) {
+        this.signal.add(receiver, scope);
+    }
+
+    /**
+     * @param {Element} elem
+     * @returns {HTMLElement} the created element, or null if the keybindings are not shown
+     *  */
+    appendLabelToElement(elem) {
+        if (IS_MOBILE) {
+            return null;
+        }
+        const spacer = document.createElement("code");
+        spacer.classList.add("keybinding");
+        spacer.innerHTML = getStringForKeyCode(this.keyCode);
+        elem.appendChild(spacer);
+        return spacer;
+    }
+
+    /**
+     * Returns the key code as a nice string
+     */
+    getKeyCodeString() {
+        return getStringForKeyCode(this.keyCode);
+    }
+
+    /**
+     * Remvoes all signal receivers
+     */
+    clearSignalReceivers() {
+        this.signal.removeAll();
+    }
+}
+
+export class KeyActionMapper {
+    /**
+     *
+     * @param {GameRoot} root
+     * @param {InputReceiver} inputReciever
+     */
+    constructor(root, inputReciever) {
+        this.root = root;
+        this.inputReceiver = inputReciever;
+
+        inputReciever.keydown.add(this.handleKeydown, this);
+        inputReciever.keyup.add(this.handleKeyup, this);
+
+        /** @type {Object.&lt;string, Keybinding>} */
+        this.keybindings = {};
+
+        const overrides = root.app.settings.getKeybindingOverrides();
+
+        for (const category in KEYMAPPINGS) {
+            for (const key in KEYMAPPINGS[category]) {
+                let payload = Object.assign({}, KEYMAPPINGS[category][key]);
+                if (overrides[key]) {
+                    payload.keyCode = overrides[key];
+                }
+
+                this.keybindings[key] = new Keybinding(this, this.root.app, payload);
+
+                if (G_IS_DEV) {
+                    // Sanity
+                    if (!T.keybindings.mappings[key]) {
+                        assertAlways(false, "Keybinding " + key + " has no translation!");
+                    }
+                }
+            }
+        }
+
+        inputReciever.pageBlur.add(this.onPageBlur, this);
+        inputReciever.destroyed.add(this.cleanup, this);
+    }
+
+    /**
+     * Returns all keybindings starting with the given id
+     * @param {string} pattern
+     * @returns {Array&lt;Keybinding>}
+     */
+    getKeybindingsStartingWith(pattern) {
+        let result = [];
+        for (const key in this.keybindings) {
+            if (key.startsWith(pattern)) {
+                result.push(this.keybindings[key]);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Forwards the given events to the other mapper (used in tooltips)
+     * @param {KeyActionMapper} receiver
+     * @param {Array&lt;string>} bindings
+     */
+    forward(receiver, bindings) {
+        for (let i = 0; i &lt; bindings.length; ++i) {
+            const key = bindings[i];
+            this.keybindings[key].signal.add((...args) => receiver.keybindings[key].signal.dispatch(...args));
+        }
+    }
+
+    cleanup() {
+        for (const key in this.keybindings) {
+            this.keybindings[key].signal.removeAll();
+        }
+    }
+
+    onPageBlur() {
+        // Reset all down states
+        // Find mapping
+        for (const key in this.keybindings) {
+            /** @type {Keybinding} */
+            const binding = this.keybindings[key];
+        }
+    }
+
+    /**
+     * Internal keydown handler
+     * @param {object} param0
+     * @param {number} param0.keyCode
+     * @param {boolean} param0.shift
+     * @param {boolean} param0.alt
+     * @param {boolean=} param0.initial
+     */
+    handleKeydown({ keyCode, shift, alt, initial }) {
+        let stop = false;
+
+        // Find mapping
+        for (const key in this.keybindings) {
+            /** @type {Keybinding} */
+            const binding = this.keybindings[key];
+            if (binding.keyCode === keyCode &amp;&amp; (initial || binding.repeated)) {
+                /** @type {Signal} */
+                const signal = this.keybindings[key].signal;
+                if (signal.dispatch() === STOP_PROPAGATION) {
+                    return;
+                }
+            }
+        }
+
+        if (stop) {
+            return STOP_PROPAGATION;
+        }
+    }
+
+    /**
+     * Internal keyup handler
+     * @param {object} param0
+     * @param {number} param0.keyCode
+     * @param {boolean} param0.shift
+     * @param {boolean} param0.alt
+     */
+    handleKeyup({ keyCode, shift, alt }) {
+        // Empty
+    }
+
+    /**
+     * Returns a given keybinding
+     * @param {{ keyCode: number }} binding
+     * @returns {Keybinding}
+     */
+    getBinding(binding) {
+        // @ts-ignore
+        const id = binding.id;
+        assert(id, "Not a valid keybinding: " + JSON.stringify(binding));
+        assert(this.keybindings[id], "Keybinding " + id + " not known!");
+        return this.keybindings[id];
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AdinplayAdProvider_AdinplayAdProvider.html">AdinplayAdProvider</a></li><li><a href="AdProviderInterface_AdProviderInterface.html">AdProviderInterface</a></li><li><a href="AtlasDefinition_AtlasDefinition.html">AtlasDefinition</a></li><li><a href="AtlasSprite_AtlasSprite.html">AtlasSprite</a></li><li><a href="BackgroundResourcesLoader_BackgroundResourcesLoader.html">BackgroundResourcesLoader</a></li><li><a href="BaseDataType.html">BaseDataType</a></li><li><a href="BaseGameSpeed_BaseGameSpeed.html">BaseGameSpeed</a></li><li><a href="BaseHUDPart_BaseHUDPart.html">BaseHUDPart</a></li><li><a href="BaseItem.html">BaseItem</a></li><li><a href="BaseMap_BaseMap.html">BaseMap</a></li><li><a href="BaseSavegameInterface_BaseSavegameInterface.html">BaseSavegameInterface</a></li><li><a href="BaseSetting_BaseSetting.html">BaseSetting</a></li><li><a href="BasicSerializableObject_BasicSerializableObject.html">BasicSerializableObject</a></li><li><a href="BeltComponent_BeltComponent.html">BeltComponent</a></li><li><a href="BeltPath.html">BeltPath</a></li><li><a href="BeltSystem.html">BeltSystem</a></li><li><a href="Blueprint_Blueprint.html">Blueprint</a></li><li><a href="BooleanItem_BooleanItem.html">BooleanItem</a></li><li><a href="BufferMaintainer_BufferMaintainer.html">BufferMaintainer</a></li><li><a href="ColorItem_ColorItem.html">ColorItem</a></li><li><a href="Component_Component.html">Component</a></li><li><a href="ConstantSignalComponent_ConstantSignalComponent.html">ConstantSignalComponent</a></li><li><a href="Dialog.html">Dialog</a></li><li><a href="DialogLoading.html">DialogLoading</a></li><li><a href="DialogWithForm_DialogWithForm.html">DialogWithForm</a></li><li><a href="DynamicDomAttach_DynamicDomAttach.html">DynamicDomAttach</a></li><li><a href="DynamicTickrate_DynamicTickrate.html">DynamicTickrate</a></li><li><a href="Entity_Entity.html">Entity</a></li><li><a href="EntityComponentStorage.html">EntityComponentStorage</a></li><li><a href="FormElementItemChooser_FormElementItemChooser.html">FormElementItemChooser</a></li><li><a href="GameCore.html">GameCore</a></li><li><a href="GamedistributionAdProvider_GamedistributionAdProvider.html">GamedistributionAdProvider</a></li><li><a href="GameHUD_GameHUD.html">GameHUD</a></li><li><a href="GameLoadingOverlay_GameLoadingOverlay.html">GameLoadingOverlay</a></li><li><a href="GameLogic_GameLogic.html">GameLogic</a></li><li><a href="GameRoot.html">GameRoot</a></li><li><a href="GameState.html">GameState</a></li><li><a href="GameSystem.html">GameSystem</a></li><li><a href="GameSystemManager_GameSystemManager.html">GameSystemManager</a></li><li><a href="GameSystemWithFilter_GameSystemWithFilter.html">GameSystemWithFilter</a></li><li><a href="GameTime_GameTime.html">GameTime</a></li><li><a href="HubGoals_HubGoals.html">HubGoals</a></li><li><a href="HUDBaseToolbar_HUDBaseToolbar.html">HUDBaseToolbar</a></li><li><a href="HUDBuildingPlacerLogic.html">HUDBuildingPlacerLogic</a></li><li><a href="HUDEntityDebugger.html">HUDEntityDebugger</a></li><li><a href="HUDLayerPreview.html">HUDLayerPreview</a></li><li><a href="HUDPinnedShapes.html">HUDPinnedShapes</a></li><li><a href="HUDShapeStatisticsHandle.html">HUDShapeStatisticsHandle</a></li><li><a href="HUDTutorialVideoOffer.html">HUDTutorialVideoOffer</a></li><li><a href="InputDistributor_InputDistributor.html">InputDistributor</a></li><li><a href="KeyActionMapper_KeyActionMapper.html">KeyActionMapper</a></li><li><a href="Keybinding_Keybinding.html">Keybinding</a></li><li><a href="LeverComponent_LeverComponent.html">LeverComponent</a></li><li><a href="Logger.html">Logger</a></li><li><a href="LogicGateComponent_LogicGateComponent.html">LogicGateComponent</a></li><li><a href="MapChunk_MapChunk.html">MapChunk</a></li><li><a href="MapChunkView_MapChunkView.html">MapChunkView</a></li><li><a href="MapView.html">MapView</a></li><li><a href="MetaBuilding_MetaBuilding.html">MetaBuilding</a></li><li><a href="ProductionAnalytics_ProductionAnalytics.html">ProductionAnalytics</a></li><li><a href="RandomNumberGenerator_RandomNumberGenerator.html">RandomNumberGenerator</a></li><li><a href="RestrictionManager_RestrictionManager.html">RestrictionManager</a></li><li><a href="SavegameSerializer.html">SavegameSerializer</a></li><li><a href="ShapeDefinition_ShapeDefinition.html">ShapeDefinition</a></li><li><a href="ShapeDefinitionManager_ShapeDefinitionManager.html">ShapeDefinitionManager</a></li><li><a href="ShapeItem_ShapeItem.html">ShapeItem</a></li><li><a href="SoundProxy_SoundProxy.html">SoundProxy</a></li><li><a href="SpriteAtlasLink.html">SpriteAtlasLink</a></li><li><a href="StaleAreaDetector_StaleAreaDetector.html">StaleAreaDetector</a></li><li><a href="StateManager.html">StateManager</a></li><li><a href="StaticMapEntityComponent_StaticMapEntityComponent.html">StaticMapEntityComponent</a></li><li><a href="StorageComponent_StorageComponent.html">StorageComponent</a></li><li><a href="TextualGameState.html">TextualGameState</a></li><li><a href="TrailerMaker_TrailerMaker.html">TrailerMaker</a></li><li><a href="TypeArray_TypeArray.html">TypeArray</a></li><li><a href="TypeClass_TypeClass.html">TypeClass</a></li><li><a href="TypeClassData_TypeClassData.html">TypeClassData</a></li><li><a href="TypeClassFromMetaclass_TypeClassFromMetaclass.html">TypeClassFromMetaclass</a></li><li><a href="TypeClassId_TypeClassId.html">TypeClassId</a></li><li><a href="TypeEnum_TypeEnum.html">TypeEnum</a></li><li><a href="TypeFixedClass_TypeFixedClass.html">TypeFixedClass</a></li><li><a href="TypeKeyValueMap_TypeKeyValueMap.html">TypeKeyValueMap</a></li><li><a href="TypeMetaClass_TypeMetaClass.html">TypeMetaClass</a></li><li><a href="TypeNullable_TypeNullable.html">TypeNullable</a></li><li><a href="TypePair_TypePair.html">TypePair</a></li><li><a href="TypeStructuredObject_TypeStructuredObject.html">TypeStructuredObject</a></li><li><a href="UndergroundBeltComponent_UndergroundBeltComponent.html">UndergroundBeltComponent</a></li><li><a href="Vector_Vector.html">Vector</a></li><li><a href="WireComponent_WireComponent.html">WireComponent</a></li><li><a href="WrappedSoundInstance.html">WrappedSoundInstance</a></li></ul><h3>Global</h3><ul><li><a href="global.html#accessNestedPropertyReverse">accessNestedPropertyReverse</a></li><li><a href="global.html#allApplicationSettings">allApplicationSettings</a></li><li><a href="global.html#arrayAllDirections">arrayAllDirections</a></li><li><a href="global.html#arrayDelete">arrayDelete</a></li><li><a href="global.html#arrayDeleteValue">arrayDeleteValue</a></li><li><a href="global.html#arrayUndergroundRotationVariantToMode">arrayUndergroundRotationVariantToMode</a></li><li><a href="global.html#atlasFiles">atlasFiles</a></li><li><a href="global.html#autoDetectLanguageId">autoDetectLanguageId</a></li><li><a href="global.html#buildBuildingCodeCache">buildBuildingCodeCache</a></li><li><a href="global.html#cachebust">cachebust</a></li><li><a href="global.html#capitalizeFirstLetter">capitalizeFirstLetter</a></li><li><a href="global.html#catchErrors">catchErrors</a></li><li><a href="global.html#clamp">clamp</a></li><li><a href="global.html#clearBufferBacklog">clearBufferBacklog</a></li><li><a href="global.html#COLOR_ITEM_SINGLETONS">COLOR_ITEM_SINGLETONS</a></li><li><a href="global.html#compressInt">compressInt</a></li><li><a href="global.html#compressObject">compressObject</a></li><li><a href="global.html#compressObjectInternal">compressObjectInternal</a></li><li><a href="global.html#compressU8WHeader">compressU8WHeader</a></li><li><a href="global.html#computeCrc">computeCrc</a></li><li><a href="global.html#createSimpleShape">createSimpleShape</a></li><li><a href="global.html#decompressInt">decompressInt</a></li><li><a href="global.html#decompressObject">decompressObject</a></li><li><a href="global.html#decompressObjectInternal">decompressObjectInternal</a></li><li><a href="global.html#decompressU8WHeader">decompressU8WHeader</a></li><li><a href="global.html#deserializeSchema">deserializeSchema</a></li><li><a href="global.html#disableImageSmoothing">disableImageSmoothing</a></li><li><a href="global.html#drawRotatedSprite">drawRotatedSprite</a></li><li><a href="global.html#drawSpriteClipped">drawSpriteClipped</a></li><li><a href="global.html#enableImageSmoothing">enableImageSmoothing</a></li><li><a href="global.html#enumAnalyticsDataSource">enumAnalyticsDataSource</a></li><li><a href="global.html#enumAngleToDirection">enumAngleToDirection</a></li><li><a href="global.html#enumBalancerVariants">enumBalancerVariants</a></li><li><a href="global.html#enumCategories">enumCategories</a></li><li><a href="global.html#enumClippedBeltUnderlayType">enumClippedBeltUnderlayType</a></li><li><a href="global.html#enumColorMixingResults">enumColorMixingResults</a></li><li><a href="global.html#enumColors">enumColors</a></li><li><a href="global.html#enumColorsToHexCode">enumColorsToHexCode</a></li><li><a href="global.html#enumColorToShortcode">enumColorToShortcode</a></li><li><a href="global.html#enumCutterVariants">enumCutterVariants</a></li><li><a href="global.html#enumDebugOverlayMode">enumDebugOverlayMode</a></li><li><a href="global.html#enumDebugOverlayModeNext">enumDebugOverlayModeNext</a></li><li><a href="global.html#enumDirection">enumDirection</a></li><li><a href="global.html#enumDirectionToAngle">enumDirectionToAngle</a></li><li><a href="global.html#enumDirectionToVector">enumDirectionToVector</a></li><li><a href="global.html#enumDisplayMode">enumDisplayMode</a></li><li><a href="global.html#enumHubGoalRewards">enumHubGoalRewards</a></li><li><a href="global.html#enumHubGoalRewardsToContentUnlocked">enumHubGoalRewardsToContentUnlocked</a></li><li><a href="global.html#enumInvertedDirections">enumInvertedDirections</a></li><li><a href="global.html#enumItemProcessorRequirements">enumItemProcessorRequirements</a></li><li><a href="global.html#enumItemProcessorTypes">enumItemProcessorTypes</a></li><li><a href="global.html#enumLocalSavegameStatus">enumLocalSavegameStatus</a></li><li><a href="global.html#enumLogicGateType">enumLogicGateType</a></li><li><a href="global.html#enumLogicGateVariants">enumLogicGateVariants</a></li><li><a href="global.html#enumMinerVariants">enumMinerVariants</a></li><li><a href="global.html#enumMouseButton">enumMouseButton</a></li><li><a href="global.html#enumNotificationType">enumNotificationType</a></li><li><a href="global.html#enumPainterVariants">enumPainterVariants</a></li><li><a href="global.html#enumPinSlotType">enumPinSlotType</a></li><li><a href="global.html#enumRotaterVariants">enumRotaterVariants</a></li><li><a href="global.html#enumSavePriority">enumSavePriority</a></li><li><a href="global.html#enumShortcodeToColor">enumShortcodeToColor</a></li><li><a href="global.html#enumShortcodeToSubShape">enumShortcodeToSubShape</a></li><li><a href="global.html#enumSubShape">enumSubShape</a></li><li><a href="global.html#enumSubShapeToShortcode">enumSubShapeToShortcode</a></li><li><a href="global.html#enumTransistorVariants">enumTransistorVariants</a></li><li><a href="global.html#enumTypeToSize">enumTypeToSize</a></li><li><a href="global.html#enumUndergroundBeltMode">enumUndergroundBeltMode</a></li><li><a href="global.html#enumUndergroundBeltVariants">enumUndergroundBeltVariants</a></li><li><a href="global.html#enumUnderlayTypeToClipRect">enumUnderlayTypeToClipRect</a></li><li><a href="global.html#enumVariantToGate">enumVariantToGate</a></li><li><a href="global.html#enumVirtualProcessorVariants">enumVirtualProcessorVariants</a></li><li><a href="global.html#enumWireType">enumWireType</a></li><li><a href="global.html#enumWireVariant">enumWireVariant</a></li><li><a href="global.html#epsilonCompare">epsilonCompare</a></li><li><a href="global.html#extendSchema">extendSchema</a></li><li><a href="global.html#FAKE_BELT_ACCEPTOR_SLOT">FAKE_BELT_ACCEPTOR_SLOT</a></li><li><a href="global.html#FAKE_BELT_EJECTOR_SLOT_BY_DIRECTION">FAKE_BELT_EJECTOR_SLOT_BY_DIRECTION</a></li><li><a href="global.html#fastArrayDelete">fastArrayDelete</a></li><li><a href="global.html#fastArrayDeleteValue">fastArrayDeleteValue</a></li><li><a href="global.html#fastArrayDeleteValueIfContained">fastArrayDeleteValueIfContained</a></li><li><a href="global.html#fillInLinkIntoTranslation">fillInLinkIntoTranslation</a></li><li><a href="global.html#findCode">findCode</a></li><li><a href="global.html#findNiceIntegerValue">findNiceIntegerValue</a></li><li><a href="global.html#findNiceValue">findNiceValue</a></li><li><a href="global.html#formatBigNumber">formatBigNumber</a></li><li><a href="global.html#formatBigNumberFull">formatBigNumberFull</a></li><li><a href="global.html#formatItemsPerSecond">formatItemsPerSecond</a></li><li><a href="global.html#formatSeconds">formatSeconds</a></li><li><a href="global.html#formatSecondsToTimeAgo">formatSecondsToTimeAgo</a></li><li><a href="global.html#freeCanvas">freeCanvas</a></li><li><a href="global.html#freeCanvasBuckets">freeCanvasBuckets</a></li><li><a href="global.html#gBuildingsByCategory">gBuildingsByCategory</a></li><li><a href="global.html#gBuildingVariants">gBuildingVariants</a></li><li><a href="global.html#gComponentRegistry">gComponentRegistry</a></li><li><a href="global.html#generateFileDownload">generateFileDownload</a></li><li><a href="global.html#generateLevelDefinitions">generateLevelDefinitions</a></li><li><a href="global.html#generateMatrixRotations">generateMatrixRotations</a></li><li><a href="global.html#generateUpgrades">generateUpgrades</a></li><li><a href="global.html#getBufferStats">getBufferStats</a></li><li><a href="global.html#getBufferVramUsageBytes">getBufferVramUsageBytes</a></li><li><a href="global.html#getBuildingDataFromCode">getBuildingDataFromCode</a></li><li><a href="global.html#getCodeFromBuildingData">getCodeFromBuildingData</a></li><li><a href="global.html#getDeviceDPI">getDeviceDPI</a></li><li><a href="global.html#getPlatformName">getPlatformName</a></li><li><a href="global.html#getRandomHint">getRandomHint</a></li><li><a href="global.html#getRomanNumber">getRomanNumber</a></li><li><a href="global.html#getSavegameInterface">getSavegameInterface</a></li><li><a href="global.html#getStringForKeyCode">getStringForKeyCode</a></li><li><a href="global.html#gGameSpeedRegistry">gGameSpeedRegistry</a></li><li><a href="global.html#gItemRegistry">gItemRegistry</a></li><li><a href="global.html#GLOBAL_APP">GLOBAL_APP</a></li><li><a href="global.html#indexMapToArray">indexMapToArray</a></li><li><a href="global.html#initBuildingCodesAfterResourcesLoaded">initBuildingCodesAfterResourcesLoaded</a></li><li><a href="global.html#initBuildingsByCategory">initBuildingsByCategory</a></li><li><a href="global.html#internalBuildStringFromArgs">internalBuildStringFromArgs</a></li><li><a href="global.html#ipcRenderer">ipcRenderer</a></li><li><a href="global.html#isAndroid">isAndroid</a></li><li><a href="global.html#isIos">isIos</a></li><li><a href="global.html#isSupportedBrowser">isSupportedBrowser</a></li><li><a href="global.html#isTrueItem">isTrueItem</a></li><li><a href="global.html#isTruthyItem">isTruthyItem</a></li><li><a href="global.html#itemResolverSingleton">itemResolverSingleton</a></li><li><a href="global.html#itemTypes">itemTypes</a></li><li><a href="global.html#LANGUAGES">LANGUAGES</a></li><li><a href="global.html#lastCanvas">lastCanvas</a></li><li><a href="global.html#lastContext">lastContext</a></li><li><a href="global.html#layers">layers</a></li><li><a href="global.html#lerp">lerp</a></li><li><a href="global.html#make2DUndefinedArray">make2DUndefinedArray</a></li><li><a href="global.html#makeButton">makeButton</a></li><li><a href="global.html#makeButtonElement">makeButtonElement</a></li><li><a href="global.html#makeDiv">makeDiv</a></li><li><a href="global.html#makeDivElement">makeDivElement</a></li><li><a href="global.html#makeNewRng">makeNewRng</a></li><li><a href="global.html#makeOffscreenBuffer">makeOffscreenBuffer</a></li><li><a href="global.html#MAX_LABEL_LENGTH">MAX_LABEL_LENGTH</a></li><li><a href="global.html#MAX_QUEUED_CHARGES">MAX_QUEUED_CHARGES</a></li><li><a href="global.html#mixVector">mixVector</a></li><li><a href="global.html#newEmptyMap">newEmptyMap</a></li><li><a href="global.html#ongoingClickDetectors">ongoingClickDetectors</a></li><li><a href="global.html#prepareHighDPIContext">prepareHighDPIContext</a></li><li><a href="global.html#preparePayload">preparePayload</a></li><li><a href="global.html#randomChoice">randomChoice</a></li><li><a href="global.html#randomInt">randomInt</a></li><li><a href="global.html#rebalance">rebalance</a></li><li><a href="global.html#registerBuildingVariant">registerBuildingVariant</a></li><li><a href="global.html#registerCanvas">registerCanvas</a></li><li><a href="global.html#registeredCanvas">registeredCanvas</a></li><li><a href="global.html#removeAllChildren">removeAllChildren</a></li><li><a href="global.html#resizeCanvas">resizeCanvas</a></li><li><a href="global.html#resizeCanvasAndClear">resizeCanvasAndClear</a></li><li><a href="global.html#resizeHighDPICanvas">resizeHighDPICanvas</a></li><li><a href="global.html#rotateDirectionalObject">rotateDirectionalObject</a></li><li><a href="global.html#rotateFlatMatrix3x3">rotateFlatMatrix3x3</a></li><li><a href="global.html#round1Digit">round1Digit</a></li><li><a href="global.html#round1DigitLocalized">round1DigitLocalized</a></li><li><a href="global.html#round2Digits">round2Digits</a></li><li><a href="global.html#round3Digits">round3Digits</a></li><li><a href="global.html#round4Digits">round4Digits</a></li><li><a href="global.html#safeModulo">safeModulo</a></li><li><a href="global.html#savegameInterfaces">savegameInterfaces</a></li><li><a href="global.html#schemaObject">schemaObject</a></li><li><a href="global.html#schemaToJsonSchema">schemaToJsonSchema</a></li><li><a href="global.html#serializeError">serializeError</a></li><li><a href="global.html#serializeEvent">serializeEvent</a></li><li><a href="global.html#serializeSchema">serializeSchema</a></li><li><a href="global.html#setGlobalApp">setGlobalApp</a></li><li><a href="global.html#SHORT_KEY_CACHE">SHORT_KEY_CACHE</a></li><li><a href="global.html#smoothenDpi">smoothenDpi</a></li><li><a href="global.html#smoothPulse">smoothPulse</a></li><li><a href="global.html#startFileChoose">startFileChoose</a></li><li><a href="global.html#statisticsUnitsSeconds">statisticsUnitsSeconds</a></li><li><a href="global.html#stats">stats</a></li><li><a href="global.html#stringifyObjectContainingErrors">stringifyObjectContainingErrors</a></li><li><a href="global.html#typed">typed</a></li><li><a href="global.html#variantsCache">variantsCache</a></li><li><a href="global.html#verifySchema">verifySchema</a></li><li><a href="global.html#waitNextFrame">waitNextFrame</a></li><li><a href="global.html#wireVariants">wireVariants</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Dec 16 2020 10:12:12 GMT+0100 (GMT+01:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

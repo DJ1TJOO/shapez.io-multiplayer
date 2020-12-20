@@ -17,6 +17,7 @@ import { Rectangle } from "../core/rectangle";
 import { ORIGINAL_SPRITE_SCALE } from "../core/sprites";
 import { lerp, randomInt, round2Digits } from "../core/utils";
 import { Vector } from "../core/vector";
+import { MultiplayerSavegame } from "../savegame/multiplayer_savegame";
 import { Savegame } from "../savegame/savegame";
 import { SavegameSerializer } from "../savegame/savegame_serializer";
 import { AutomaticSave } from "./automatic_save";
@@ -155,6 +156,85 @@ export class GameCore {
     }
 
     /**
+     * Initializes the root object which stores all game related data. The state
+     * is required as a back reference (used sometimes)
+     * @param {import("../states/multiplayer").MultiplayerState} parentState
+     * @param {MultiplayerSavegame} multiplayerSavegame
+     */
+    initializeRootMultiplayer(parentState, multiplayerSavegame) {
+        // Construct the root element, this is the data representation of the game
+        this.root = new GameRoot(this.app);
+        this.root.gameState = parentState;
+        this.root.keyMapper = parentState.keyActionMapper;
+        this.root.multiplayerSavegame = multiplayerSavegame;
+        this.root.gameWidth = this.app.screenWidth;
+        this.root.gameHeight = this.app.screenHeight;
+
+        // Initialize canvas element & context
+        this.internalInitCanvas();
+
+        // Members
+        const root = this.root;
+
+        // This isn't nice, but we need it right here
+        root.keyMapper = new KeyActionMapper(root, this.root.gameState.inputReciever);
+
+        // Needs to come first
+        root.dynamicTickrate = new DynamicTickrate(root);
+
+        // Init game mode
+        root.gameMode = new RegularGameMode(root);
+
+        // Init classes
+        root.camera = new Camera(root);
+        root.map = new MapView(root);
+        root.logic = new GameLogic(root);
+        root.hud = new GameHUD(root);
+        root.time = new GameTime(root);
+        root.automaticSave = new AutomaticSave(root);
+        root.soundProxy = new SoundProxy(root);
+
+        // Init managers
+        root.entityMgr = new EntityManager(root);
+        root.systemMgr = new GameSystemManager(root);
+        root.shapeDefinitionMgr = new ShapeDefinitionManager(root);
+        root.hubGoals = new HubGoals(root);
+        root.productionAnalytics = new ProductionAnalytics(root);
+        root.buffers = new BufferMaintainer(root);
+
+        // Initialize the hud once everything is loaded
+        this.root.hud.initialize();
+
+        // Initial resize event, it might be possible that the screen
+        // resized later during init tho, which is why will emit it later
+        // again anyways
+        this.resize(this.app.screenWidth, this.app.screenHeight);
+
+        if (G_IS_DEV) {
+            // @ts-ignore
+            window.globalRoot = root;
+        }
+
+        // @todo Find better place
+        if (G_IS_DEV && globalConfig.debug.manualTickOnly) {
+            this.root.gameState.inputReciever.keydown.add(key => {
+                if (key.keyCode === 84) {
+                    // 'T'
+
+                    // Extract current real time
+                    this.root.time.updateRealtimeNow();
+
+                    // Perform logic ticks
+                    this.root.time.performTicks(this.root.dynamicTickrate.deltaMs, this.boundInternalTick);
+
+                    // Update analytics
+                    root.productionAnalytics.update();
+                }
+            });
+        }
+    }
+
+    /**
      * Initializes a new game, this means creating a new map and centering on the
      * playerbase
      * */
@@ -180,12 +260,16 @@ export class GameCore {
      * Inits an existing game by loading the raw savegame data and deserializing it.
      * Also runs basic validity checks.
      */
-    initExistingGame() {
+    initExistingGame(multiplayer = false) {
         logger.log("Initializing existing game");
         const serializer = new SavegameSerializer();
 
         try {
-            const status = serializer.deserialize(this.root.savegame.getCurrentDump(), this.root);
+            let status;
+            if (multiplayer)
+                status = serializer.deserialize(this.root.multiplayerSavegame.getCurrentDump(), this.root);
+            else status = serializer.deserialize(this.root.savegame.getCurrentDump(), this.root);
+
             if (!status.isGood()) {
                 logger.error("savegame-deserialize-failed:" + status.reason);
                 return false;
@@ -277,7 +361,7 @@ export class GameCore {
         }
 
         // Update automatic save after everything finished
-        root.automaticSave.update();
+        if (this.root.savegame) root.automaticSave.update();
 
         return true;
     }
@@ -402,9 +486,7 @@ export class GameCore {
         // Transform to world space
 
         if (G_IS_DEV && globalConfig.debug.testClipping) {
-            params.visibleRect = params.visibleRect.expandedInAllDirections(
-                -200 / this.root.camera.zoomLevel
-            );
+            params.visibleRect = params.visibleRect.expandedInAllDirections(-200 / this.root.camera.zoomLevel);
         }
 
         root.camera.transform(context);
@@ -501,11 +583,11 @@ export class GameCore {
             context.fillStyle = "blue";
             context.fillText(
                 "Atlas: " +
-                    desiredAtlasScale +
-                    " / Zoom: " +
-                    round2Digits(zoomLevel) +
-                    " / Effective Zoom: " +
-                    round2Digits(effectiveZoomLevel),
+                desiredAtlasScale +
+                " / Zoom: " +
+                round2Digits(zoomLevel) +
+                " / Effective Zoom: " +
+                round2Digits(effectiveZoomLevel),
                 20,
                 600
             );
@@ -514,31 +596,31 @@ export class GameCore {
 
             context.fillText(
                 "Maintained Buffers: " +
-                    stats.rootKeys +
-                    " root keys / " +
-                    stats.subKeys +
-                    " buffers / VRAM: " +
-                    round2Digits(stats.vramBytes / (1024 * 1024)) +
-                    " MB",
+                stats.rootKeys +
+                " root keys / " +
+                stats.subKeys +
+                " buffers / VRAM: " +
+                round2Digits(stats.vramBytes / (1024 * 1024)) +
+                " MB",
                 20,
                 620
             );
             const internalStats = getBufferStats();
             context.fillText(
                 "Total Buffers: " +
-                    internalStats.bufferCount +
-                    " buffers / " +
-                    internalStats.backlogSize +
-                    " backlog / " +
-                    internalStats.backlogKeys +
-                    " keys in backlog / VRAM " +
-                    round2Digits(internalStats.vramUsage / (1024 * 1024)) +
-                    " MB / Backlog " +
-                    round2Digits(internalStats.backlogVramUsage / (1024 * 1024)) +
-                    " MB / Created " +
-                    internalStats.numCreated +
-                    " / Reused " +
-                    internalStats.numReused,
+                internalStats.bufferCount +
+                " buffers / " +
+                internalStats.backlogSize +
+                " backlog / " +
+                internalStats.backlogKeys +
+                " keys in backlog / VRAM " +
+                round2Digits(internalStats.vramUsage / (1024 * 1024)) +
+                " MB / Backlog " +
+                round2Digits(internalStats.backlogVramUsage / (1024 * 1024)) +
+                " MB / Created " +
+                internalStats.numCreated +
+                " / Reused " +
+                internalStats.numReused,
                 20,
                 640
             );

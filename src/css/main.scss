@@ -11,7 +11,6 @@
 @import "material_colors";
 @import "dynamic_ui";
 @import "variables";
-
 @import "mixins";
 @import "common";
 @import "animations";
@@ -19,7 +18,6 @@
 @import "application_error";
 @import "textual_game_state";
 @import "adinplay";
-
 @import "states/preload";
 @import "states/main_menu";
 @import "states/ingame";
@@ -28,7 +26,7 @@
 @import "states/about";
 @import "states/mobile_warning";
 @import "states/changelog";
-
+@import "states/multiplayer";
 @import "ingame_hud/buildings_toolbar";
 @import "ingame_hud/building_placer";
 @import "ingame_hud/beta_overlay";
@@ -54,18 +52,14 @@
 @import "ingame_hud/sandbox_controller";
 @import "ingame_hud/standalone_advantages";
 @import "ingame_hud/cat_memes";
-
 // prettier-ignore
-$elements: 
-// Base    
+$elements: // Base
 ingame_Canvas,
 ingame_VignetteOverlay,
-
 // Ingame overlays
 ingame_HUD_Waypoints,
 ingame_HUD_PlacementHints,
 ingame_HUD_PlacerVariants,
-
 // Regular hud
 ingame_HUD_PinnedShapes,
 ingame_HUD_GameMenu,
@@ -83,10 +77,8 @@ ingame_HUD_WatermarkClicker,
 ingame_HUD_Watermark,
 ingame_HUD_ColorBlindBelowTileHelper,
 ingame_HUD_SandboxController,
-
 // Overlays
 ingame_HUD_BetaOverlay,
-
 // Dialogs
 ingame_HUD_Shop,
 ingame_HUD_Statistics,
@@ -96,15 +88,12 @@ ingame_HUD_UnlockNotification,
 ingame_HUD_SettingsMenu,
 ingame_HUD_ModalDialogs,
 ingame_HUD_CatMemes;
-
 $zindex: 100;
-
 @each $elem in $elements {
     ##{$elem} {
         z-index: $zindex;
     }
-
-    $zindex: $zindex + 10;
+    $zindex: $zindex+10;
 }
 
 body.uiHidden {
@@ -123,7 +112,7 @@ body.uiHidden {
 body.modalDialogActive,
 body.externalAdOpen,
 body.ingameDialogOpen {
-    > *:not(.ingameDialog):not(.modalDialogParent):not(.loadingDialog):not(.gameLoadingOverlay):not(#ingame_HUD_ModalDialogs):not(.noBlur) {
-        // filter: blur(5px) !important;
+    >*:not(.ingameDialog):not(.modalDialogParent):not(.loadingDialog):not(.gameLoadingOverlay):not(#ingame_HUD_ModalDialogs):not(.noBlur) {
+        //filter: blur(5px) !important;
     }
 }

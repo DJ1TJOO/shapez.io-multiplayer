@@ -3,6 +3,7 @@ import { A_B_TESTING_LINK_TYPE, globalConfig, THIRDPARTY_URLS } from "../core/co
 import { GameState } from "../core/game_state";
 import { DialogWithForm } from "../core/modal_dialog_elements";
 import { FormElementInput } from "../core/modal_dialog_forms";
+import { FlagPacketFlags, MultiplayerPacketTypes } from "../core/multiplayer_packets";
 import { ReadWriteProxy } from "../core/read_write_proxy";
 import {
     formatSecondsToTimeAgo,
@@ -15,11 +16,14 @@ import {
     startFileChoose,
     waitNextFrame,
 } from "../core/utils";
+import { GameLoadingOverlay } from "../game/game_loading_overlay";
 import { HUDModalDialogs } from "../game/hud/parts/modal_dialogs";
 import { getApplicationSettingById } from "../profile/application_settings";
 import { T } from "../translations";
+import { MultiplayerConnection } from "./multiplayer";
 
 const trim = require("trim");
+const io = require("socket.io-client");
 
 /**
  * @typedef {import("../savegame/savegame_typedefs").SavegameMetadata} SavegameMetadata
@@ -32,15 +36,15 @@ export class MainMenuState extends GameState {
     }
 
     getInnerHTML() {
-        const bannerHtml = `
+            const bannerHtml = `
             <h3>${T.demoBanners.title}</h3>
             <p>${T.demoBanners.intro}</p>
             <a href="#" class="steamLink ${A_B_TESTING_LINK_TYPE}" target="_blank">Get the shapez.io standalone!</a>
         `;
 
-        const showDemoBadges = this.app.restrictionMgr.getIsStandaloneMarketingActive();
+            const showDemoBadges = this.app.restrictionMgr.getIsStandaloneMarketingActive();
 
-        return `
+            return `
             <div class="topButtons">
                 <button class="languageChoose" data-languageicon="${this.app.settings.getLanguage()}"></button>
                 <button class="settingsButton"></button>
@@ -247,6 +251,32 @@ export class MainMenuState extends GameState {
         );
     }
 
+    renderMultiplayerMenu() {
+        const buttonContainer = this.htmlElement.querySelector(".mainContainer .buttons");
+        removeAllChildren(buttonContainer);
+
+        const importButtonElement = makeButtonElement(
+            ["importButton", "styledButton"],
+            T.mainMenu.importSavegame
+        );
+        this.trackClicks(importButtonElement, this.requestImportSavegame);
+
+        const backButton = makeButton(buttonContainer, ["backButton", "styledButton"], T.mainMenu.back);
+        this.trackClicks(backButton, this.onBackButtonClicked);
+
+        const joinButton = makeButton(buttonContainer, ["joinButton", "styledButton"], T.mainMenu.join);
+        this.trackClicks(joinButton, this.onJoinButtonClicked);
+
+        const outerDiv = makeDiv(buttonContainer, null, ["outer"], null);
+        outerDiv.appendChild(importButtonElement);
+        const newGameButton = makeButton(
+            this.htmlElement.querySelector(".mainContainer .outer"),
+            ["newGameButton", "styledButton"],
+            T.mainMenu.newGame
+        );
+        this.trackClicks(newGameButton, this.onMultiplayerPlayButtonClicked);
+    }
+
     renderMainMenu() {
         const buttonContainer = this.htmlElement.querySelector(".mainContainer .buttons");
         removeAllChildren(buttonContainer);
@@ -267,6 +297,14 @@ export class MainMenuState extends GameState {
             );
             this.trackClicks(continueButton, this.onContinueButtonClicked);
 
+            // Multiplayer game
+            const multiplayerButton = makeButton(
+                buttonContainer,
+                ["multiplayerButton", "styledButton"],
+                T.mainMenu.multiplayer
+            );
+            this.trackClicks(multiplayerButton, this.onMultiplayerButtonClicked);
+
             const outerDiv = makeDiv(buttonContainer, null, ["outer"], null);
             outerDiv.appendChild(importButtonElement);
             const newGameButton = makeButton(
@@ -279,6 +317,15 @@ export class MainMenuState extends GameState {
             // New game
             const playBtn = makeButton(buttonContainer, ["playButton", "styledButton"], T.mainMenu.play);
             this.trackClicks(playBtn, this.onPlayButtonClicked);
+
+            // Multiplayer game
+            const multiplayerButton = makeButton(
+                buttonContainer,
+                ["multiplayerButton", "styledButton"],
+                T.mainMenu.multiplayer
+            );
+            this.trackClicks(multiplayerButton, this.onMultiplayerButtonClicked);
+
             buttonContainer.appendChild(importButtonElement);
         }
     }
@@ -347,7 +394,7 @@ export class MainMenuState extends GameState {
         return this.app.savegameMgr.getSavegamesMetaData();
     }
 
-    renderSavegames() {
+    renderSavegames(multiplayer = false) {
         const oldContainer = this.htmlElement.querySelector(".mainContainer .savegames");
         if (oldContainer) {
             oldContainer.remove();
@@ -400,8 +447,10 @@ export class MainMenuState extends GameState {
 
                 this.trackClicks(deleteButton, () => this.deleteGame(games[i]));
                 this.trackClicks(downloadButton, () => this.downloadGame(games[i]));
-                this.trackClicks(resumeButton, () => this.resumeGame(games[i]));
                 this.trackClicks(renameButton, () => this.requestRenameSavegame(games[i]));
+
+                if (multiplayer) this.trackClicks(resumeButton, () => this.resumeMultiplayerGame(games[i]));
+                else this.trackClicks(resumeButton, () => this.resumeGame(games[i]));
             }
         }
     }
@@ -544,10 +593,10 @@ export class MainMenuState extends GameState {
         this.app.analytics.trackUiClick("startgame");
         this.app.adProvider.showVideoAd().then(() => {
             const savegame = this.app.savegameMgr.createNewSavegame();
-
             this.moveToState("InGameState", {
                 savegame,
             });
+
             this.app.analytics.trackUiClick("startgame_adcomplete");
         });
     }
@@ -572,5 +621,174 @@ export class MainMenuState extends GameState {
 
     onLeave() {
         this.dialogs.cleanup();
+    }
+
+    onMultiplayerButtonClicked() {
+        this.renderMultiplayerMenu();
+        this.renderSavegames(true);
+    }
+
+    onBackButtonClicked() {
+        this.renderMainMenu();
+        this.renderSavegames();
+    }
+
+    onJoinButtonClicked() {
+        //UUID v4 regex
+        const regex = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
+
+        const connectIdInput = new FormElementInput({
+            id: "connectIdInput",
+            label: null,
+            placeholder: "",
+            defaultValue: "",
+            validator: val => val.match(regex) && trim(val).length > 0,
+        });
+        const dialog = new DialogWithForm({
+            app: this.app,
+            title: T.dialogs.joinMultiplayerGame.title,
+            desc: T.dialogs.joinMultiplayerGame.desc,
+            formElements: [connectIdInput],
+            buttons: ["cancel:bad:escape", "ok:good:enter"],
+        });
+        this.dialogs.internalShowDialog(dialog);
+
+        // When confirmed, create connection
+        dialog.buttonSignals.ok.add(() => {
+            let connectionId = trim(connectIdInput.getValue());
+
+            // @ts-ignore
+            var socket = io("ws://localhost:8888/", { transport: ["websocket"] });
+            var socketId = undefined;
+            socket.on("connect", () => {
+                socket.on("id", id => {
+                    socketId = id;
+                    socket.emit("joinRoom", connectionId, socketId);
+                });
+                socket.on("error", () => {
+                    this.dialogs.showWarning(
+                        T.dialogs.multiplayerGameError.title,
+                        T.dialogs.multiplayerGameError.desc + "<br><br>"
+                    );
+                });
+                socket.on("offer", async data => {
+                    if (data.socketIdSender !== socketId) return;
+                    const config = {
+                        iceServers: [
+                            {
+                                urls: "stun:stun.1.google.com:19302",
+                            },
+                        ],
+                    };
+                    const pc = new RTCPeerConnection(config);
+                    const dc = pc.createDataChannel("game", {
+                        negotiated: true,
+                        id: 0,
+                    });
+                    await pc.setRemoteDescription({
+                        type: "offer",
+                        sdp: data.offer,
+                    });
+                    await pc.setLocalDescription(await pc.createAnswer());
+                    pc.onicecandidate = ({ candidate }) => {
+                        if (candidate) return;
+                        socket.emit("answer", {
+                            socketIdReceiver: data.socketIdReceiver,
+                            socketIdSender: data.socketIdSender,
+                            answer: pc.localDescription.sdp,
+                            room: data.room,
+                        });
+                    };
+
+                    var gameDataState = -1;
+                    var gameData = "";
+
+                    var onMessage = ev => {
+                        var packet = JSON.parse(ev.data);
+
+                        //When data ends
+                        if (
+                            packet.type === MultiplayerPacketTypes.FLAG &&
+                            packet.flag === FlagPacketFlags.ENDDATA
+                        ) {
+                            gameDataState = 1;
+                            console.log(gameData);
+                            gameData = JSON.parse(gameData);
+                            var connection = new MultiplayerConnection(pc, dc, gameData);
+                            this.moveToState("MultiplayerState", {
+                                connection,
+                                connectionId,
+                            });
+                        }
+
+                        //When data recieved
+                        if (packet.type === MultiplayerPacketTypes.DATA && gameDataState === 0)
+                            gameData = gameData + packet.data;
+
+                        //When start data
+                        if (
+                            packet.type === MultiplayerPacketTypes.FLAG &&
+                            packet.flag === FlagPacketFlags.STARTDATA
+                        ) {
+                            gameDataState = 0;
+                            this.loadingOverlay = new GameLoadingOverlay(this.app, this.getDivElement());
+                            this.loadingOverlay.showBasic();
+                        }
+                    };
+
+                    dc.onmessage = onMessage;
+                    pc.ondatachannel = event => {
+                        let receiveChannel = event.channel;
+                        receiveChannel.onmessage = onMessage;
+                    };
+                });
+            });
+        });
+    }
+
+    onMultiplayerPlayButtonClicked() {
+        if (
+            this.app.savegameMgr.getSavegamesMetaData().length > 0 &&
+            !this.app.restrictionMgr.getHasUnlimitedSavegames()
+        ) {
+            this.app.analytics.trackUiClick("startgame_slot_limit_show");
+            this.showSavegameSlotLimit();
+            return;
+        }
+
+        this.app.analytics.trackUiClick("startgame");
+        this.app.adProvider.showVideoAd().then(() => {
+            const savegame = this.app.savegameMgr.createNewSavegame();
+            this.moveToState("MultiplayerState", {
+                savegame,
+            });
+
+            this.app.analytics.trackUiClick("startgame_adcomplete");
+        });
+    }
+
+    /**
+     * @param {SavegameMetadata} game
+     */
+    resumeMultiplayerGame(game) {
+        this.app.analytics.trackUiClick("resume_game");
+
+        this.app.adProvider.showVideoAd().then(() => {
+            this.app.analytics.trackUiClick("resume_game_adcomplete");
+            const savegame = this.app.savegameMgr.getSavegameById(game.internalId);
+            savegame
+                .readAsync()
+                .then(() => {
+                    this.moveToState("MultiplayerState", {
+                        savegame,
+                    });
+                })
+                .catch(err => {
+                    this.dialogs.showWarning(
+                        T.dialogs.gameLoadFailure.title,
+                        T.dialogs.gameLoadFailure.text + "<br><br>" + err
+                    );
+                });
+        });
     }
 }

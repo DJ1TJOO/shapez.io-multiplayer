@@ -127,8 +127,7 @@ export class HubGoals extends BasicSerializableObject {
      * @returns {boolean}
      */
     isEndOfDemoReached() {
-        return (
-            !this.root.gameMode.getIsFreeplayAvailable() &&
+        return (!this.root.gameMode.getIsFreeplayAvailable() &&
             this.level >= this.root.gameMode.getLevelDefinitions().length
         );
     }
@@ -314,9 +313,10 @@ export class HubGoals extends BasicSerializableObject {
     /**
      * Tries to unlock the given upgrade
      * @param {string} upgradeId
+     * @param {boolean} multiplayerUpgradePurchased
      * @returns {boolean}
      */
-    tryUnlockUpgrade(upgradeId) {
+    tryUnlockUpgrade(upgradeId, multiplayerUpgradePurchased = false) {
         if (!this.canUnlockUpgrade(upgradeId)) {
             return false;
         }
@@ -343,6 +343,7 @@ export class HubGoals extends BasicSerializableObject {
         this.upgradeLevels[upgradeId] = (this.upgradeLevels[upgradeId] || 0) + 1;
         this.upgradeImprovements[upgradeId] += tierData.improvement;
 
+        this.root.multiplayerUpgradePurchased = multiplayerUpgradePurchased;
         this.root.signals.upgradePurchased.dispatch(upgradeId);
 
         this.root.app.gameAnalytics.handleUpgradeUnlocked(upgradeId, currentLevel);
@@ -509,34 +510,36 @@ export class HubGoals extends BasicSerializableObject {
             case enumItemProcessorTypes.mixer:
             case enumItemProcessorTypes.painter:
             case enumItemProcessorTypes.painterDouble:
-            case enumItemProcessorTypes.painterQuad: {
-                assert(
-                    globalConfig.buildingSpeeds[processorType],
-                    "Processor type has no speed set in globalConfig.buildingSpeeds: " + processorType
-                );
-                return (
-                    globalConfig.beltSpeedItemsPerSecond *
-                    this.upgradeImprovements.painting *
-                    globalConfig.buildingSpeeds[processorType]
-                );
-            }
+            case enumItemProcessorTypes.painterQuad:
+                {
+                    assert(
+                        globalConfig.buildingSpeeds[processorType],
+                        "Processor type has no speed set in globalConfig.buildingSpeeds: " + processorType
+                    );
+                    return (
+                        globalConfig.beltSpeedItemsPerSecond *
+                        this.upgradeImprovements.painting *
+                        globalConfig.buildingSpeeds[processorType]
+                    );
+                }
 
             case enumItemProcessorTypes.cutter:
             case enumItemProcessorTypes.cutterQuad:
             case enumItemProcessorTypes.rotater:
             case enumItemProcessorTypes.rotaterCCW:
             case enumItemProcessorTypes.rotater180:
-            case enumItemProcessorTypes.stacker: {
-                assert(
-                    globalConfig.buildingSpeeds[processorType],
-                    "Processor type has no speed set in globalConfig.buildingSpeeds: " + processorType
-                );
-                return (
-                    globalConfig.beltSpeedItemsPerSecond *
-                    this.upgradeImprovements.processors *
-                    globalConfig.buildingSpeeds[processorType]
-                );
-            }
+            case enumItemProcessorTypes.stacker:
+                {
+                    assert(
+                        globalConfig.buildingSpeeds[processorType],
+                        "Processor type has no speed set in globalConfig.buildingSpeeds: " + processorType
+                    );
+                    return (
+                        globalConfig.beltSpeedItemsPerSecond *
+                        this.upgradeImprovements.processors *
+                        globalConfig.buildingSpeeds[processorType]
+                    );
+                }
             default:
                 assertAlways(false, "invalid processor type: " + processorType);
         }

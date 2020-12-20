@@ -97,6 +97,9 @@ mainMenu:
     madeBy: Gemaakt door <author-link>
     subreddit: Reddit
     savegameUnnamed: Unnamed
+    multiplayer: Samen spelen
+    back: Terug
+    join: Meedoen
 dialogs:
     buttons:
         ok: OK
@@ -209,9 +212,15 @@ dialogs:
         title: Tutorial Beschikbaar
         desc: Er is een tutorial video beschikbaar voor dit level! Zou je het willen bekijken?
     tutorialVideoAvailableForeignLanguage:
-        title: Tutorial Available
+        title: Tutorial Beschikbaar
         desc: Er is een tutorial beschikbaar voor dit level, maar het is alleen
             beschikbaar in het Engels. Zou je het toch graag kijken?
+    joinMultiplayerGame:
+        title: Samenspelen
+        desc: Voer de samenspelen code in die je gekregen hebt van de spel leider.
+    multiplayerGameError:
+        title: Spel niet gevonden
+        desc: Het spel waarbij je mee wilden doen is niet gevonden of bestaat niet.
 ingame:
     keybindingsOverlay:
         moveMap: Beweeg speelveld

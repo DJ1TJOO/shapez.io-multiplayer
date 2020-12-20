@@ -23,6 +23,7 @@ import { SavegameManager } from "./savegame/savegame_manager";
 import { AboutState } from "./states/about";
 import { ChangelogState } from "./states/changelog";
 import { InGameState } from "./states/ingame";
+import { MultiplayerState } from "./states/multiplayer";
 import { KeybindingsState } from "./states/keybindings";
 import { MainMenuState } from "./states/main_menu";
 import { MobileWarningState } from "./states/mobile_warning";
@@ -153,6 +154,7 @@ export class Application {
             KeybindingsState,
             AboutState,
             ChangelogState,
+            MultiplayerState,
         ];
 
         for (let i = 0; i < states.length; ++i) {

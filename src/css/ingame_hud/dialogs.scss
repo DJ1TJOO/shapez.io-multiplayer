@@ -6,11 +6,9 @@
     bottom: 0;
     pointer-events: all;
     background: $modalDialogBg;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     @include InlineAnimation(0.12s ease-in-out) {
         0% {
             background-color: transparent;
@@ -20,9 +18,7 @@
             background-color: $modalDialogBg;
         }
     }
-
     $darkModeDialogBg: darken($darkModeGameBackground, 5);
-
     @include DarkThemeOverride {
         background: rgba($darkModeDialogBg, 0.9);
         @include InlineAnimation(0.12s ease-in-out) {
@@ -34,15 +30,12 @@
                 background-color: rgba($darkModeDialogBg, 0.9);
             }
         }
-
-        > .dialogInner.optionChooserDialog .optionParent {
+        >.dialogInner.optionChooserDialog .optionParent {
             .option {
                 background: $darkModeControlsBackground;
-
                 &:hover {
                     background-color: lighten($darkModeControlsBackground, 5);
                 }
-
                 &.active {
                     background: $colorBlueBright;
                     color: #fff;
@@ -50,26 +43,22 @@
             }
         }
     }
-
     &.visible {
         .dialogInner {
             opacity: 1;
         }
         backdrop-filter: blur(D(3px));
     }
-
     .dialogInner {
         transition: opacity 0.2s ease-in-out;
         opacity: 0;
     }
-
     &.loadingDialog {
         * {
             color: #fff;
         }
     }
-
-    > .dialogInner {
+    >.dialogInner {
         background: #fff;
         max-height: calc(100vh - #{D(40px)});
         @include S(border-radius, $globalBorderRadius);
@@ -77,11 +66,9 @@
         flex-direction: column;
         @include S(padding, 12px);
         pointer-events: all;
-
         @include DarkThemeOverride {
             background: darken($darkModeControlsBackground, 5);
         }
-
         &.optionChooserDialog {
             .optionParent {
                 display: grid;
@@ -91,15 +78,11 @@
                     pointer-events: all;
                     cursor: pointer;
                     @include S(padding, 10px);
-
                     background: #eee;
-
                     transition: background-color 0.12s ease-in-out;
-
                     &:hover {
                         background-color: #e7e7e7;
                     }
-
                     &.active {
                         background-color: $colorBlueBright;
                         color: #fff;
@@ -107,8 +90,7 @@
                 }
             }
         }
-
-        > .title {
+        >.title {
             @include Heading;
             margin: 0;
             text-transform: uppercase;
@@ -116,9 +98,8 @@
             align-items: center;
             grid-template-columns: 1fr auto;
             @include S(margin-bottom, 10px);
-
             @include DarkThemeInvert();
-            > .closeButton {
+            >.closeButton {
                 opacity: 0.7;
                 @include S(width, 20px);
                 @include S(height, 20px);
@@ -134,25 +115,20 @@
                 }
             }
         }
-
-        > .content {
+        >.content {
             @include PlainText;
             overflow-y: auto;
             pointer-events: all;
             @include S(width, 350px);
-
             @include DarkThemeOverride {
                 color: #aaa;
             }
-
             a {
                 color: $colorBlueBright;
             }
-
             strong {
                 font-weight: bold;
             }
-
             .keybinding {
                 position: relative;
                 background: #eee;
@@ -160,25 +136,20 @@
                 height: unset;
                 margin: 1px 0;
             }
-
             input {
                 background: #eee;
                 color: #333438;
                 width: 100%;
-
                 &.errored {
                     background-color: rgb(250, 206, 206);
                 }
             }
-
             ul.bucketList {
                 padding-left: 30px;
-
                 li {
                     display: list-item;
                 }
             }
-
             .ingameItemChooser {
                 @include S(margin, 10px, 0);
                 display: grid;
@@ -187,7 +158,6 @@
                 grid-template-columns: repeat(10, 1fr);
                 align-items: center;
                 justify-items: center;
-
                 canvas {
                     pointer-events: all;
                     @include S(width, 25px);
@@ -195,39 +165,33 @@
                     position: relative;
                     cursor: pointer;
                     @include IncreasedClickArea(3px);
-
                     &:hover {
                         opacity: 0.9;
                     }
                 }
             }
         }
-
-        > .buttons {
+        >.buttons {
             @include S(margin-top, 15px);
             display: flex;
             justify-content: flex-end;
-            > button {
+            >button {
                 @include S(margin-left, 8px);
                 @include Text;
                 @include S(min-width, 60px);
                 @include S(padding, 5px, 15px);
-
                 transition: opacity 0.12s ease-in-out;
                 &:hover {
                     opacity: 0.9;
                 }
-
                 &.good {
                     background-color: $colorGreenBright;
                     color: #fff;
                 }
-
                 &.bad {
                     background-color: $colorRedBright;
                     color: #fff;
                 }
-
                 &.timedButton {
                     pointer-events: none;
                     cursor: default;

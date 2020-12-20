@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: application.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: application.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { AnimationFrame } from "./core/animation_frame";
+import { BackgroundResourcesLoader } from "./core/background_resources_loader";
+import { IS_MOBILE } from "./core/config";
+import { GameState } from "./core/game_state";
+import { GLOBAL_APP, setGlobalApp } from "./core/globals";
+import { InputDistributor } from "./core/input_distributor";
+import { Loader } from "./core/loader";
+import { createLogger, logSection } from "./core/logging";
+import { StateManager } from "./core/state_manager";
+import { TrackedState } from "./core/tracked_state";
+import { getPlatformName, waitNextFrame } from "./core/utils";
+import { Vector } from "./core/vector";
+import { AdProviderInterface } from "./platform/ad_provider";
+import { NoAdProvider } from "./platform/ad_providers/no_ad_provider";
+import { AnalyticsInterface } from "./platform/analytics";
+import { GoogleAnalyticsImpl } from "./platform/browser/google_analytics";
+import { SoundImplBrowser } from "./platform/browser/sound";
+import { PlatformWrapperImplBrowser } from "./platform/browser/wrapper";
+import { PlatformWrapperImplElectron } from "./platform/electron/wrapper";
+import { PlatformWrapperInterface } from "./platform/wrapper";
+import { ApplicationSettings } from "./profile/application_settings";
+import { SavegameManager } from "./savegame/savegame_manager";
+import { AboutState } from "./states/about";
+import { ChangelogState } from "./states/changelog";
+import { InGameState } from "./states/ingame";
+import { MultiplayerState } from "./states/multiplayer";
+import { KeybindingsState } from "./states/keybindings";
+import { MainMenuState } from "./states/main_menu";
+import { MobileWarningState } from "./states/mobile_warning";
+import { PreloadState } from "./states/preload";
+import { SettingsState } from "./states/settings";
+import { ShapezGameAnalytics } from "./platform/browser/game_analytics";
+import { RestrictionManager } from "./core/restriction_manager";
+
+/**
+ * @typedef {import("./platform/game_analytics").GameAnalyticsInterface} GameAnalyticsInterface
+ * @typedef {import("./platform/sound").SoundInterface} SoundInterface
+ * @typedef {import("./platform/storage").StorageInterface} StorageInterface
+ */
+
+const logger = createLogger("application");
+
+// Set the name of the hidden property and the change event for visibility
+let pageHiddenPropName, pageVisibilityEventName;
+if (typeof document.hidden !== "undefined") {
+    // Opera 12.10 and Firefox 18 and later support
+    pageHiddenPropName = "hidden";
+    pageVisibilityEventName = "visibilitychange";
+    // @ts-ignore
+} else if (typeof document.msHidden !== "undefined") {
+    pageHiddenPropName = "msHidden";
+    pageVisibilityEventName = "msvisibilitychange";
+    // @ts-ignore
+} else if (typeof document.webkitHidden !== "undefined") {
+    pageHiddenPropName = "webkitHidden";
+    pageVisibilityEventName = "webkitvisibilitychange";
+}
+
+export class Application {
+    constructor() {
+        assert(!GLOBAL_APP, "Tried to construct application twice");
+        logger.log("Creating application, platform =", getPlatformName());
+        setGlobalApp(this);
+
+        this.unloaded = false;
+
+        // Global stuff
+        this.settings = new ApplicationSettings(this);
+        this.ticker = new AnimationFrame();
+        this.stateMgr = new StateManager(this);
+        this.savegameMgr = new SavegameManager(this);
+        this.inputMgr = new InputDistributor(this);
+        this.backgroundResourceLoader = new BackgroundResourcesLoader(this);
+
+        // Restrictions (Like demo etc)
+        this.restrictionMgr = new RestrictionManager(this);
+
+        // Platform dependent stuff
+
+        /** @type {StorageInterface} */
+        this.storage = null;
+
+        /** @type {SoundInterface} */
+        this.sound = null;
+
+        /** @type {PlatformWrapperInterface} */
+        this.platformWrapper = null;
+
+        /** @type {AdProviderInterface} */
+        this.adProvider = null;
+
+        /** @type {AnalyticsInterface} */
+        this.analytics = null;
+
+        /** @type {GameAnalyticsInterface} */
+        this.gameAnalytics = null;
+
+        this.initPlatformDependentInstances();
+
+        // Track if the window is focused (only relevant for browser)
+        this.focused = true;
+
+        // Track if the window is visible
+        this.pageVisible = true;
+
+        // Track if the app is paused (cordova)
+        this.applicationPaused = false;
+
+        /** @type {TypedTrackedState&lt;boolean>} */
+        this.trackedIsRenderable = new TrackedState(this.onAppRenderableStateChanged, this);
+
+        // Dimensions
+        this.screenWidth = 0;
+        this.screenHeight = 0;
+
+        // Store the timestamp where we last checked for a screen resize, since orientationchange is unreliable with cordova
+        this.lastResizeCheck = null;
+
+        // Store the mouse position, or null if not available
+        /** @type {Vector|null} */
+        this.mousePosition = null;
+    }
+
+    /**
+     * Initializes all platform instances
+     */
+    initPlatformDependentInstances() {
+        logger.log("Creating platform dependent instances (standalone=", G_IS_STANDALONE, ")");
+
+        if (G_IS_STANDALONE) {
+            this.platformWrapper = new PlatformWrapperImplElectron(this);
+        } else {
+            this.platformWrapper = new PlatformWrapperImplBrowser(this);
+        }
+
+        // Start with empty ad provider
+        this.adProvider = new NoAdProvider(this);
+        this.sound = new SoundImplBrowser(this);
+        this.analytics = new GoogleAnalyticsImpl(this);
+        this.gameAnalytics = new ShapezGameAnalytics(this);
+    }
+
+    /**
+     * Registers all game states
+     */
+    registerStates() {
+        /** @type {Array&lt;typeof GameState>} */
+        const states = [
+            PreloadState,
+            MobileWarningState,
+            MainMenuState,
+            InGameState,
+            SettingsState,
+            KeybindingsState,
+            AboutState,
+            ChangelogState,
+            MultiplayerState,
+        ];
+
+        for (let i = 0; i &lt; states.length; ++i) {
+            this.stateMgr.register(states[i]);
+        }
+    }
+
+    /**
+     * Registers all event listeners
+     */
+    registerEventListeners() {
+        window.addEventListener("focus", this.onFocus.bind(this));
+        window.addEventListener("blur", this.onBlur.bind(this));
+
+        window.addEventListener("resize", () => this.checkResize(), true);
+        window.addEventListener("orientationchange", () => this.checkResize(), true);
+
+        if (!G_IS_MOBILE_APP &amp;&amp; !IS_MOBILE) {
+            window.addEventListener("mousemove", this.handleMousemove.bind(this));
+            window.addEventListener("mouseout", this.handleMousemove.bind(this));
+            window.addEventListener("mouseover", this.handleMousemove.bind(this));
+            window.addEventListener("mouseleave", this.handleMousemove.bind(this));
+        }
+
+        // Unload events
+        window.addEventListener("beforeunload", this.onBeforeUnload.bind(this), true);
+        window.addEventListener("unload", this.onUnload.bind(this), true);
+
+        document.addEventListener(pageVisibilityEventName, this.handleVisibilityChange.bind(this), false);
+
+        // Track touches so we can update the focus appropriately
+        document.addEventListener("touchstart", this.updateFocusAfterUserInteraction.bind(this), true);
+        document.addEventListener("touchend", this.updateFocusAfterUserInteraction.bind(this), true);
+    }
+
+    /**
+     * Checks the focus after a touch
+     * @param {TouchEvent} event
+     */
+    updateFocusAfterUserInteraction(event) {
+        const target = /** @type {HTMLElement} */ (event.target);
+        if (!target || !target.tagName) {
+            // Safety check
+            logger.warn("Invalid touchstart/touchend event:", event);
+            return;
+        }
+
+        // When clicking an element which is not the currently focused one, defocus it
+        if (target !== document.activeElement) {
+            // @ts-ignore
+            if (document.activeElement.blur) {
+                // @ts-ignore
+                document.activeElement.blur();
+            }
+        }
+
+        // If we click an input field, focus it now
+        if (target.tagName.toLowerCase() === "input") {
+            // We *really* need the focus
+            waitNextFrame().then(() => target.focus());
+        }
+    }
+
+    /**
+     * Handles a page visibility change event
+     * @param {Event} event
+     */
+    handleVisibilityChange(event) {
+        window.focus();
+        const pageVisible = !document[pageHiddenPropName];
+        if (pageVisible !== this.pageVisible) {
+            this.pageVisible = pageVisible;
+            logger.log("Visibility changed:", this.pageVisible);
+            this.trackedIsRenderable.set(this.isRenderable());
+        }
+    }
+
+    /**
+     * Handles a mouse move event
+     * @param {MouseEvent} event
+     */
+    handleMousemove(event) {
+        this.mousePosition = new Vector(event.clientX, event.clientY);
+    }
+
+    /**
+     * Internal on focus handler
+     */
+    onFocus() {
+        this.focused = true;
+    }
+
+    /**
+     * Internal blur handler
+     */
+    onBlur() {
+        this.focused = false;
+    }
+
+    /**
+     * Returns if the app is currently visible
+     */
+    isRenderable() {
+        return !this.applicationPaused &amp;&amp; this.pageVisible;
+    }
+
+    onAppRenderableStateChanged(renderable) {
+        logger.log("Application renderable:", renderable);
+        window.focus();
+        const currentState = this.stateMgr.getCurrentState();
+        if (!renderable) {
+            if (currentState) {
+                currentState.onAppPause();
+            }
+        } else {
+            if (currentState) {
+                currentState.onAppResume();
+            }
+            this.checkResize();
+        }
+
+        this.sound.onPageRenderableStateChanged(renderable);
+    }
+
+    /**
+     * Internal unload handler
+     */
+    onUnload(event) {
+        if (!this.unloaded) {
+            logSection("UNLOAD HANDLER", "#f77");
+            this.unloaded = true;
+            const currentState = this.stateMgr.getCurrentState();
+            if (currentState) {
+                currentState.onBeforeExit();
+            }
+            this.deinitialize();
+        }
+    }
+
+    /**
+     * Internal before-unload handler
+     */
+    onBeforeUnload(event) {
+        logSection("BEFORE UNLOAD HANDLER", "#f77");
+        const currentState = this.stateMgr.getCurrentState();
+
+        if (!G_IS_DEV &amp;&amp; currentState &amp;&amp; currentState.getHasUnloadConfirmation()) {
+            if (!G_IS_STANDALONE) {
+                // Need to show a "Are you sure you want to exit"
+                event.preventDefault();
+                event.returnValue = "Are you sure you want to exit?";
+            }
+        }
+    }
+
+    /**
+     * Boots the application
+     */
+    boot() {
+        console.log("Booting ...");
+        this.registerStates();
+        this.registerEventListeners();
+
+        Loader.linkAppAfterBoot(this);
+
+        // Check for mobile
+        if (IS_MOBILE) {
+            this.stateMgr.moveToState("MobileWarningState");
+        } else {
+            this.stateMgr.moveToState("PreloadState");
+        }
+
+        // Starting rendering
+        this.ticker.frameEmitted.add(this.onFrameEmitted, this);
+        this.ticker.bgFrameEmitted.add(this.onBackgroundFrame, this);
+        this.ticker.start();
+
+        window.focus();
+    }
+
+    /**
+     * Deinitializes the application
+     */
+    deinitialize() {
+        return this.sound.deinitialize();
+    }
+
+    /**
+     * Background frame update callback
+     * @param {number} dt
+     */
+    onBackgroundFrame(dt) {
+        if (this.isRenderable()) {
+            return;
+        }
+
+        const currentState = this.stateMgr.getCurrentState();
+        if (currentState) {
+            currentState.onBackgroundTick(dt);
+        }
+    }
+
+    /**
+     * Frame update callback
+     * @param {number} dt
+     */
+    onFrameEmitted(dt) {
+        if (!this.isRenderable()) {
+            return;
+        }
+
+        const time = performance.now();
+
+        // Periodically check for resizes, this is expensive (takes 2-3ms so only do it once in a while!)
+        if (!this.lastResizeCheck || time - this.lastResizeCheck > 1000) {
+            this.checkResize();
+            this.lastResizeCheck = time;
+        }
+
+        const currentState = this.stateMgr.getCurrentState();
+        if (currentState) {
+            currentState.onRender(dt);
+        }
+    }
+
+    /**
+     * Checks if the app resized. Only does this once in a while
+     * @param {boolean} forceUpdate Forced update of the dimensions
+     */
+    checkResize(forceUpdate = false) {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        if (this.screenWidth !== w || this.screenHeight !== h || forceUpdate) {
+            this.screenWidth = w;
+            this.screenHeight = h;
+            const currentState = this.stateMgr.getCurrentState();
+            if (currentState) {
+                currentState.onResized(this.screenWidth, this.screenHeight);
+            }
+
+            const scale = this.getEffectiveUiScale();
+            waitNextFrame().then(() => document.documentElement.style.setProperty("--ui-scale", `${scale}`));
+            window.focus();
+        }
+    }
+
+    /**
+     * Returns the effective ui sclae
+     */
+    getEffectiveUiScale() {
+        return this.platformWrapper.getUiScale() * this.settings.getInterfaceScaleValue();
+    }
+
+    /**
+     * Callback after ui scale has changed
+     */
+    updateAfterUiScaleChanged() {
+        this.checkResize(true);
+    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AdinplayAdProvider_AdinplayAdProvider.html">AdinplayAdProvider</a></li><li><a href="AdProviderInterface_AdProviderInterface.html">AdProviderInterface</a></li><li><a href="AtlasDefinition_AtlasDefinition.html">AtlasDefinition</a></li><li><a href="AtlasSprite_AtlasSprite.html">AtlasSprite</a></li><li><a href="BackgroundResourcesLoader_BackgroundResourcesLoader.html">BackgroundResourcesLoader</a></li><li><a href="BaseDataType.html">BaseDataType</a></li><li><a href="BaseGameSpeed_BaseGameSpeed.html">BaseGameSpeed</a></li><li><a href="BaseHUDPart_BaseHUDPart.html">BaseHUDPart</a></li><li><a href="BaseItem.html">BaseItem</a></li><li><a href="BaseMap_BaseMap.html">BaseMap</a></li><li><a href="BaseSavegameInterface_BaseSavegameInterface.html">BaseSavegameInterface</a></li><li><a href="BaseSetting_BaseSetting.html">BaseSetting</a></li><li><a href="BasicSerializableObject_BasicSerializableObject.html">BasicSerializableObject</a></li><li><a href="BeltComponent_BeltComponent.html">BeltComponent</a></li><li><a href="BeltPath.html">BeltPath</a></li><li><a href="BeltSystem.html">BeltSystem</a></li><li><a href="Blueprint_Blueprint.html">Blueprint</a></li><li><a href="BooleanItem_BooleanItem.html">BooleanItem</a></li><li><a href="BufferMaintainer_BufferMaintainer.html">BufferMaintainer</a></li><li><a href="ColorItem_ColorItem.html">ColorItem</a></li><li><a href="Component_Component.html">Component</a></li><li><a href="ConstantSignalComponent_ConstantSignalComponent.html">ConstantSignalComponent</a></li><li><a href="Dialog.html">Dialog</a></li><li><a href="DialogLoading.html">DialogLoading</a></li><li><a href="DialogWithForm_DialogWithForm.html">DialogWithForm</a></li><li><a href="DynamicDomAttach_DynamicDomAttach.html">DynamicDomAttach</a></li><li><a href="DynamicTickrate_DynamicTickrate.html">DynamicTickrate</a></li><li><a href="Entity_Entity.html">Entity</a></li><li><a href="EntityComponentStorage.html">EntityComponentStorage</a></li><li><a href="FormElementItemChooser_FormElementItemChooser.html">FormElementItemChooser</a></li><li><a href="GameCore.html">GameCore</a></li><li><a href="GamedistributionAdProvider_GamedistributionAdProvider.html">GamedistributionAdProvider</a></li><li><a href="GameHUD_GameHUD.html">GameHUD</a></li><li><a href="GameLoadingOverlay_GameLoadingOverlay.html">GameLoadingOverlay</a></li><li><a href="GameLogic_GameLogic.html">GameLogic</a></li><li><a href="GameRoot.html">GameRoot</a></li><li><a href="GameState.html">GameState</a></li><li><a href="GameSystem.html">GameSystem</a></li><li><a href="GameSystemManager_GameSystemManager.html">GameSystemManager</a></li><li><a href="GameSystemWithFilter_GameSystemWithFilter.html">GameSystemWithFilter</a></li><li><a href="GameTime_GameTime.html">GameTime</a></li><li><a href="HubGoals_HubGoals.html">HubGoals</a></li><li><a href="HUDBaseToolbar_HUDBaseToolbar.html">HUDBaseToolbar</a></li><li><a href="HUDBuildingPlacerLogic.html">HUDBuildingPlacerLogic</a></li><li><a href="HUDEntityDebugger.html">HUDEntityDebugger</a></li><li><a href="HUDLayerPreview.html">HUDLayerPreview</a></li><li><a href="HUDPinnedShapes.html">HUDPinnedShapes</a></li><li><a href="HUDShapeStatisticsHandle.html">HUDShapeStatisticsHandle</a></li><li><a href="HUDTutorialVideoOffer.html">HUDTutorialVideoOffer</a></li><li><a href="InputDistributor_InputDistributor.html">InputDistributor</a></li><li><a href="KeyActionMapper_KeyActionMapper.html">KeyActionMapper</a></li><li><a href="Keybinding_Keybinding.html">Keybinding</a></li><li><a href="LeverComponent_LeverComponent.html">LeverComponent</a></li><li><a href="Logger.html">Logger</a></li><li><a href="LogicGateComponent_LogicGateComponent.html">LogicGateComponent</a></li><li><a href="MapChunk_MapChunk.html">MapChunk</a></li><li><a href="MapChunkView_MapChunkView.html">MapChunkView</a></li><li><a href="MapView.html">MapView</a></li><li><a href="MetaBuilding_MetaBuilding.html">MetaBuilding</a></li><li><a href="ProductionAnalytics_ProductionAnalytics.html">ProductionAnalytics</a></li><li><a href="RandomNumberGenerator_RandomNumberGenerator.html">RandomNumberGenerator</a></li><li><a href="RestrictionManager_RestrictionManager.html">RestrictionManager</a></li><li><a href="SavegameSerializer.html">SavegameSerializer</a></li><li><a href="ShapeDefinition_ShapeDefinition.html">ShapeDefinition</a></li><li><a href="ShapeDefinitionManager_ShapeDefinitionManager.html">ShapeDefinitionManager</a></li><li><a href="ShapeItem_ShapeItem.html">ShapeItem</a></li><li><a href="SoundProxy_SoundProxy.html">SoundProxy</a></li><li><a href="SpriteAtlasLink.html">SpriteAtlasLink</a></li><li><a href="StaleAreaDetector_StaleAreaDetector.html">StaleAreaDetector</a></li><li><a href="StateManager.html">StateManager</a></li><li><a href="StaticMapEntityComponent_StaticMapEntityComponent.html">StaticMapEntityComponent</a></li><li><a href="StorageComponent_StorageComponent.html">StorageComponent</a></li><li><a href="TextualGameState.html">TextualGameState</a></li><li><a href="TrailerMaker_TrailerMaker.html">TrailerMaker</a></li><li><a href="TypeArray_TypeArray.html">TypeArray</a></li><li><a href="TypeClass_TypeClass.html">TypeClass</a></li><li><a href="TypeClassData_TypeClassData.html">TypeClassData</a></li><li><a href="TypeClassFromMetaclass_TypeClassFromMetaclass.html">TypeClassFromMetaclass</a></li><li><a href="TypeClassId_TypeClassId.html">TypeClassId</a></li><li><a href="TypeEnum_TypeEnum.html">TypeEnum</a></li><li><a href="TypeFixedClass_TypeFixedClass.html">TypeFixedClass</a></li><li><a href="TypeKeyValueMap_TypeKeyValueMap.html">TypeKeyValueMap</a></li><li><a href="TypeMetaClass_TypeMetaClass.html">TypeMetaClass</a></li><li><a href="TypeNullable_TypeNullable.html">TypeNullable</a></li><li><a href="TypePair_TypePair.html">TypePair</a></li><li><a href="TypeStructuredObject_TypeStructuredObject.html">TypeStructuredObject</a></li><li><a href="UndergroundBeltComponent_UndergroundBeltComponent.html">UndergroundBeltComponent</a></li><li><a href="Vector_Vector.html">Vector</a></li><li><a href="WireComponent_WireComponent.html">WireComponent</a></li><li><a href="WrappedSoundInstance.html">WrappedSoundInstance</a></li></ul><h3>Global</h3><ul><li><a href="global.html#accessNestedPropertyReverse">accessNestedPropertyReverse</a></li><li><a href="global.html#allApplicationSettings">allApplicationSettings</a></li><li><a href="global.html#arrayAllDirections">arrayAllDirections</a></li><li><a href="global.html#arrayDelete">arrayDelete</a></li><li><a href="global.html#arrayDeleteValue">arrayDeleteValue</a></li><li><a href="global.html#arrayUndergroundRotationVariantToMode">arrayUndergroundRotationVariantToMode</a></li><li><a href="global.html#atlasFiles">atlasFiles</a></li><li><a href="global.html#autoDetectLanguageId">autoDetectLanguageId</a></li><li><a href="global.html#buildBuildingCodeCache">buildBuildingCodeCache</a></li><li><a href="global.html#cachebust">cachebust</a></li><li><a href="global.html#capitalizeFirstLetter">capitalizeFirstLetter</a></li><li><a href="global.html#catchErrors">catchErrors</a></li><li><a href="global.html#clamp">clamp</a></li><li><a href="global.html#clearBufferBacklog">clearBufferBacklog</a></li><li><a href="global.html#COLOR_ITEM_SINGLETONS">COLOR_ITEM_SINGLETONS</a></li><li><a href="global.html#compressInt">compressInt</a></li><li><a href="global.html#compressObject">compressObject</a></li><li><a href="global.html#compressObjectInternal">compressObjectInternal</a></li><li><a href="global.html#compressU8WHeader">compressU8WHeader</a></li><li><a href="global.html#computeCrc">computeCrc</a></li><li><a href="global.html#createSimpleShape">createSimpleShape</a></li><li><a href="global.html#decompressInt">decompressInt</a></li><li><a href="global.html#decompressObject">decompressObject</a></li><li><a href="global.html#decompressObjectInternal">decompressObjectInternal</a></li><li><a href="global.html#decompressU8WHeader">decompressU8WHeader</a></li><li><a href="global.html#deserializeSchema">deserializeSchema</a></li><li><a href="global.html#disableImageSmoothing">disableImageSmoothing</a></li><li><a href="global.html#drawRotatedSprite">drawRotatedSprite</a></li><li><a href="global.html#drawSpriteClipped">drawSpriteClipped</a></li><li><a href="global.html#enableImageSmoothing">enableImageSmoothing</a></li><li><a href="global.html#enumAnalyticsDataSource">enumAnalyticsDataSource</a></li><li><a href="global.html#enumAngleToDirection">enumAngleToDirection</a></li><li><a href="global.html#enumBalancerVariants">enumBalancerVariants</a></li><li><a href="global.html#enumCategories">enumCategories</a></li><li><a href="global.html#enumClippedBeltUnderlayType">enumClippedBeltUnderlayType</a></li><li><a href="global.html#enumColorMixingResults">enumColorMixingResults</a></li><li><a href="global.html#enumColors">enumColors</a></li><li><a href="global.html#enumColorsToHexCode">enumColorsToHexCode</a></li><li><a href="global.html#enumColorToShortcode">enumColorToShortcode</a></li><li><a href="global.html#enumCutterVariants">enumCutterVariants</a></li><li><a href="global.html#enumDebugOverlayMode">enumDebugOverlayMode</a></li><li><a href="global.html#enumDebugOverlayModeNext">enumDebugOverlayModeNext</a></li><li><a href="global.html#enumDirection">enumDirection</a></li><li><a href="global.html#enumDirectionToAngle">enumDirectionToAngle</a></li><li><a href="global.html#enumDirectionToVector">enumDirectionToVector</a></li><li><a href="global.html#enumDisplayMode">enumDisplayMode</a></li><li><a href="global.html#enumHubGoalRewards">enumHubGoalRewards</a></li><li><a href="global.html#enumHubGoalRewardsToContentUnlocked">enumHubGoalRewardsToContentUnlocked</a></li><li><a href="global.html#enumInvertedDirections">enumInvertedDirections</a></li><li><a href="global.html#enumItemProcessorRequirements">enumItemProcessorRequirements</a></li><li><a href="global.html#enumItemProcessorTypes">enumItemProcessorTypes</a></li><li><a href="global.html#enumLocalSavegameStatus">enumLocalSavegameStatus</a></li><li><a href="global.html#enumLogicGateType">enumLogicGateType</a></li><li><a href="global.html#enumLogicGateVariants">enumLogicGateVariants</a></li><li><a href="global.html#enumMinerVariants">enumMinerVariants</a></li><li><a href="global.html#enumMouseButton">enumMouseButton</a></li><li><a href="global.html#enumNotificationType">enumNotificationType</a></li><li><a href="global.html#enumPainterVariants">enumPainterVariants</a></li><li><a href="global.html#enumPinSlotType">enumPinSlotType</a></li><li><a href="global.html#enumRotaterVariants">enumRotaterVariants</a></li><li><a href="global.html#enumSavePriority">enumSavePriority</a></li><li><a href="global.html#enumShortcodeToColor">enumShortcodeToColor</a></li><li><a href="global.html#enumShortcodeToSubShape">enumShortcodeToSubShape</a></li><li><a href="global.html#enumSubShape">enumSubShape</a></li><li><a href="global.html#enumSubShapeToShortcode">enumSubShapeToShortcode</a></li><li><a href="global.html#enumTransistorVariants">enumTransistorVariants</a></li><li><a href="global.html#enumTypeToSize">enumTypeToSize</a></li><li><a href="global.html#enumUndergroundBeltMode">enumUndergroundBeltMode</a></li><li><a href="global.html#enumUndergroundBeltVariants">enumUndergroundBeltVariants</a></li><li><a href="global.html#enumUnderlayTypeToClipRect">enumUnderlayTypeToClipRect</a></li><li><a href="global.html#enumVariantToGate">enumVariantToGate</a></li><li><a href="global.html#enumVirtualProcessorVariants">enumVirtualProcessorVariants</a></li><li><a href="global.html#enumWireType">enumWireType</a></li><li><a href="global.html#enumWireVariant">enumWireVariant</a></li><li><a href="global.html#epsilonCompare">epsilonCompare</a></li><li><a href="global.html#extendSchema">extendSchema</a></li><li><a href="global.html#FAKE_BELT_ACCEPTOR_SLOT">FAKE_BELT_ACCEPTOR_SLOT</a></li><li><a href="global.html#FAKE_BELT_EJECTOR_SLOT_BY_DIRECTION">FAKE_BELT_EJECTOR_SLOT_BY_DIRECTION</a></li><li><a href="global.html#fastArrayDelete">fastArrayDelete</a></li><li><a href="global.html#fastArrayDeleteValue">fastArrayDeleteValue</a></li><li><a href="global.html#fastArrayDeleteValueIfContained">fastArrayDeleteValueIfContained</a></li><li><a href="global.html#fillInLinkIntoTranslation">fillInLinkIntoTranslation</a></li><li><a href="global.html#findCode">findCode</a></li><li><a href="global.html#findNiceIntegerValue">findNiceIntegerValue</a></li><li><a href="global.html#findNiceValue">findNiceValue</a></li><li><a href="global.html#formatBigNumber">formatBigNumber</a></li><li><a href="global.html#formatBigNumberFull">formatBigNumberFull</a></li><li><a href="global.html#formatItemsPerSecond">formatItemsPerSecond</a></li><li><a href="global.html#formatSeconds">formatSeconds</a></li><li><a href="global.html#formatSecondsToTimeAgo">formatSecondsToTimeAgo</a></li><li><a href="global.html#freeCanvas">freeCanvas</a></li><li><a href="global.html#freeCanvasBuckets">freeCanvasBuckets</a></li><li><a href="global.html#gBuildingsByCategory">gBuildingsByCategory</a></li><li><a href="global.html#gBuildingVariants">gBuildingVariants</a></li><li><a href="global.html#gComponentRegistry">gComponentRegistry</a></li><li><a href="global.html#generateFileDownload">generateFileDownload</a></li><li><a href="global.html#generateLevelDefinitions">generateLevelDefinitions</a></li><li><a href="global.html#generateMatrixRotations">generateMatrixRotations</a></li><li><a href="global.html#generateUpgrades">generateUpgrades</a></li><li><a href="global.html#getBufferStats">getBufferStats</a></li><li><a href="global.html#getBufferVramUsageBytes">getBufferVramUsageBytes</a></li><li><a href="global.html#getBuildingDataFromCode">getBuildingDataFromCode</a></li><li><a href="global.html#getCodeFromBuildingData">getCodeFromBuildingData</a></li><li><a href="global.html#getDeviceDPI">getDeviceDPI</a></li><li><a href="global.html#getPlatformName">getPlatformName</a></li><li><a href="global.html#getRandomHint">getRandomHint</a></li><li><a href="global.html#getRomanNumber">getRomanNumber</a></li><li><a href="global.html#getSavegameInterface">getSavegameInterface</a></li><li><a href="global.html#getStringForKeyCode">getStringForKeyCode</a></li><li><a href="global.html#gGameSpeedRegistry">gGameSpeedRegistry</a></li><li><a href="global.html#gItemRegistry">gItemRegistry</a></li><li><a href="global.html#GLOBAL_APP">GLOBAL_APP</a></li><li><a href="global.html#indexMapToArray">indexMapToArray</a></li><li><a href="global.html#initBuildingCodesAfterResourcesLoaded">initBuildingCodesAfterResourcesLoaded</a></li><li><a href="global.html#initBuildingsByCategory">initBuildingsByCategory</a></li><li><a href="global.html#internalBuildStringFromArgs">internalBuildStringFromArgs</a></li><li><a href="global.html#ipcRenderer">ipcRenderer</a></li><li><a href="global.html#isAndroid">isAndroid</a></li><li><a href="global.html#isIos">isIos</a></li><li><a href="global.html#isSupportedBrowser">isSupportedBrowser</a></li><li><a href="global.html#isTrueItem">isTrueItem</a></li><li><a href="global.html#isTruthyItem">isTruthyItem</a></li><li><a href="global.html#itemResolverSingleton">itemResolverSingleton</a></li><li><a href="global.html#itemTypes">itemTypes</a></li><li><a href="global.html#LANGUAGES">LANGUAGES</a></li><li><a href="global.html#lastCanvas">lastCanvas</a></li><li><a href="global.html#lastContext">lastContext</a></li><li><a href="global.html#layers">layers</a></li><li><a href="global.html#lerp">lerp</a></li><li><a href="global.html#make2DUndefinedArray">make2DUndefinedArray</a></li><li><a href="global.html#makeButton">makeButton</a></li><li><a href="global.html#makeButtonElement">makeButtonElement</a></li><li><a href="global.html#makeDiv">makeDiv</a></li><li><a href="global.html#makeDivElement">makeDivElement</a></li><li><a href="global.html#makeNewRng">makeNewRng</a></li><li><a href="global.html#makeOffscreenBuffer">makeOffscreenBuffer</a></li><li><a href="global.html#MAX_LABEL_LENGTH">MAX_LABEL_LENGTH</a></li><li><a href="global.html#MAX_QUEUED_CHARGES">MAX_QUEUED_CHARGES</a></li><li><a href="global.html#mixVector">mixVector</a></li><li><a href="global.html#newEmptyMap">newEmptyMap</a></li><li><a href="global.html#ongoingClickDetectors">ongoingClickDetectors</a></li><li><a href="global.html#prepareHighDPIContext">prepareHighDPIContext</a></li><li><a href="global.html#preparePayload">preparePayload</a></li><li><a href="global.html#randomChoice">randomChoice</a></li><li><a href="global.html#randomInt">randomInt</a></li><li><a href="global.html#rebalance">rebalance</a></li><li><a href="global.html#registerBuildingVariant">registerBuildingVariant</a></li><li><a href="global.html#registerCanvas">registerCanvas</a></li><li><a href="global.html#registeredCanvas">registeredCanvas</a></li><li><a href="global.html#removeAllChildren">removeAllChildren</a></li><li><a href="global.html#resizeCanvas">resizeCanvas</a></li><li><a href="global.html#resizeCanvasAndClear">resizeCanvasAndClear</a></li><li><a href="global.html#resizeHighDPICanvas">resizeHighDPICanvas</a></li><li><a href="global.html#rotateDirectionalObject">rotateDirectionalObject</a></li><li><a href="global.html#rotateFlatMatrix3x3">rotateFlatMatrix3x3</a></li><li><a href="global.html#round1Digit">round1Digit</a></li><li><a href="global.html#round1DigitLocalized">round1DigitLocalized</a></li><li><a href="global.html#round2Digits">round2Digits</a></li><li><a href="global.html#round3Digits">round3Digits</a></li><li><a href="global.html#round4Digits">round4Digits</a></li><li><a href="global.html#safeModulo">safeModulo</a></li><li><a href="global.html#savegameInterfaces">savegameInterfaces</a></li><li><a href="global.html#schemaObject">schemaObject</a></li><li><a href="global.html#schemaToJsonSchema">schemaToJsonSchema</a></li><li><a href="global.html#serializeError">serializeError</a></li><li><a href="global.html#serializeEvent">serializeEvent</a></li><li><a href="global.html#serializeSchema">serializeSchema</a></li><li><a href="global.html#setGlobalApp">setGlobalApp</a></li><li><a href="global.html#SHORT_KEY_CACHE">SHORT_KEY_CACHE</a></li><li><a href="global.html#smoothenDpi">smoothenDpi</a></li><li><a href="global.html#smoothPulse">smoothPulse</a></li><li><a href="global.html#startFileChoose">startFileChoose</a></li><li><a href="global.html#statisticsUnitsSeconds">statisticsUnitsSeconds</a></li><li><a href="global.html#stats">stats</a></li><li><a href="global.html#stringifyObjectContainingErrors">stringifyObjectContainingErrors</a></li><li><a href="global.html#typed">typed</a></li><li><a href="global.html#variantsCache">variantsCache</a></li><li><a href="global.html#verifySchema">verifySchema</a></li><li><a href="global.html#waitNextFrame">waitNextFrame</a></li><li><a href="global.html#wireVariants">wireVariants</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Dec 16 2020 10:12:11 GMT+0100 (GMT+01:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

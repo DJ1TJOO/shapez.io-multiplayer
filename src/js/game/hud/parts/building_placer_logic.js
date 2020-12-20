@@ -289,6 +289,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             staticComp.rotation = this.currentBaseRotation;
         }
     }
+
     /**
      * Tries to delete the building under the mouse
      */
@@ -399,34 +400,49 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
     /**
      * Tries to place the current building at the given tile
      * @param {Vector} tile
+     * @param {object} entity
+     * @param {boolean} multipalyerPlace
      */
-    tryPlaceCurrentBuildingAt(tile) {
+    tryPlaceCurrentBuildingAt(tile, entity = null, uid = null, multipalyerPlace = false) {
         if (this.root.camera.zoomLevel < globalConfig.mapChunkOverviewMinZoom) {
             // Dont allow placing in overview mode
             return;
         }
 
-        const metaBuilding = this.currentMetaBuilding.get();
+        const metaBuilding = entity ? entity.building : this.currentMetaBuilding.get();
         const { rotation, rotationVariant } = metaBuilding.computeOptimalDirectionAndRotationVariantAtTile({
             root: this.root,
-            tile,
+            tile: new Vector(tile.x, tile.y),
             rotation: this.currentBaseRotation,
             variant: this.currentVariant.get(),
             layer: metaBuilding.getLayer(),
         });
 
-        const entity = this.root.logic.tryPlaceBuilding({
-            origin: tile,
-            rotation,
-            rotationVariant,
-            originalRotation: this.currentBaseRotation,
-            building: this.currentMetaBuilding.get(),
-            variant: this.currentVariant.get(),
-        });
+        entity = this.root.logic.tryPlaceBuilding(
+            entity !== null ?
+            {
+                origin: entity.origin,
+                originalRotation: entity.originalRotation,
+                rotation: entity.rotation,
+                rotationVariant: entity.rotationVariant,
+                variant: entity.variant,
+                building: entity.building,
+            } :
+            {
+                origin: tile,
+                rotation,
+                rotationVariant,
+                originalRotation: this.currentBaseRotation,
+                building: this.currentMetaBuilding.get(),
+                variant: this.currentVariant.get(),
+            },
+            uid,
+            multipalyerPlace
+        );
 
         if (entity) {
             // Succesfully placed, find which entity we actually placed
-            this.root.signals.entityManuallyPlaced.dispatch(entity);
+            if (!multipalyerPlace) this.root.signals.entityManuallyPlaced.dispatch(entity);
 
             // Check if we should flip the orientation (used for tunnels)
             if (
@@ -438,14 +454,15 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
                 this.currentBaseRotation = (180 + this.currentBaseRotation) % 360;
             }
 
-            // Check if we should stop placement
-            if (
-                !metaBuilding.getStayInPlacementMode() &&
-                !this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.placeMultiple).pressed &&
-                !this.root.app.settings.getAllSettings().alwaysMultiplace
-            ) {
-                // Stop placement
-                this.currentMetaBuilding.set(null);
+            if (!multipalyerPlace) {
+                // Check if we should stop placement
+                if (!metaBuilding.getStayInPlacementMode() &&
+                    !this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.placeMultiple).pressed &&
+                    !this.root.app.settings.getAllSettings().alwaysMultiplace
+                ) {
+                    // Stop placement
+                    this.currentMetaBuilding.set(null);
+                }
             }
             return true;
         } else {

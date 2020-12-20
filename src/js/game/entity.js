@@ -60,6 +60,26 @@ export class Entity extends BasicSerializableObject {
         this.queuedForDestroy;
 
         /**
+         * Stores if this entity has to emit a event, when destored by the @see EntityManager
+         * @type {boolean} */
+        this.multipalyerDestroy;
+
+        /**
+         * Stores if this entity has to emit a event, when is placed by the @see EntityManager
+         * @type {boolean} */
+        this.multipalyerPlace;
+
+        /**
+         * Stores if this entity has to emit a event, when component is removed by the @see EntityManager
+         * @type {boolean} */
+        this.multipalyerComponentRemove;
+
+        /**
+         * Stores if this entity has to emit a event, when component is added by the @see EntityManager
+         * @type {boolean} */
+        this.multipalyerComponentAdd;
+
+        /**
          * Stores the reason why this entity was destroyed
          * @type {string} */
         this.destroyReason;
@@ -99,7 +119,8 @@ export class Entity extends BasicSerializableObject {
         });
 
         for (const key in this.components) {
-            /** @type {Component} */ (this.components[key]).copyAdditionalStateTo(clone.components[key]);
+            /** @type {Component} */
+            (this.components[key]).copyAdditionalStateTo(clone.components[key]);
         }
 
         return clone;
@@ -110,12 +131,30 @@ export class Entity extends BasicSerializableObject {
      * after that use @see EntityManager.addDynamicComponent
      * @param {Component} componentInstance
      * @param {boolean} force Used by the entity manager. Internal parameter, do not change
+     * @param {boolean} multipalyerComponentAdd
      */
-    addComponent(componentInstance, force = false) {
+    addComponent(componentInstance, force = false, multipalyerComponentAdd = false) {
         if (!force && this.registered) {
-            this.root.entityMgr.attachDynamicComponent(this, componentInstance);
+            this.root.entityMgr.attachDynamicComponent(this, componentInstance, multipalyerComponentAdd);
             return;
         }
+
+        if (this.root) {
+            var self = this;
+            componentInstance = new Proxy(componentInstance, {
+                set(target, property, value) {
+                    target[property] = value;
+                    self.root.signals.entityComponentChanged.dispatch(self, target);
+                    return true;
+                },
+                deleteProperty(target, property) {
+                    delete target[property];
+                    self.root.signals.entityComponentChanged.dispatch(self, target);
+                    return true;
+                },
+            });
+        }
+
         assert(force || !this.registered, "Entity already registered, use EntityManager.addDynamicComponent");
         const id = /** @type {typeof Component} */ (componentInstance.constructor).getId();
         assert(!this.components[id], "Component already present");
@@ -127,10 +166,11 @@ export class Entity extends BasicSerializableObject {
      * after that use @see EntityManager.removeDynamicComponent
      * @param {typeof Component} componentClass
      * @param {boolean} force
+     * @param {boolean} multipalyerComponentRemove
      */
-    removeComponent(componentClass, force = false) {
+    removeComponent(componentClass, force = false, multipalyerComponentRemove = false) {
         if (!force && this.registered) {
-            this.root.entityMgr.removeDynamicComponent(this, componentClass);
+            this.root.entityMgr.removeDynamicComponent(this, componentClass, multipalyerComponentRemove);
             return;
         }
         assert(

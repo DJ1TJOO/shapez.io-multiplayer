@@ -309,7 +309,7 @@ export class DialogOptionChooser extends Dialog {
                 <div class='option ${value === options.active ? "active" : ""} ${
                 iconPrefix ? "hasIcon" : ""
             }' data-optionvalue='${value}'>
-                    ${iconHtml}    
+                    ${iconHtml}
                     <span class='title'>${text}</span>
                     ${descHtml}
                 </div>

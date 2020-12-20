@@ -49,13 +49,11 @@ export class MetaConstantSignalBuilding extends MetaBuilding {
     setupEntityComponents(entity) {
         entity.addComponent(
             new WiredPinsComponent({
-                slots: [
-                    {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.top,
-                        type: enumPinSlotType.logicalEjector,
-                    },
-                ],
+                slots: [{
+                    pos: new Vector(0, 0),
+                    direction: enumDirection.top,
+                    type: enumPinSlotType.logicalEjector,
+                }, ],
             })
         );
         entity.addComponent(new ConstantSignalComponent({}));

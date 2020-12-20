@@ -95,9 +95,14 @@ export class GameLogic {
      * @param {number} param0.rotationVariant
      * @param {string} param0.variant
      * @param {MetaBuilding} param0.building
+     * @param {number} uid
+     * @param {boolean} multiplayerPlace
      * @returns {Entity}
      */
-    tryPlaceBuilding({ origin, rotation, rotationVariant, originalRotation, variant, building }) {
+    tryPlaceBuilding({ origin, rotation, rotationVariant, originalRotation, variant, building },
+        uid = null,
+        multiplayerPlace = false
+    ) {
         const entity = building.createEntity({
             root: this.root,
             origin,
@@ -107,9 +112,9 @@ export class GameLogic {
             variant,
         });
         if (this.checkCanPlaceEntity(entity)) {
-            this.freeEntityAreaBeforeBuild(entity);
+            this.freeEntityAreaBeforeBuild(entity, multiplayerPlace);
             this.root.map.placeStaticEntity(entity);
-            this.root.entityMgr.registerEntity(entity);
+            this.root.entityMgr.registerEntity(entity, uid, multiplayerPlace);
             return entity;
         }
         return null;
@@ -119,8 +124,9 @@ export class GameLogic {
      * Removes all entities with a RemovableMapEntityComponent which need to get
      * removed before placing this entity
      * @param {Entity} entity
+     * @param {boolean} multiplayerPlace
      */
-    freeEntityAreaBeforeBuild(entity) {
+    freeEntityAreaBeforeBuild(entity, multiplayerPlace = false) {
         const staticComp = entity.components.StaticMapEntity;
         const rect = staticComp.getTileSpaceBounds();
         // Remove any removeable colliding entities on the same layer
@@ -132,7 +138,7 @@ export class GameLogic {
                         contents.components.StaticMapEntity.getMetaBuilding().getIsReplaceable(),
                         "Tried to replace non-repleaceable entity"
                     );
-                    if (!this.tryDeleteBuilding(contents)) {
+                    if (!this.tryDeleteBuilding(contents, multiplayerPlace)) {
                         assertAlways(false, "Tried to replace non-repleaceable entity #2");
                     }
                 }
@@ -173,13 +179,14 @@ export class GameLogic {
     /**
      * Tries to delete the given building
      * @param {Entity} building
+     * @param {boolean} multipalyerDestroy
      */
-    tryDeleteBuilding(building) {
+    tryDeleteBuilding(building, multipalyerDestroy = false) {
         if (!this.canDeleteBuilding(building)) {
             return false;
         }
         this.root.map.removeStaticEntity(building);
-        this.root.entityMgr.destroyEntity(building);
+        this.root.entityMgr.destroyEntity(building, multipalyerDestroy);
         this.root.entityMgr.processDestroyList();
         return true;
     }

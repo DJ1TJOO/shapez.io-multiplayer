@@ -28,6 +28,8 @@ import { DynamicTickrate } from "./dynamic_tickrate";
 import { KeyActionMapper } from "./key_action_mapper";
 import { Vector } from "../core/vector";
 import { GameMode } from "./game_mode";
+import { MultiplayerSavegame } from "../savegame/multiplayer_savegame";
+import { Component } from "./component";
 /* typehints:end */
 
 const logger = createLogger("game/root");
@@ -50,6 +52,9 @@ export class GameRoot {
 
         /** @type {Savegame} */
         this.savegame = null;
+
+        /** @type {MultiplayerSavegame} */
+        this.multiplayerSavegame = null;
 
         /** @type {InGameState} */
         this.gameState = null;
@@ -134,12 +139,19 @@ export class GameRoot {
         /** @type {GameMode} */
         this.gameMode = null;
 
+        /** @type {boolean} */
+        this.multiplayerUpgradePurchased = false;
+
+        /** @type {boolean} */
+        this.multiplayerStoryGoalComplete = false;
+
         this.signals = {
             // Entities
             entityManuallyPlaced: /** @type {TypedSignal<[Entity]>} */ (new Signal()),
             entityAdded: /** @type {TypedSignal<[Entity]>} */ (new Signal()),
             entityChanged: /** @type {TypedSignal<[Entity]>} */ (new Signal()),
             entityGotNewComponent: /** @type {TypedSignal<[Entity]>} */ (new Signal()),
+            entityComponentChanged: /** @type {TypedSignal<[Entity, Component]>} */ (new Signal()),
             entityComponentRemoved: /** @type {TypedSignal<[Entity]>} */ (new Signal()),
             entityQueuedForDestroy: /** @type {TypedSignal<[Entity]>} */ (new Signal()),
             entityDestroyed: /** @type {TypedSignal<[Entity]>} */ (new Signal()),

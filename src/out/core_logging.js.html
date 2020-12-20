@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: core/logging.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: core/logging.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { globalConfig } from "../core/config";
+const circularJson = require("circular-json");
+
+/*
+Logging functions
+- To be extended
+*/
+
+/**
+ * Base logger class
+ */
+class Logger {
+    constructor(context) {
+        this.context = context;
+    }
+
+    debug(...args) {
+        globalDebug(this.context, ...args);
+    }
+
+    log(...args) {
+        globalLog(this.context, ...args);
+    }
+
+    warn(...args) {
+        globalWarn(this.context, ...args);
+    }
+
+    error(...args) {
+        globalError(this.context, ...args);
+    }
+}
+
+export function createLogger(context) {
+    return new Logger(context);
+}
+
+function prepareObjectForLogging(obj, maxDepth = 1) {
+    if (!window.Sentry) {
+        // Not required without sentry
+        return obj;
+    }
+
+    if (typeof obj !== "object" &amp;&amp; !Array.isArray(obj)) {
+        return obj;
+    }
+    const result = {};
+    for (const key in obj) {
+        const val = obj[key];
+
+        if (typeof val === "object") {
+            if (maxDepth > 0) {
+                result[key] = prepareObjectForLogging(val, maxDepth - 1);
+            } else {
+                result[key] = "[object]";
+            }
+        } else {
+            result[key] = val;
+        }
+    }
+    return result;
+}
+
+/**
+ * Serializes an error
+ * @param {Error|ErrorEvent} err
+ */
+export function serializeError(err) {
+    if (!err) {
+        return null;
+    }
+    const result = {
+        type: err.constructor.name,
+    };
+
+    if (err instanceof Error) {
+        result.message = err.message;
+        result.name = err.name;
+        result.stack = err.stack;
+        result.type = "{type.Error}";
+    } else if (err instanceof ErrorEvent) {
+        result.filename = err.filename;
+        result.message = err.message;
+        result.lineno = err.lineno;
+        result.colno = err.colno;
+        result.type = "{type.ErrorEvent}";
+
+        if (err.error) {
+            result.error = serializeError(err.error);
+        } else {
+            result.error = "{not-provided}";
+        }
+    } else {
+        result.type = "{unkown-type:" + typeof err + "}";
+    }
+
+    return result;
+}
+
+/**
+ * Serializes an event
+ * @param {Event} event
+ */
+function serializeEvent(event) {
+    let result = {
+        type: "{type.Event:" + typeof event + "}",
+    };
+    result.eventType = event.type;
+    return result;
+}
+
+/**
+ * Prepares a json payload
+ * @param {string} key
+ * @param {any} value
+ */
+function preparePayload(key, value) {
+    if (value instanceof Error || value instanceof ErrorEvent) {
+        return serializeError(value);
+    }
+    if (value instanceof Event) {
+        return serializeEvent(value);
+    }
+    if (typeof value === "undefined") {
+        return null;
+    }
+    return value;
+}
+
+/**
+ * Stringifies an object containing circular references and errors
+ * @param {any} payload
+ */
+export function stringifyObjectContainingErrors(payload) {
+    return circularJson.stringify(payload, preparePayload);
+}
+
+export function globalDebug(context, ...args) {
+    if (G_IS_DEV) {
+        logInternal(context, console.log, prepareArgsForLogging(args));
+    }
+}
+
+export function globalLog(context, ...args) {
+    // eslint-disable-next-line no-console
+    logInternal(context, console.log, prepareArgsForLogging(args));
+}
+
+export function globalWarn(context, ...args) {
+    // eslint-disable-next-line no-console
+    logInternal(context, console.warn, prepareArgsForLogging(args));
+}
+
+export function globalError(context, ...args) {
+    args = prepareArgsForLogging(args);
+    // eslint-disable-next-line no-console
+    logInternal(context, console.error, args);
+
+    if (window.Sentry) {
+        window.Sentry.withScope(scope => {
+            scope.setExtra("args", args);
+            window.Sentry.captureMessage(internalBuildStringFromArgs(args), "error");
+        });
+    }
+}
+
+function prepareArgsForLogging(args) {
+    let result = [];
+    for (let i = 0; i &lt; args.length; ++i) {
+        result.push(prepareObjectForLogging(args[i]));
+    }
+    return result;
+}
+
+/**
+ * @param {Array&lt;any>} args
+ */
+function internalBuildStringFromArgs(args) {
+    let result = [];
+
+    for (let i = 0; i &lt; args.length; ++i) {
+        let arg = args[i];
+        if (
+            typeof arg === "string" ||
+            typeof arg === "number" ||
+            typeof arg === "boolean" ||
+            arg === null ||
+            arg === undefined
+        ) {
+            result.push("" + arg);
+        } else if (arg instanceof Error) {
+            result.push(arg.message);
+        } else {
+            result.push("[object]");
+        }
+    }
+    return result.join(" ");
+}
+
+export function logSection(name, color) {
+    while (name.length &lt;= 14) {
+        name = " " + name + " ";
+    }
+    name = name.padEnd(19, " ");
+
+    const lineCss =
+        "letter-spacing: -3px; color: " + color + "; font-size: 6px; background: #eee; color: #eee;";
+    const line = "%c----------------------------";
+    console.log("\n" + line + " %c" + name + " " + line + "\n", lineCss, "color: " + color, lineCss);
+}
+
+function extractHandleContext(handle) {
+    let context = handle || "unknown";
+    if (handle &amp;&amp; handle.constructor &amp;&amp; handle.constructor.name) {
+        context = handle.constructor.name;
+        if (context === "String") {
+            context = handle;
+        }
+    }
+
+    if (handle &amp;&amp; handle.name) {
+        context = handle.name;
+    }
+    return context + "";
+}
+
+function logInternal(handle, consoleMethod, args) {
+    const context = extractHandleContext(handle).padEnd(20, " ");
+    const labelColor = handle &amp;&amp; handle.LOG_LABEL_COLOR ? handle.LOG_LABEL_COLOR : "#aaa";
+
+    if (G_IS_DEV &amp;&amp; globalConfig.debug.logTimestamps) {
+        const timestamp = "⏱ %c" + (Math.floor(performance.now()) + "").padEnd(6, " ") + "";
+        consoleMethod.call(
+            console,
+            timestamp + " %c" + context,
+            "color: #7f7;",
+            "color: " + labelColor + ";",
+            ...args
+        );
+    } else {
+        // if (G_IS_DEV &amp;&amp; !globalConfig.debug.disableLoggingLogSources) {
+        consoleMethod.call(console, "%c" + context, "color: " + labelColor, ...args);
+        // } else {
+        // consoleMethod.call(console, ...args);
+        // }
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AdinplayAdProvider_AdinplayAdProvider.html">AdinplayAdProvider</a></li><li><a href="AdProviderInterface_AdProviderInterface.html">AdProviderInterface</a></li><li><a href="AtlasDefinition_AtlasDefinition.html">AtlasDefinition</a></li><li><a href="AtlasSprite_AtlasSprite.html">AtlasSprite</a></li><li><a href="BackgroundResourcesLoader_BackgroundResourcesLoader.html">BackgroundResourcesLoader</a></li><li><a href="BaseDataType.html">BaseDataType</a></li><li><a href="BaseGameSpeed_BaseGameSpeed.html">BaseGameSpeed</a></li><li><a href="BaseHUDPart_BaseHUDPart.html">BaseHUDPart</a></li><li><a href="BaseItem.html">BaseItem</a></li><li><a href="BaseMap_BaseMap.html">BaseMap</a></li><li><a href="BaseSavegameInterface_BaseSavegameInterface.html">BaseSavegameInterface</a></li><li><a href="BaseSetting_BaseSetting.html">BaseSetting</a></li><li><a href="BasicSerializableObject_BasicSerializableObject.html">BasicSerializableObject</a></li><li><a href="BeltComponent_BeltComponent.html">BeltComponent</a></li><li><a href="BeltPath.html">BeltPath</a></li><li><a href="BeltSystem.html">BeltSystem</a></li><li><a href="Blueprint_Blueprint.html">Blueprint</a></li><li><a href="BooleanItem_BooleanItem.html">BooleanItem</a></li><li><a href="BufferMaintainer_BufferMaintainer.html">BufferMaintainer</a></li><li><a href="ColorItem_ColorItem.html">ColorItem</a></li><li><a href="Component_Component.html">Component</a></li><li><a href="ConstantSignalComponent_ConstantSignalComponent.html">ConstantSignalComponent</a></li><li><a href="Dialog.html">Dialog</a></li><li><a href="DialogLoading.html">DialogLoading</a></li><li><a href="DialogWithForm_DialogWithForm.html">DialogWithForm</a></li><li><a href="DynamicDomAttach_DynamicDomAttach.html">DynamicDomAttach</a></li><li><a href="DynamicTickrate_DynamicTickrate.html">DynamicTickrate</a></li><li><a href="Entity_Entity.html">Entity</a></li><li><a href="EntityComponentStorage.html">EntityComponentStorage</a></li><li><a href="FormElementItemChooser_FormElementItemChooser.html">FormElementItemChooser</a></li><li><a href="GameCore.html">GameCore</a></li><li><a href="GamedistributionAdProvider_GamedistributionAdProvider.html">GamedistributionAdProvider</a></li><li><a href="GameHUD_GameHUD.html">GameHUD</a></li><li><a href="GameLoadingOverlay_GameLoadingOverlay.html">GameLoadingOverlay</a></li><li><a href="GameLogic_GameLogic.html">GameLogic</a></li><li><a href="GameRoot.html">GameRoot</a></li><li><a href="GameState.html">GameState</a></li><li><a href="GameSystem.html">GameSystem</a></li><li><a href="GameSystemManager_GameSystemManager.html">GameSystemManager</a></li><li><a href="GameSystemWithFilter_GameSystemWithFilter.html">GameSystemWithFilter</a></li><li><a href="GameTime_GameTime.html">GameTime</a></li><li><a href="HubGoals_HubGoals.html">HubGoals</a></li><li><a href="HUDBaseToolbar_HUDBaseToolbar.html">HUDBaseToolbar</a></li><li><a href="HUDBuildingPlacerLogic.html">HUDBuildingPlacerLogic</a></li><li><a href="HUDEntityDebugger.html">HUDEntityDebugger</a></li><li><a href="HUDLayerPreview.html">HUDLayerPreview</a></li><li><a href="HUDPinnedShapes.html">HUDPinnedShapes</a></li><li><a href="HUDShapeStatisticsHandle.html">HUDShapeStatisticsHandle</a></li><li><a href="HUDTutorialVideoOffer.html">HUDTutorialVideoOffer</a></li><li><a href="InputDistributor_InputDistributor.html">InputDistributor</a></li><li><a href="KeyActionMapper_KeyActionMapper.html">KeyActionMapper</a></li><li><a href="Keybinding_Keybinding.html">Keybinding</a></li><li><a href="LeverComponent_LeverComponent.html">LeverComponent</a></li><li><a href="Logger.html">Logger</a></li><li><a href="LogicGateComponent_LogicGateComponent.html">LogicGateComponent</a></li><li><a href="MapChunk_MapChunk.html">MapChunk</a></li><li><a href="MapChunkView_MapChunkView.html">MapChunkView</a></li><li><a href="MapView.html">MapView</a></li><li><a href="MetaBuilding_MetaBuilding.html">MetaBuilding</a></li><li><a href="ProductionAnalytics_ProductionAnalytics.html">ProductionAnalytics</a></li><li><a href="RandomNumberGenerator_RandomNumberGenerator.html">RandomNumberGenerator</a></li><li><a href="RestrictionManager_RestrictionManager.html">RestrictionManager</a></li><li><a href="SavegameSerializer.html">SavegameSerializer</a></li><li><a href="ShapeDefinition_ShapeDefinition.html">ShapeDefinition</a></li><li><a href="ShapeDefinitionManager_ShapeDefinitionManager.html">ShapeDefinitionManager</a></li><li><a href="ShapeItem_ShapeItem.html">ShapeItem</a></li><li><a href="SoundProxy_SoundProxy.html">SoundProxy</a></li><li><a href="SpriteAtlasLink.html">SpriteAtlasLink</a></li><li><a href="StaleAreaDetector_StaleAreaDetector.html">StaleAreaDetector</a></li><li><a href="StateManager.html">StateManager</a></li><li><a href="StaticMapEntityComponent_StaticMapEntityComponent.html">StaticMapEntityComponent</a></li><li><a href="StorageComponent_StorageComponent.html">StorageComponent</a></li><li><a href="TextualGameState.html">TextualGameState</a></li><li><a href="TrailerMaker_TrailerMaker.html">TrailerMaker</a></li><li><a href="TypeArray_TypeArray.html">TypeArray</a></li><li><a href="TypeClass_TypeClass.html">TypeClass</a></li><li><a href="TypeClassData_TypeClassData.html">TypeClassData</a></li><li><a href="TypeClassFromMetaclass_TypeClassFromMetaclass.html">TypeClassFromMetaclass</a></li><li><a href="TypeClassId_TypeClassId.html">TypeClassId</a></li><li><a href="TypeEnum_TypeEnum.html">TypeEnum</a></li><li><a href="TypeFixedClass_TypeFixedClass.html">TypeFixedClass</a></li><li><a href="TypeKeyValueMap_TypeKeyValueMap.html">TypeKeyValueMap</a></li><li><a href="TypeMetaClass_TypeMetaClass.html">TypeMetaClass</a></li><li><a href="TypeNullable_TypeNullable.html">TypeNullable</a></li><li><a href="TypePair_TypePair.html">TypePair</a></li><li><a href="TypeStructuredObject_TypeStructuredObject.html">TypeStructuredObject</a></li><li><a href="UndergroundBeltComponent_UndergroundBeltComponent.html">UndergroundBeltComponent</a></li><li><a href="Vector_Vector.html">Vector</a></li><li><a href="WireComponent_WireComponent.html">WireComponent</a></li><li><a href="WrappedSoundInstance.html">WrappedSoundInstance</a></li></ul><h3>Global</h3><ul><li><a href="global.html#accessNestedPropertyReverse">accessNestedPropertyReverse</a></li><li><a href="global.html#allApplicationSettings">allApplicationSettings</a></li><li><a href="global.html#arrayAllDirections">arrayAllDirections</a></li><li><a href="global.html#arrayDelete">arrayDelete</a></li><li><a href="global.html#arrayDeleteValue">arrayDeleteValue</a></li><li><a href="global.html#arrayUndergroundRotationVariantToMode">arrayUndergroundRotationVariantToMode</a></li><li><a href="global.html#atlasFiles">atlasFiles</a></li><li><a href="global.html#autoDetectLanguageId">autoDetectLanguageId</a></li><li><a href="global.html#buildBuildingCodeCache">buildBuildingCodeCache</a></li><li><a href="global.html#cachebust">cachebust</a></li><li><a href="global.html#capitalizeFirstLetter">capitalizeFirstLetter</a></li><li><a href="global.html#catchErrors">catchErrors</a></li><li><a href="global.html#clamp">clamp</a></li><li><a href="global.html#clearBufferBacklog">clearBufferBacklog</a></li><li><a href="global.html#COLOR_ITEM_SINGLETONS">COLOR_ITEM_SINGLETONS</a></li><li><a href="global.html#compressInt">compressInt</a></li><li><a href="global.html#compressObject">compressObject</a></li><li><a href="global.html#compressObjectInternal">compressObjectInternal</a></li><li><a href="global.html#compressU8WHeader">compressU8WHeader</a></li><li><a href="global.html#computeCrc">computeCrc</a></li><li><a href="global.html#createSimpleShape">createSimpleShape</a></li><li><a href="global.html#decompressInt">decompressInt</a></li><li><a href="global.html#decompressObject">decompressObject</a></li><li><a href="global.html#decompressObjectInternal">decompressObjectInternal</a></li><li><a href="global.html#decompressU8WHeader">decompressU8WHeader</a></li><li><a href="global.html#deserializeSchema">deserializeSchema</a></li><li><a href="global.html#disableImageSmoothing">disableImageSmoothing</a></li><li><a href="global.html#drawRotatedSprite">drawRotatedSprite</a></li><li><a href="global.html#drawSpriteClipped">drawSpriteClipped</a></li><li><a href="global.html#enableImageSmoothing">enableImageSmoothing</a></li><li><a href="global.html#enumAnalyticsDataSource">enumAnalyticsDataSource</a></li><li><a href="global.html#enumAngleToDirection">enumAngleToDirection</a></li><li><a href="global.html#enumBalancerVariants">enumBalancerVariants</a></li><li><a href="global.html#enumCategories">enumCategories</a></li><li><a href="global.html#enumClippedBeltUnderlayType">enumClippedBeltUnderlayType</a></li><li><a href="global.html#enumColorMixingResults">enumColorMixingResults</a></li><li><a href="global.html#enumColors">enumColors</a></li><li><a href="global.html#enumColorsToHexCode">enumColorsToHexCode</a></li><li><a href="global.html#enumColorToShortcode">enumColorToShortcode</a></li><li><a href="global.html#enumCutterVariants">enumCutterVariants</a></li><li><a href="global.html#enumDebugOverlayMode">enumDebugOverlayMode</a></li><li><a href="global.html#enumDebugOverlayModeNext">enumDebugOverlayModeNext</a></li><li><a href="global.html#enumDirection">enumDirection</a></li><li><a href="global.html#enumDirectionToAngle">enumDirectionToAngle</a></li><li><a href="global.html#enumDirectionToVector">enumDirectionToVector</a></li><li><a href="global.html#enumDisplayMode">enumDisplayMode</a></li><li><a href="global.html#enumHubGoalRewards">enumHubGoalRewards</a></li><li><a href="global.html#enumHubGoalRewardsToContentUnlocked">enumHubGoalRewardsToContentUnlocked</a></li><li><a href="global.html#enumInvertedDirections">enumInvertedDirections</a></li><li><a href="global.html#enumItemProcessorRequirements">enumItemProcessorRequirements</a></li><li><a href="global.html#enumItemProcessorTypes">enumItemProcessorTypes</a></li><li><a href="global.html#enumLocalSavegameStatus">enumLocalSavegameStatus</a></li><li><a href="global.html#enumLogicGateType">enumLogicGateType</a></li><li><a href="global.html#enumLogicGateVariants">enumLogicGateVariants</a></li><li><a href="global.html#enumMinerVariants">enumMinerVariants</a></li><li><a href="global.html#enumMouseButton">enumMouseButton</a></li><li><a href="global.html#enumNotificationType">enumNotificationType</a></li><li><a href="global.html#enumPainterVariants">enumPainterVariants</a></li><li><a href="global.html#enumPinSlotType">enumPinSlotType</a></li><li><a href="global.html#enumRotaterVariants">enumRotaterVariants</a></li><li><a href="global.html#enumSavePriority">enumSavePriority</a></li><li><a href="global.html#enumShortcodeToColor">enumShortcodeToColor</a></li><li><a href="global.html#enumShortcodeToSubShape">enumShortcodeToSubShape</a></li><li><a href="global.html#enumSubShape">enumSubShape</a></li><li><a href="global.html#enumSubShapeToShortcode">enumSubShapeToShortcode</a></li><li><a href="global.html#enumTransistorVariants">enumTransistorVariants</a></li><li><a href="global.html#enumTypeToSize">enumTypeToSize</a></li><li><a href="global.html#enumUndergroundBeltMode">enumUndergroundBeltMode</a></li><li><a href="global.html#enumUndergroundBeltVariants">enumUndergroundBeltVariants</a></li><li><a href="global.html#enumUnderlayTypeToClipRect">enumUnderlayTypeToClipRect</a></li><li><a href="global.html#enumVariantToGate">enumVariantToGate</a></li><li><a href="global.html#enumVirtualProcessorVariants">enumVirtualProcessorVariants</a></li><li><a href="global.html#enumWireType">enumWireType</a></li><li><a href="global.html#enumWireVariant">enumWireVariant</a></li><li><a href="global.html#epsilonCompare">epsilonCompare</a></li><li><a href="global.html#extendSchema">extendSchema</a></li><li><a href="global.html#FAKE_BELT_ACCEPTOR_SLOT">FAKE_BELT_ACCEPTOR_SLOT</a></li><li><a href="global.html#FAKE_BELT_EJECTOR_SLOT_BY_DIRECTION">FAKE_BELT_EJECTOR_SLOT_BY_DIRECTION</a></li><li><a href="global.html#fastArrayDelete">fastArrayDelete</a></li><li><a href="global.html#fastArrayDeleteValue">fastArrayDeleteValue</a></li><li><a href="global.html#fastArrayDeleteValueIfContained">fastArrayDeleteValueIfContained</a></li><li><a href="global.html#fillInLinkIntoTranslation">fillInLinkIntoTranslation</a></li><li><a href="global.html#findCode">findCode</a></li><li><a href="global.html#findNiceIntegerValue">findNiceIntegerValue</a></li><li><a href="global.html#findNiceValue">findNiceValue</a></li><li><a href="global.html#formatBigNumber">formatBigNumber</a></li><li><a href="global.html#formatBigNumberFull">formatBigNumberFull</a></li><li><a href="global.html#formatItemsPerSecond">formatItemsPerSecond</a></li><li><a href="global.html#formatSeconds">formatSeconds</a></li><li><a href="global.html#formatSecondsToTimeAgo">formatSecondsToTimeAgo</a></li><li><a href="global.html#freeCanvas">freeCanvas</a></li><li><a href="global.html#freeCanvasBuckets">freeCanvasBuckets</a></li><li><a href="global.html#gBuildingsByCategory">gBuildingsByCategory</a></li><li><a href="global.html#gBuildingVariants">gBuildingVariants</a></li><li><a href="global.html#gComponentRegistry">gComponentRegistry</a></li><li><a href="global.html#generateFileDownload">generateFileDownload</a></li><li><a href="global.html#generateLevelDefinitions">generateLevelDefinitions</a></li><li><a href="global.html#generateMatrixRotations">generateMatrixRotations</a></li><li><a href="global.html#generateUpgrades">generateUpgrades</a></li><li><a href="global.html#getBufferStats">getBufferStats</a></li><li><a href="global.html#getBufferVramUsageBytes">getBufferVramUsageBytes</a></li><li><a href="global.html#getBuildingDataFromCode">getBuildingDataFromCode</a></li><li><a href="global.html#getCodeFromBuildingData">getCodeFromBuildingData</a></li><li><a href="global.html#getDeviceDPI">getDeviceDPI</a></li><li><a href="global.html#getPlatformName">getPlatformName</a></li><li><a href="global.html#getRandomHint">getRandomHint</a></li><li><a href="global.html#getRomanNumber">getRomanNumber</a></li><li><a href="global.html#getSavegameInterface">getSavegameInterface</a></li><li><a href="global.html#getStringForKeyCode">getStringForKeyCode</a></li><li><a href="global.html#gGameSpeedRegistry">gGameSpeedRegistry</a></li><li><a href="global.html#gItemRegistry">gItemRegistry</a></li><li><a href="global.html#GLOBAL_APP">GLOBAL_APP</a></li><li><a href="global.html#indexMapToArray">indexMapToArray</a></li><li><a href="global.html#initBuildingCodesAfterResourcesLoaded">initBuildingCodesAfterResourcesLoaded</a></li><li><a href="global.html#initBuildingsByCategory">initBuildingsByCategory</a></li><li><a href="global.html#internalBuildStringFromArgs">internalBuildStringFromArgs</a></li><li><a href="global.html#ipcRenderer">ipcRenderer</a></li><li><a href="global.html#isAndroid">isAndroid</a></li><li><a href="global.html#isIos">isIos</a></li><li><a href="global.html#isSupportedBrowser">isSupportedBrowser</a></li><li><a href="global.html#isTrueItem">isTrueItem</a></li><li><a href="global.html#isTruthyItem">isTruthyItem</a></li><li><a href="global.html#itemResolverSingleton">itemResolverSingleton</a></li><li><a href="global.html#itemTypes">itemTypes</a></li><li><a href="global.html#LANGUAGES">LANGUAGES</a></li><li><a href="global.html#lastCanvas">lastCanvas</a></li><li><a href="global.html#lastContext">lastContext</a></li><li><a href="global.html#layers">layers</a></li><li><a href="global.html#lerp">lerp</a></li><li><a href="global.html#make2DUndefinedArray">make2DUndefinedArray</a></li><li><a href="global.html#makeButton">makeButton</a></li><li><a href="global.html#makeButtonElement">makeButtonElement</a></li><li><a href="global.html#makeDiv">makeDiv</a></li><li><a href="global.html#makeDivElement">makeDivElement</a></li><li><a href="global.html#makeNewRng">makeNewRng</a></li><li><a href="global.html#makeOffscreenBuffer">makeOffscreenBuffer</a></li><li><a href="global.html#MAX_LABEL_LENGTH">MAX_LABEL_LENGTH</a></li><li><a href="global.html#MAX_QUEUED_CHARGES">MAX_QUEUED_CHARGES</a></li><li><a href="global.html#mixVector">mixVector</a></li><li><a href="global.html#newEmptyMap">newEmptyMap</a></li><li><a href="global.html#ongoingClickDetectors">ongoingClickDetectors</a></li><li><a href="global.html#prepareHighDPIContext">prepareHighDPIContext</a></li><li><a href="global.html#preparePayload">preparePayload</a></li><li><a href="global.html#randomChoice">randomChoice</a></li><li><a href="global.html#randomInt">randomInt</a></li><li><a href="global.html#rebalance">rebalance</a></li><li><a href="global.html#registerBuildingVariant">registerBuildingVariant</a></li><li><a href="global.html#registerCanvas">registerCanvas</a></li><li><a href="global.html#registeredCanvas">registeredCanvas</a></li><li><a href="global.html#removeAllChildren">removeAllChildren</a></li><li><a href="global.html#resizeCanvas">resizeCanvas</a></li><li><a href="global.html#resizeCanvasAndClear">resizeCanvasAndClear</a></li><li><a href="global.html#resizeHighDPICanvas">resizeHighDPICanvas</a></li><li><a href="global.html#rotateDirectionalObject">rotateDirectionalObject</a></li><li><a href="global.html#rotateFlatMatrix3x3">rotateFlatMatrix3x3</a></li><li><a href="global.html#round1Digit">round1Digit</a></li><li><a href="global.html#round1DigitLocalized">round1DigitLocalized</a></li><li><a href="global.html#round2Digits">round2Digits</a></li><li><a href="global.html#round3Digits">round3Digits</a></li><li><a href="global.html#round4Digits">round4Digits</a></li><li><a href="global.html#safeModulo">safeModulo</a></li><li><a href="global.html#savegameInterfaces">savegameInterfaces</a></li><li><a href="global.html#schemaObject">schemaObject</a></li><li><a href="global.html#schemaToJsonSchema">schemaToJsonSchema</a></li><li><a href="global.html#serializeError">serializeError</a></li><li><a href="global.html#serializeEvent">serializeEvent</a></li><li><a href="global.html#serializeSchema">serializeSchema</a></li><li><a href="global.html#setGlobalApp">setGlobalApp</a></li><li><a href="global.html#SHORT_KEY_CACHE">SHORT_KEY_CACHE</a></li><li><a href="global.html#smoothenDpi">smoothenDpi</a></li><li><a href="global.html#smoothPulse">smoothPulse</a></li><li><a href="global.html#startFileChoose">startFileChoose</a></li><li><a href="global.html#statisticsUnitsSeconds">statisticsUnitsSeconds</a></li><li><a href="global.html#stats">stats</a></li><li><a href="global.html#stringifyObjectContainingErrors">stringifyObjectContainingErrors</a></li><li><a href="global.html#typed">typed</a></li><li><a href="global.html#variantsCache">variantsCache</a></li><li><a href="global.html#verifySchema">verifySchema</a></li><li><a href="global.html#waitNextFrame">waitNextFrame</a></li><li><a href="global.html#wireVariants">wireVariants</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Dec 16 2020 10:12:12 GMT+0100 (GMT+01:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
