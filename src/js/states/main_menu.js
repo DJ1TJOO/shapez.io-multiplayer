@@ -635,7 +635,7 @@ export class MainMenuState extends GameState {
 
     onJoinButtonClicked() {
         //host regex
-        const host = /wss:\/\/[a-z]{2,}.[a-z]{2,}?:[0-9]{4,5}\/?/i;
+        const host = /wss:\/\/[a-z]{2,}\.[a-z]{2,}?:[0-9]{4,5}\/?/i;
 
         const hostInput = new FormElementInput({
             id: "hostInput",
@@ -780,14 +780,14 @@ export class MainMenuState extends GameState {
             return;
         }
         //host regex
-        const host = /wss:\/\/[a-z]{2,}.[a-z]{2,}?:[0-9]{4,5}\/?/i;
+        const host = /wss:\/\/[a-z]{2,}\.[a-z]{2,}?:[0-9]{4,5}\/?/i;
 
         const hostInput = new FormElementInput({
             id: "hostInput",
             label: null,
             placeholder: "",
             defaultValue: "",
-            validator: val => val.match(host) && trim(val).length > 0,
+            validator: val => trim(val).length > 0,
         });
         const hostDialog = new DialogWithForm({
             app: this.app,
@@ -825,7 +825,7 @@ export class MainMenuState extends GameState {
             label: null,
             placeholder: "",
             defaultValue: "",
-            validator: val => val.match(host) && trim(val).length > 0,
+            validator: val => trim(val).length > 0,
         });
         const hostDialog = new DialogWithForm({
             app: this.app,
