@@ -9,11 +9,11 @@ function gulptasksCSS($, gulp, buildFolder, browserSync) {
             loadPaths: [path.join(buildFolder, "res", "ui")],
             basePath: buildFolder,
             baseUrl: ".",
-            cachebuster: cachebust
-                ? (filePath, urlPathname) => ({
-                      pathname: buildUtils.cachebust(urlPathname, commitHash),
-                  })
-                : "",
+            cachebuster: cachebust ?
+                (filePath, urlPathname) => ({
+                    pathname: buildUtils.cachebust(urlPathname, commitHash),
+                }) :
+                "",
         });
 
     // Postcss configuration
@@ -21,7 +21,6 @@ function gulptasksCSS($, gulp, buildFolder, browserSync) {
         const plugins = [postcssAssetsPlugin(cachebust)];
         if (prod) {
             plugins.unshift(
-                $.postcssUnprefix(),
                 $.postcssPresetEnv({
                     browsers: ["> 0.1%"],
                 })
