@@ -2,7 +2,7 @@
 
 This fork adds multiplayer to shapez.io. 
 - The game is hosted at `DJ1TJOO.github.io/shapez.io-multiplayer`
-- Its only in English and Dutch. 
+- Its only in English and Dutch (Not much more text has been added).
 - There is a multiplayer server hosted at `ws://thomasbrants.nl:8888`.
 
 -------------------------------------------------------------------------------------------------
