@@ -684,8 +684,10 @@ export class MainMenuState extends GameState {
                 var socket = io(host, { transport: ["websocket"] });
                 var socketId = undefined;
                 socket.on("connect", () => {
+                    console.log("Connected to the signalling server");
                     socket.on("id", id => {
                         socketId = id;
+                        console.log("Got id: " + id);
                         socket.emit("joinRoom", connectionId, socketId);
                     });
                     socket.on("error", () => {
@@ -696,6 +698,7 @@ export class MainMenuState extends GameState {
                     });
                     socket.on("offer", async data => {
                         if (data.socketIdSender !== socketId) return;
+                        console.log("offer received");
                         const config = {
                             iceServers: [
                                 {
@@ -721,6 +724,7 @@ export class MainMenuState extends GameState {
                                 answer: pc.localDescription.sdp,
                                 room: data.room,
                             });
+                            console.log("answer send");
                         };
 
                         var gameDataState = -1;
@@ -728,6 +732,8 @@ export class MainMenuState extends GameState {
 
                         var onMessage = ev => {
                             var packet = JSON.parse(ev.data);
+                            console.log("Message received");
+                            console.log(packet);
 
                             //When data ends
                             if (

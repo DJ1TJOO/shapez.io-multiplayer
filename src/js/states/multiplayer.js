@@ -272,6 +272,7 @@ export class MultiplayerState extends GameState {
                 this.multiplayerSavegame = new MultiplayerSavegame(this.app, this.connection.gameData);
                 this.core.initializeRootMultiplayer(this, this.multiplayerSavegame);
 
+                console.log(this.multiplayerSavegame);
                 if (this.multiplayerSavegame.hasGameDump()) {
                     this.stage4bResumeGame();
                 } else {
