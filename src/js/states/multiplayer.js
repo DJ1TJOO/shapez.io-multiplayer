@@ -522,7 +522,7 @@ export class MultiplayerState extends GameState {
                             });
                             console.log("Answer received");
                             console.log(pc.signalingState);
-                            console.log(pc.getStats);
+                            console.log(pc.getStats());
 
                             var onOpen = event => {
                                 this.core.root.signals.entityAdded.add(entity => {
