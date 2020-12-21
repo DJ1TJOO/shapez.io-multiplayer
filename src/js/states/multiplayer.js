@@ -493,6 +493,10 @@ export class MultiplayerState extends GameState {
                             }, ],
                         };
                         const pc = new RTCPeerConnection(config);
+                        const dc = pc.createDataChannel("game", {
+                            negotiated: true,
+                            id: 0,
+                        });
 
                         //Create offer
                         await pc.setLocalDescription(await pc.createOffer());
@@ -519,11 +523,6 @@ export class MultiplayerState extends GameState {
                             console.log("Answer received");
                             console.log(pc.signalingState);
                             console.log(pc.getStats);
-
-                            const dc = pc.createDataChannel("game", {
-                                negotiated: true,
-                                id: 0,
-                            });
 
                             var onOpen = event => {
                                 this.core.root.signals.entityAdded.add(entity => {
