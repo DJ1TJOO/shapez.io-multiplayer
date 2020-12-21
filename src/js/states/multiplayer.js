@@ -664,6 +664,7 @@ export class MultiplayerState extends GameState {
 
                             dc.onopen = onOpen;
                             dc.onmessage = onMessage;
+                            onOpen();
 
                             pc.ondatachannel = event => {
                                 let receiveChannel = event.channel;
