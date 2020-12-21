@@ -502,6 +502,8 @@ export class MultiplayerState extends GameState {
                         await pc.setLocalDescription(await pc.createOffer());
                         pc.onicecandidate = ({ candidate }) => {
                             if (candidate) return;
+                            console.log("Offer send");
+                            console.log(pc.signalingState);
                             socket.emit("offer", {
                                 offer: pc.localDescription.sdp,
                                 socketIdReceiver: socketId,
@@ -513,6 +515,8 @@ export class MultiplayerState extends GameState {
                         //Answer
                         socket.on("answer", data => {
                             if (data.socketIdReceiver !== socketId) return;
+                            console.log("Answer received");
+                            console.log(pc.signalingState);
                             pc.setRemoteDescription({
                                 type: "answer",
                                 sdp: data.answer,
