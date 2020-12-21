@@ -707,7 +707,10 @@ export class MainMenuState extends GameState {
                             ],
                         };
                         const pc = new RTCPeerConnection(config);
-                        var dc;
+                        const dc = pc.createDataChannel("game", {
+                            negotiated: true,
+                            id: 0,
+                        });
                         await pc.setRemoteDescription({
                             type: "offer",
                             sdp: data.offer,
@@ -722,10 +725,6 @@ export class MainMenuState extends GameState {
                                 room: data.room,
                             });
                             console.log("answer send");
-                            dc = pc.createDataChannel("game", {
-                                negotiated: true,
-                                id: 0,
-                            });
                         };
 
                         var gameDataState = -1;
