@@ -25,7 +25,8 @@ import { ConstantSignalComponent } from "../game/components/constant_signal";
 
 const logger = createLogger("state/ingame");
 const { v4: uuidv4 } = require("uuid");
-
+const wrtc = require("wrtc");
+const Peer = require("simple-peer");
 const io = require("socket.io-client");
 
 // Different sub-states
@@ -51,12 +52,9 @@ export const gameCreationAction = {
 };
 
 export class MultiplayerConnection {
-    constructor(pc, dc, gameData) {
-        /** @type {RTCPeerConnection} */
-        this.pc = pc;
-
-        /** @type {RTCDataChannel} */
-        this.dc = dc;
+    constructor(peer, gameData) {
+        /** @type {Peer} */
+        this.peer = peer;
 
         /** @type {object} */
         this.gameData = gameData;
@@ -372,7 +370,7 @@ export class MultiplayerState extends GameState {
                         if (entity.multipalyerPlace) return;
 
                         MultiplayerPacket.sendPacket(
-                            this.connection.dc,
+                            this.connection.peer,
                             new SignalPacket(SignalPacketSignals.entityAdded, [entity])
                         );
                     });
@@ -380,7 +378,7 @@ export class MultiplayerState extends GameState {
                         if (entity.multipalyerDestroy) return;
 
                         MultiplayerPacket.sendPacket(
-                            this.connection.dc,
+                            this.connection.peer,
                             new SignalPacket(SignalPacketSignals.entityDestroyed, [entity])
                         );
                     });
@@ -388,7 +386,7 @@ export class MultiplayerState extends GameState {
                         if (!(component instanceof ConstantSignalComponent)) return;
 
                         MultiplayerPacket.sendPacket(
-                            this.connection.dc,
+                            this.connection.peer,
                             new SignalPacket(SignalPacketSignals.entityComponentChanged, [entity, component])
                         );
                     });
@@ -396,7 +394,7 @@ export class MultiplayerState extends GameState {
                         if (entity.multipalyerComponentAdd) return;
 
                         MultiplayerPacket.sendPacket(
-                            this.connection.dc,
+                            this.connection.peer,
                             new SignalPacket(SignalPacketSignals.entityComponentRemoved, [entity])
                         );
                     });
@@ -404,7 +402,7 @@ export class MultiplayerState extends GameState {
                         if (entity.multipalyerComponentRemove) return;
 
                         MultiplayerPacket.sendPacket(
-                            this.connection.dc,
+                            this.connection.peer,
                             new SignalPacket(SignalPacketSignals.entityComponentRemoved, [entity])
                         );
                     });
@@ -412,16 +410,16 @@ export class MultiplayerState extends GameState {
                         if (this.core.root.multiplayerUpgradePurchased) return;
 
                         MultiplayerPacket.sendPacket(
-                            this.connection.dc,
+                            this.connection.peer,
                             new SignalPacket(SignalPacketSignals.upgradePurchased, [
                                 new StringSerializable(upgradeId),
                             ])
                         );
                     });
                 };
-                onOpen();
-                var onMessage = ev => {
-                    var packet = JSON.parse(ev.data);
+
+                var onMessage = data => {
+                    var packet = JSON.parse(data);
                     if (packet.type === MultiplayerPacketTypes.SIGNAL) {
                         packet.args = MultiplayerPacket.deserialize(packet.args, this.core.root);
                         if (packet.signal === SignalPacketSignals.entityAdded) {
@@ -464,14 +462,10 @@ export class MultiplayerState extends GameState {
                     }
                 };
 
-                this.connection.dc.onopen = onOpen;
-                this.connection.dc.onmessage = onMessage;
+                this.connection.peer.on("connect", onOpen);
+                onOpen();
 
-                this.connection.pc.ondatachannel = event => {
-                    let receiveChannel = event.channel;
-                    receiveChannel.onopen = onOpen;
-                    receiveChannel.onmessage = onMessage;
-                };
+                this.connection.peer.on("data", onMessage);
             } else {
                 this.connectionId = uuidv4();
                 // @ts-ignore
@@ -492,187 +486,170 @@ export class MultiplayerState extends GameState {
                                 urls: "stun:stun.1.google.com:19302",
                             }, ],
                         };
-                        const pc = new RTCPeerConnection(config);
-                        const dc = pc.createDataChannel("game", {
-                            negotiated: true,
-                            id: 0,
+                        const peer = new Peer({ initiator: true, wrtc: wrtc, config: config });
+                        const peerId = uuidv4();
+                        peer.on("signal", signalData => {
+                            console.log("Send signal");
+                            console.log({
+                                peerId: peerId,
+                                signal: signalData,
+                                senderId: socketId,
+                                receiverId: data.receiverId,
+                            });
+                            socket.emit("signal", {
+                                peerId: peerId,
+                                signal: signalData,
+                                senderId: socketId,
+                                receiverId: data.receiverId,
+                            });
+                        });
+                        socket.on("signal", signalData => {
+                            if (socketId !== signalData.receiverId) return;
+                            if (peerId !== signalData.peerId) return;
+                            console.log("Received signal");
+                            console.log(signalData);
+
+                            peer.signal(signalData.signal);
                         });
 
-                        //Create offer
-                        await pc.setLocalDescription(await pc.createOffer());
-                        pc.onicecandidate = ({ candidate }) => {
-                            if (candidate || pc.signalingState === "stable") return;
-                            console.log("Offer send");
-                            console.log(pc.signalingState);
-                            console.log(pc.getStats);
-                            socket.emit("offer", {
-                                offer: pc.localDescription.sdp,
-                                socketIdReceiver: socketId,
-                                socketIdSender: data.socketIdSender,
-                                room: data.room,
+                        var onOpen = event => {
+                            this.core.root.signals.entityAdded.add(entity => {
+                                if (entity.multipalyerPlace) return;
+
+                                MultiplayerPacket.sendPacket(
+                                    peer,
+                                    new SignalPacket(SignalPacketSignals.entityAdded, [entity]),
+                                    connections
+                                );
                             });
+                            this.core.root.signals.entityDestroyed.add(entity => {
+                                if (entity.multipalyerDestroy) return;
+
+                                MultiplayerPacket.sendPacket(
+                                    peer,
+                                    new SignalPacket(SignalPacketSignals.entityDestroyed, [entity]),
+                                    connections
+                                );
+                            });
+                            this.core.root.signals.entityComponentChanged.add((entity, component) => {
+                                if (!(component instanceof ConstantSignalComponent)) return;
+
+                                MultiplayerPacket.sendPacket(
+                                    peer,
+                                    new SignalPacket(SignalPacketSignals.entityComponentChanged, [
+                                        entity,
+                                        component,
+                                    ]),
+                                    connections
+                                );
+                            });
+                            this.core.root.signals.entityGotNewComponent.add(entity => {
+                                if (entity.multipalyerComponentAdd) return;
+
+                                MultiplayerPacket.sendPacket(
+                                    peer,
+                                    new SignalPacket(SignalPacketSignals.entityComponentRemoved, [entity]),
+                                    connections
+                                );
+                            });
+                            this.core.root.signals.entityComponentRemoved.add(entity => {
+                                if (entity.multipalyerComponentRemove) return;
+
+                                MultiplayerPacket.sendPacket(
+                                    peer,
+                                    new SignalPacket(SignalPacketSignals.entityComponentRemoved, [entity]),
+                                    connections
+                                );
+                            });
+                            this.core.root.signals.upgradePurchased.add(upgradeId => {
+                                if (this.core.root.multiplayerUpgradePurchased) return;
+
+                                MultiplayerPacket.sendPacket(
+                                    peer,
+                                    new SignalPacket(SignalPacketSignals.upgradePurchased, [
+                                        new StringSerializable(upgradeId),
+                                    ]),
+                                    connections
+                                );
+                            });
+
+                            var dataPackets = DataPacket.createFromData({
+                                    version: this.savegame.getCurrentVersion(),
+                                    dump: this.savegame.getCurrentDump(),
+                                    stats: this.savegame.getStatistics(),
+                                    lastUpdate: this.savegame.getRealLastUpdate(),
+                                },
+                                600
+                            );
+
+                            MultiplayerPacket.sendPacket(peer, new FlagPacket(FlagPacketFlags.STARTDATA));
+                            for (let i = 0; i < dataPackets.length; i++) {
+                                MultiplayerPacket.sendPacket(peer, dataPackets[i]);
+                            }
+                            MultiplayerPacket.sendPacket(peer, new FlagPacket(FlagPacketFlags.ENDDATA));
                         };
 
-                        //Answer
-                        socket.on("answer", data => {
-                            if (data.socketIdReceiver !== socketId || pc.signalingState === "stable") return;
-                            pc.setRemoteDescription({
-                                type: "answer",
-                                sdp: data.answer,
-                            });
-                            console.log("Answer received");
-                            console.log(pc.signalingState);
-                            console.log(pc.getStats());
+                        var onMessage = data => {
+                            var packet = JSON.parse(data);
+                            if (packet.type === MultiplayerPacketTypes.SIGNAL) {
+                                packet.args = MultiplayerPacket.deserialize(packet.args, this.core.root);
 
-                            var onOpen = event => {
-                                this.core.root.signals.entityAdded.add(entity => {
-                                    if (entity.multipalyerPlace) return;
+                                for (let i = 0; i < connections.length; i++) {
+                                    if (connections[i].peerId === peerId) continue;
 
                                     MultiplayerPacket.sendPacket(
-                                        dc,
-                                        new SignalPacket(SignalPacketSignals.entityAdded, [entity]),
+                                        connections[i].peer,
+                                        new SignalPacket(packet.signal, packet.args),
                                         connections
                                     );
-                                });
-                                this.core.root.signals.entityDestroyed.add(entity => {
-                                    if (entity.multipalyerDestroy) return;
-
-                                    MultiplayerPacket.sendPacket(
-                                        dc,
-                                        new SignalPacket(SignalPacketSignals.entityDestroyed, [entity]),
-                                        connections
-                                    );
-                                });
-                                this.core.root.signals.entityComponentChanged.add((entity, component) => {
-                                    if (!(component instanceof ConstantSignalComponent)) return;
-
-                                    MultiplayerPacket.sendPacket(
-                                        dc,
-                                        new SignalPacket(SignalPacketSignals.entityComponentChanged, [
-                                            entity,
-                                            component,
-                                        ]),
-                                        connections
-                                    );
-                                });
-                                this.core.root.signals.entityGotNewComponent.add(entity => {
-                                    if (entity.multipalyerComponentAdd) return;
-
-                                    MultiplayerPacket.sendPacket(
-                                        dc,
-                                        new SignalPacket(SignalPacketSignals.entityComponentRemoved, [
-                                            entity,
-                                        ]),
-                                        connections
-                                    );
-                                });
-                                this.core.root.signals.entityComponentRemoved.add(entity => {
-                                    if (entity.multipalyerComponentRemove) return;
-
-                                    MultiplayerPacket.sendPacket(
-                                        dc,
-                                        new SignalPacket(SignalPacketSignals.entityComponentRemoved, [
-                                            entity,
-                                        ]),
-                                        connections
-                                    );
-                                });
-                                this.core.root.signals.upgradePurchased.add(upgradeId => {
-                                    if (this.core.root.multiplayerUpgradePurchased) return;
-
-                                    MultiplayerPacket.sendPacket(
-                                        dc,
-                                        new SignalPacket(SignalPacketSignals.upgradePurchased, [
-                                            new StringSerializable(upgradeId),
-                                        ]),
-                                        connections
-                                    );
-                                });
-
-                                var dataPackets = DataPacket.createFromData({
-                                        version: this.savegame.getCurrentVersion(),
-                                        dump: this.savegame.getCurrentDump(),
-                                        stats: this.savegame.getStatistics(),
-                                        lastUpdate: this.savegame.getRealLastUpdate(),
-                                    },
-                                    600
-                                );
-
-                                MultiplayerPacket.sendPacket(dc, new FlagPacket(FlagPacketFlags.STARTDATA));
-                                for (let i = 0; i < dataPackets.length; i++) {
-                                    MultiplayerPacket.sendPacket(dc, dataPackets[i]);
                                 }
-                                MultiplayerPacket.sendPacket(dc, new FlagPacket(FlagPacketFlags.ENDDATA));
-                            };
 
-                            var onMessage = ev => {
-                                var packet = JSON.parse(ev.data);
-                                if (packet.type === MultiplayerPacketTypes.SIGNAL) {
-                                    packet.args = MultiplayerPacket.deserialize(packet.args, this.core.root);
+                                if (packet.signal === SignalPacketSignals.entityAdded) {
+                                    var entity = packet.args[0];
 
-                                    for (let i = 0; i < connections.length; i++) {
-                                        if (connections[i].dc === dc) continue;
-
-                                        MultiplayerPacket.sendPacket(
-                                            connections[i].dc,
-                                            new SignalPacket(packet.signal, packet.args),
-                                            connections
-                                        );
-                                    }
-
-                                    if (packet.signal === SignalPacketSignals.entityAdded) {
-                                        var entity = packet.args[0];
-
-                                        this.core.root.hud.parts.buildingPlacer.tryPlaceCurrentBuildingAt(
-                                            entity.components.StaticMapEntity.origin, {
-                                                origin: entity.components.StaticMapEntity.origin,
-                                                originalRotation: entity.components.StaticMapEntity.originalRotation,
-                                                rotation: entity.components.StaticMapEntity.rotation,
-                                                rotationVariant: getBuildingDataFromCode(
-                                                    entity.components.StaticMapEntity.code
-                                                ).rotationVariant,
-                                                variant: getBuildingDataFromCode(
-                                                    entity.components.StaticMapEntity.code
-                                                ).variant,
-                                                building: getBuildingDataFromCode(
-                                                    entity.components.StaticMapEntity.code
-                                                ).metaInstance,
-                                            },
-                                            entity.uid,
+                                    this.core.root.hud.parts.buildingPlacer.tryPlaceCurrentBuildingAt(
+                                        entity.components.StaticMapEntity.origin, {
+                                            origin: entity.components.StaticMapEntity.origin,
+                                            originalRotation: entity.components.StaticMapEntity.originalRotation,
+                                            rotation: entity.components.StaticMapEntity.rotation,
+                                            rotationVariant: getBuildingDataFromCode(
+                                                entity.components.StaticMapEntity.code
+                                            ).rotationVariant,
+                                            variant: getBuildingDataFromCode(
+                                                entity.components.StaticMapEntity.code
+                                            ).variant,
+                                            building: getBuildingDataFromCode(
+                                                entity.components.StaticMapEntity.code
+                                            ).metaInstance,
+                                        },
+                                        entity.uid,
+                                        true
+                                    );
+                                }
+                                if (packet.signal === SignalPacketSignals.entityDestroyed) {
+                                    if (this.core.root.entityMgr.findByUid(packet.args[0].uid) !== null)
+                                        this.core.root.logic.tryDeleteBuilding(
+                                            this.core.root.entityMgr.findByUid(packet.args[0].uid),
                                             true
                                         );
-                                    }
-                                    if (packet.signal === SignalPacketSignals.entityDestroyed) {
-                                        if (this.core.root.entityMgr.findByUid(packet.args[0].uid) !== null)
-                                            this.core.root.logic.tryDeleteBuilding(
-                                                this.core.root.entityMgr.findByUid(packet.args[0].uid),
-                                                true
-                                            );
-                                    }
-                                    if (packet.signal === SignalPacketSignals.entityComponentChanged) {
-                                        let entity = this.core.root.entityMgr.findByUid(packet.args[0].uid);
-                                        let component = packet.args[1];
-                                        if (entity === null) return;
-                                        entity.removeComponent(component.constructor, false, true);
-                                        entity.addComponent(component, false, true);
-                                    }
-                                    if (packet.signal === SignalPacketSignals.upgradePurchased) {
-                                        this.core.root.hubGoals.tryUnlockUpgrade(packet.args[0].value, true);
-                                    }
                                 }
-                            };
+                                if (packet.signal === SignalPacketSignals.entityComponentChanged) {
+                                    let entity = this.core.root.entityMgr.findByUid(packet.args[0].uid);
+                                    let component = packet.args[1];
+                                    if (entity === null) return;
+                                    entity.removeComponent(component.constructor, false, true);
+                                    entity.addComponent(component, false, true);
+                                }
+                                if (packet.signal === SignalPacketSignals.upgradePurchased) {
+                                    this.core.root.hubGoals.tryUnlockUpgrade(packet.args[0].value, true);
+                                }
+                            }
+                        };
 
-                            dc.onopen = onOpen;
-                            dc.onmessage = onMessage;
-                            onOpen();
+                        peer.on("connect", onOpen);
+                        peer.on("data", onMessage);
 
-                            pc.ondatachannel = event => {
-                                let receiveChannel = event.channel;
-                                receiveChannel.onmessage = onMessage;
-                                receiveChannel.onopen = onOpen;
-                            };
-                            connections.push({ pc: pc, dc: dc });
-                        });
+                        connections.push({ peer: peer, peerId: peerId });
                     });
                 });
 

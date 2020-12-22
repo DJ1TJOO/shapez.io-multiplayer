@@ -1,14 +1,23 @@
-const https = require("https");
-const fs = require("fs");
+const secure = false;
+var httpsServer;
+var httpServer;
 
-const options = {
-    key: fs.readFileSync("key.pem"),
-    cert: fs.readFileSync("cert.pem"),
-};
+if (secure) {
+    const https = require("https");
+    const fs = require("fs");
 
-const httpServer = https.createServer(options, (req, res) => {});
+    const options = {
+        key: fs.readFileSync("key.pem"),
+        cert: fs.readFileSync("cert.pem"),
+    };
 
-const io = require("socket.io")(httpServer, {
+    httpsServer = https.createServer(options, (req, res) => {});
+} else {
+    const http = require("http");
+    httpServer = http.createServer((req, res) => {});
+}
+
+const io = require("socket.io")(secure ? httpsServer : httpServer, {
     cors: {
         origin: "*",
     },
@@ -27,28 +36,17 @@ io.on("connection", function(socket) {
     socket.on("joinRoom", (room, id) => {
         if ([...io.sockets.adapter.rooms.keys()].indexOf(room) >= 0) {
             socket.join(room);
-            socket.to(room).emit("createPeer", { socketIdSender: id, room: room });
+            socket.to(room).emit("createPeer", { receiverId: id, room: room });
         } else socket.emit("error", { error: 404, errorMessage: "Room not found" });
     });
 
-    socket.on("offer", dataOffer => {
-        if (dataOffer.offer && dataOffer.socketIdSender && dataOffer.socketIdReceiver && dataOffer.room) {
-            socket.to(dataOffer.room).emit("offer", {
-                socketIdSender: dataOffer.socketIdSender,
-                socketIdReceiver: dataOffer.socketIdReceiver,
-                offer: dataOffer.offer,
-                room: dataOffer.room,
-            });
-        }
-    });
-
-    socket.on("answer", dataAnswer => {
-        if (dataAnswer.answer && dataAnswer.socketIdSender && dataAnswer.socketIdReceiver && dataAnswer.room)
-            socket.to(dataAnswer.room).emit("answer", {
-                socketIdSender: dataAnswer.socketIdSender,
-                socketIdReceiver: dataAnswer.socketIdReceiver,
-                answer: dataAnswer.answer,
-            });
+    socket.on("signal", data => {
+        io.to(data.receiverId).emit("signal", {
+            peerId: data.peerId,
+            senderId: data.senderId,
+            receiverId: data.receiverId,
+            signal: data.signal,
+        });
     });
 
     //close the connection
@@ -57,6 +55,6 @@ io.on("connection", function(socket) {
     });
 });
 
-httpServer.listen(8888, () => {
-    console.log("go to wss://localhost:8888");
+(secure ? httpsServer : httpServer).listen(8889, () => {
+    console.log(`go to ${secure ? "wss" : "ws"}://localhost:8889`);
 });

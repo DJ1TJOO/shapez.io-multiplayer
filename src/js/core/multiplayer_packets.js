@@ -42,6 +42,7 @@ import { RegularGameSpeed } from "../game/time/regular_game_speed";
 import { BasicSerializableObject, types } from "../savegame/serialization";
 import { SerializerInternal } from "../savegame/serializer_internal";
 
+const Peer = require("simple-peer");
 /**
  * SerializedObject
  * @typedef {{
@@ -160,16 +161,19 @@ export class MultiplayerPacket {
 
     /**
      * Sends the packet over a peer via the datachannel
-     * @param {RTCDataChannel} dc
+     * @param {Peer} peer
      * @param {MultiplayerPacket} packet
      * @param {Array} packet
      */
-    static sendPacket(dc, packet, connections = undefined) {
-        if (dc.readyState !== "open") {
-            if (connections) connections.splice(connections.indexOf(connections.find(x => x.dc === dc)), 1);
-            return;
+    static sendPacket(peer, packet, connections = undefined) {
+        try {
+            peer.send(JSON.stringify(packet));
+        } catch (error) {
+            if (G_IS_DEV) console.log(error);
+
+            if (connections)
+                connections.splice(connections.indexOf(connections.find(x => x.peer === peer)), 1);
         }
-        dc.send(JSON.stringify(packet));
     }
 
     /**

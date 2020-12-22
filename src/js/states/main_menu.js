@@ -24,6 +24,8 @@ import { MultiplayerConnection } from "./multiplayer";
 
 const trim = require("trim");
 const io = require("socket.io-client");
+const wrtc = require("wrtc");
+const Peer = require("simple-peer");
 
 /**
  * @typedef {import("../savegame/savegame_typedefs").SavegameMetadata} SavegameMetadata
@@ -642,7 +644,7 @@ export class MainMenuState extends GameState {
             label: null,
             placeholder: "",
             defaultValue: "",
-            validator: val => val.match(host) && trim(val).length > 0,
+            validator: val => trim(val).length > 0,
         });
         const hostDialog = new DialogWithForm({
             app: this.app,
@@ -683,6 +685,9 @@ export class MainMenuState extends GameState {
                 // @ts-ignore
                 var socket = io(host, { transport: ["websocket"] });
                 var socketId = undefined;
+                var socketConnectionId = undefined;
+                var peerId = undefined;
+
                 socket.on("connect", () => {
                     console.log("Connected to the signalling server");
                     socket.on("id", id => {
@@ -696,81 +701,79 @@ export class MainMenuState extends GameState {
                             T.dialogs.multiplayerGameError.desc + "<br><br>"
                         );
                     });
-                    socket.on("offer", async data => {
-                        if (data.socketIdSender !== socketId) return;
-                        console.log("offer received");
-                        const config = {
-                            iceServers: [
-                                {
-                                    urls: "stun:stun.1.google.com:19302",
-                                },
-                            ],
-                        };
-                        const pc = new RTCPeerConnection(config);
-                        const dc = pc.createDataChannel("game", {
-                            negotiated: true,
-                            id: 0,
-                        });
-                        await pc.setRemoteDescription({
-                            type: "offer",
-                            sdp: data.offer,
-                        });
-                        await pc.setLocalDescription(await pc.createAnswer());
-                        pc.onicecandidate = ({ candidate }) => {
-                            if (candidate) return;
-                            socket.emit("answer", {
-                                socketIdReceiver: data.socketIdReceiver,
-                                socketIdSender: data.socketIdSender,
-                                answer: pc.localDescription.sdp,
-                                room: data.room,
-                            });
-                            console.log("answer send");
-                        };
 
-                        var gameDataState = -1;
-                        var gameData = "";
+                    const config = {
+                        iceServers: [
+                            {
+                                urls: "stun:stun.1.google.com:19302",
+                            },
+                        ],
+                    };
+                    const pc = new Peer({ initiator: false, wrtc: wrtc, config: config });
+                    socket.on("signal", signalData => {
+                        if (socketId !== signalData.receiverId) return;
+                        console.log("Received signal");
+                        console.log(signalData);
 
-                        var onMessage = ev => {
-                            var packet = JSON.parse(ev.data);
-                            console.log("Message received");
-                            console.log(packet);
-
-                            //When data ends
-                            if (
-                                packet.type === MultiplayerPacketTypes.FLAG &&
-                                packet.flag === FlagPacketFlags.ENDDATA
-                            ) {
-                                gameDataState = 1;
-                                console.log(gameData);
-                                gameData = JSON.parse(gameData);
-                                var connection = new MultiplayerConnection(pc, dc, gameData);
-                                this.moveToState("MultiplayerState", {
-                                    connection,
-                                    connectionId,
-                                });
-                            }
-
-                            //When data recieved
-                            if (packet.type === MultiplayerPacketTypes.DATA && gameDataState === 0)
-                                gameData = gameData + packet.data;
-
-                            //When start data
-                            if (
-                                packet.type === MultiplayerPacketTypes.FLAG &&
-                                packet.flag === FlagPacketFlags.STARTDATA
-                            ) {
-                                gameDataState = 0;
-                                this.loadingOverlay = new GameLoadingOverlay(this.app, this.getDivElement());
-                                this.loadingOverlay.showBasic();
-                            }
-                        };
-
-                        dc.onmessage = onMessage;
-                        pc.ondatachannel = event => {
-                            let receiveChannel = event.channel;
-                            receiveChannel.onmessage = onMessage;
-                        };
+                        peerId = signalData.peerId;
+                        socketConnectionId = signalData.senderId;
+                        pc.signal(signalData.signal);
                     });
+                    pc.on("signal", signalData => {
+                        console.log("Send signal");
+                        console.log({
+                            receiverId: socketConnectionId,
+                            peerId: peerId,
+                            signal: signalData,
+                            senderId: socketId,
+                        });
+                        socket.emit("signal", {
+                            receiverId: socketConnectionId,
+                            peerId: peerId,
+                            signal: signalData,
+                            senderId: socketId,
+                        });
+                    });
+
+                    var gameDataState = -1;
+                    var gameData = "";
+
+                    var onMessage = data => {
+                        var packet = JSON.parse(data);
+                        console.log("Message received");
+                        console.log(packet);
+
+                        //When data ends
+                        if (
+                            packet.type === MultiplayerPacketTypes.FLAG &&
+                            packet.flag === FlagPacketFlags.ENDDATA
+                        ) {
+                            gameDataState = 1;
+                            console.log(gameData);
+                            gameData = JSON.parse(gameData);
+                            var connection = new MultiplayerConnection(pc, gameData);
+                            this.moveToState("MultiplayerState", {
+                                connection,
+                                connectionId,
+                            });
+                        }
+
+                        //When data recieved
+                        if (packet.type === MultiplayerPacketTypes.DATA && gameDataState === 0)
+                            gameData = gameData + packet.data;
+
+                        //When start data
+                        if (
+                            packet.type === MultiplayerPacketTypes.FLAG &&
+                            packet.flag === FlagPacketFlags.STARTDATA
+                        ) {
+                            gameDataState = 0;
+                            this.loadingOverlay = new GameLoadingOverlay(this.app, this.getDivElement());
+                            this.loadingOverlay.showBasic();
+                        }
+                    };
+
+                    pc.on("data", onMessage);
                 });
             });
         });
