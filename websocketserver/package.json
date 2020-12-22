@@ -9,6 +9,7 @@
   "author": "",
   "license": "SEE LICENSE IN ../LICENSE",
   "dependencies": {
+    "peerjs-server": "^0.2.9",
     "socket.io": "^3.0.3",
     "uuid": "^8.3.1",
     "ws": "^7.4.1"
