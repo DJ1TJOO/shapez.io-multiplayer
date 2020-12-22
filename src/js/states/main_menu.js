@@ -707,6 +707,9 @@ export class MainMenuState extends GameState {
                             {
                                 urls: "stun:stun.1.google.com:19302",
                             },
+                            {
+                                urls: "turn:turn02.hubl.in?transport=tcp",
+                            },
                         ],
                     };
                     const pc = new Peer({ initiator: false, wrtc: wrtc, config: config });

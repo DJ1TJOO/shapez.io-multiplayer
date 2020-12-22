@@ -483,8 +483,12 @@ export class MultiplayerState extends GameState {
                     socket.on("createPeer", async data => {
                         const config = {
                             iceServers: [{
-                                urls: "stun:stun.1.google.com:19302",
-                            }, ],
+                                    urls: "stun:stun.1.google.com:19302",
+                                },
+                                {
+                                    urls: "turn:turn02.hubl.in?transport=tcp",
+                                },
+                            ],
                         };
                         const peer = new Peer({ initiator: true, wrtc: wrtc, config: config });
                         const peerId = uuidv4();
