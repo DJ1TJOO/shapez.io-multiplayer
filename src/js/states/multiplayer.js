@@ -486,7 +486,9 @@ export class MultiplayerState extends GameState {
                                     urls: "stun:stun.1.google.com:19302",
                                 },
                                 {
-                                    urls: "turn:turn02.hubl.in?transport=tcp",
+                                    url: "turn:numb.viagenie.ca",
+                                    credential: "muazkh",
+                                    username: "webrtc@live.com",
                                 },
                             ],
                         };
