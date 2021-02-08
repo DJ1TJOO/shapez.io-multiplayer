@@ -5,6 +5,20 @@ This fork adds multiplayer to shapez.io.
 - Its only in English and Dutch (Not much more text has been added).
 - There is a multiplayer server hosted at `wss://thomasbrants.nl:8889`.
 
+## PC 1
+1. Create a world with normal single player
+2. save that world and leave
+3. go to multiplayer
+4. play the world
+5. enter wss://thomasbrants.nl:8889
+--> then you get room code
+
+## PC 2
+1. go to multiplayer
+2. click join
+3. enter wss://thomasbrants.nl:8889
+4. enter room code
+
 -------------------------------------------------------------------------------------------------
 
 # shapez.io
