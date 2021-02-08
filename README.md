@@ -6,7 +6,7 @@ This fork adds multiplayer to shapez.io.
 - There is a multiplayer server hosted at `wss://thomasbrants.nl:8889`.
 
 ## PC 1
-1. Create a world with normal single player
+1. Create a world with normal single player or an already existing world
 2. save that world and leave
 3. go to multiplayer
 4. play the world
