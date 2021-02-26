@@ -1,8 +1,5 @@
-import { Loader } from "../../../core/loader";
-import { AtlasSprite } from "../../../core/sprites";
 import { generateMatrixRotations } from "../../../core/utils";
 import { enumDirection, Vector } from "../../../core/vector";
-import { SOUNDS } from "../../../platform/sound";
 import { enumLogicGateType } from "../../components/logic_gate";
 import { enumPinSlotType } from "../../components/wired_pins";
 import { Entity } from "../../entity";
@@ -68,8 +65,7 @@ export class DefaultAnalyzerVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.WiredPins.setSlots([
-            {
+        entity.components.WiredPins.setSlots([{
                 pos: new Vector(0, 0),
                 direction: enumDirection.left,
                 type: enumPinSlotType.logicalEjector,
