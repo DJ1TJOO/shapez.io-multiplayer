@@ -2,21 +2,19 @@ import { Loader } from "../core/loader";
 import { AtlasSprite } from "../core/sprites";
 import { Vector } from "../core/vector";
 import { SOUNDS } from "../platform/sound";
-import { getCodeFromBuildingData } from "./building_codes";
-import { StaticMapEntityComponent } from "./components/static_map_entity";
 import { Entity } from "./entity";
-import { defaultBuildingVariant } from "./meta_building";
+import { defaultBuildingVariant, MetaBuilding } from "./meta_building";
 import { GameRoot } from "./root";
 
 export class MetaBuildingVariant {
     /**
      *
      * @param {string} id Variant id
-     * @param {string} buildingId Building id
+     * @param {MetaBuilding} metaBuilding MetaBuilding
      */
-    constructor(id, buildingId) {
+    constructor(id, metaBuilding) {
         this.id = id;
-        this.buildingId = buildingId;
+        this.metaBuilding = metaBuilding;
     }
 
     /**
@@ -132,9 +130,9 @@ export class MetaBuildingVariant {
     getPreviewSprite(rotationVariant = 0) {
         return Loader.getSprite(
             "sprites/buildings/" +
-            this.buildingId +
-            (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
-            ".png"
+                this.metaBuilding.getId() +
+                (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
+                ".png"
         );
     }
 
@@ -145,9 +143,9 @@ export class MetaBuildingVariant {
     getBlueprintSprite(rotationVariant = 0) {
         return Loader.getSprite(
             "sprites/blueprints/" +
-            this.buildingId +
-            (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
-            ".png"
+                this.metaBuilding.getId() +
+                (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
+                ".png"
         );
     }
 
@@ -183,9 +181,9 @@ export class MetaBuildingVariant {
     getSprite(rotationVariant) {
         return Loader.getSprite(
             "sprites/buildings/" +
-            this.buildingId +
-            (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
-            ".png"
+                this.metaBuilding.getId() +
+                (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
+                ".png"
         );
     }
 

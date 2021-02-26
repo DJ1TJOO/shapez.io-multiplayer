@@ -14,11 +14,17 @@ export class MetaBuilding {
     /**
      *
      * @param {string} id Building id
-     * @param {Object.<string, MetaBuildingVariant>} variants Building variants
+     * @param {Array<typeof MetaBuildingVariant>} variants Building variants
      */
     constructor(id, variants) {
         this.id = id;
-        this.variants = variants;
+        /**@typedef {Object.<string, MetaBuildingVariant>} */
+        this.variants = {};
+        for (let i = 0; i < variants.length; i++) {
+            // @ts-ignore
+            const variant = new variants[i](this);
+            this.variants[variant.getId()] = variant;
+        }
     }
 
     /**
@@ -166,9 +172,9 @@ export class MetaBuilding {
         if (!this.variants[variant])
             return Loader.getSprite(
                 "sprites/buildings/" +
-                this.id +
-                (variant === defaultBuildingVariant ? "" : "-" + variant) +
-                ".png"
+                    this.id +
+                    (variant === defaultBuildingVariant ? "" : "-" + variant) +
+                    ".png"
             );
         return this.variants[variant].getPreviewSprite(rotationVariant);
     }
@@ -181,9 +187,9 @@ export class MetaBuilding {
         if (!this.variants[variant])
             return Loader.getSprite(
                 "sprites/blueprints/" +
-                this.id +
-                (variant === defaultBuildingVariant ? "" : "-" + variant) +
-                ".png"
+                    this.id +
+                    (variant === defaultBuildingVariant ? "" : "-" + variant) +
+                    ".png"
             );
         return this.variants[variant].getBlueprintSprite(rotationVariant);
     }
@@ -263,9 +269,9 @@ export class MetaBuilding {
         if (!this.variants[variant])
             return Loader.getSprite(
                 "sprites/buildings/" +
-                this.id +
-                (variant === defaultBuildingVariant ? "" : "-" + variant) +
-                ".png"
+                    this.id +
+                    (variant === defaultBuildingVariant ? "" : "-" + variant) +
+                    ".png"
             );
         return this.variants[variant].getBlueprintSprite(rotationVariant);
     }
