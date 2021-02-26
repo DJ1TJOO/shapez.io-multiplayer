@@ -6,6 +6,7 @@ import { StaticMapEntityComponent } from "./components/static_map_entity";
 import { Entity } from "./entity";
 import { GameRoot } from "./root";
 import { getCodeFromBuildingData } from "./building_codes";
+import { MetaBuildingVariant } from "./meta_building_variant";
 
 export const defaultBuildingVariant = "default";
 
@@ -13,9 +14,11 @@ export class MetaBuilding {
     /**
      *
      * @param {string} id Building id
+     * @param {Array<MetaBuildingVariant>} variants Building variants
      */
-    constructor(id) {
+    constructor(id, variants) {
         this.id = id;
+        this.variants = variants;
     }
 
     /**
@@ -142,9 +145,9 @@ export class MetaBuilding {
     getPreviewSprite(rotationVariant = 0, variant = defaultBuildingVariant) {
         return Loader.getSprite(
             "sprites/buildings/" +
-                this.id +
-                (variant === defaultBuildingVariant ? "" : "-" + variant) +
-                ".png"
+            this.id +
+            (variant === defaultBuildingVariant ? "" : "-" + variant) +
+            ".png"
         );
     }
 
@@ -155,9 +158,9 @@ export class MetaBuilding {
     getBlueprintSprite(rotationVariant = 0, variant = defaultBuildingVariant) {
         return Loader.getSprite(
             "sprites/blueprints/" +
-                this.id +
-                (variant === defaultBuildingVariant ? "" : "-" + variant) +
-                ".png"
+            this.id +
+            (variant === defaultBuildingVariant ? "" : "-" + variant) +
+            ".png"
         );
     }
 
@@ -232,9 +235,9 @@ export class MetaBuilding {
     getSprite(rotationVariant, variant) {
         return Loader.getSprite(
             "sprites/buildings/" +
-                this.id +
-                (variant === defaultBuildingVariant ? "" : "-" + variant) +
-                ".png"
+            this.id +
+            (variant === defaultBuildingVariant ? "" : "-" + variant) +
+            ".png"
         );
     }
 
