@@ -26,6 +26,10 @@ export class MetaBuildingVariant {
         return this.id;
     }
 
+    getIsAvailable(root) {
+        return true;
+    }
+
     /**
      * Returns the edit layer of the building
      * @param {GameRoot} root
@@ -191,7 +195,6 @@ export class MetaBuildingVariant {
      * @param {GameRoot} param0.root
      * @param {Vector} param0.tile
      * @param {number} param0.rotation
-     * @param {string} param0.variant
      * @param {Layer} param0.layer
      * @return {{ rotation: number, rotationVariant: number, connectedEntities?: Array<Entity> }}
      */

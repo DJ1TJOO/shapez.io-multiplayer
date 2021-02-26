@@ -101,11 +101,11 @@ export class MetaWireBuilding extends MetaBuilding {
         return MetaWireBuilding.renderPins[variant]();
     }
 
-    getHasDirectionLockAvailable() {
+    getHasDirectionLockAvailable(variant) {
         return true;
     }
 
-    getStayInPlacementMode() {
+    getStayInPlacementMode(variant) {
         return true;
     }
 
@@ -151,21 +151,26 @@ export class MetaWireBuilding extends MetaBuilding {
     getPreviewSprite(rotationVariant, variant) {
         const wireVariant = MetaWireBuilding.wireVariantToVariant[variant];
         switch (MetaWireBuilding.rotationVariantToType[rotationVariant]) {
-            case enumWireType.forward: {
-                return Loader.getSprite("sprites/wires/sets/" + wireVariant + "_forward.png");
-            }
-            case enumWireType.turn: {
-                return Loader.getSprite("sprites/wires/sets/" + wireVariant + "_turn.png");
-            }
-            case enumWireType.split: {
-                return Loader.getSprite("sprites/wires/sets/" + wireVariant + "_split.png");
-            }
-            case enumWireType.cross: {
-                return Loader.getSprite("sprites/wires/sets/" + wireVariant + "_cross.png");
-            }
-            default: {
-                assertAlways(false, "Invalid wire rotation variant");
-            }
+            case enumWireType.forward:
+                {
+                    return Loader.getSprite("sprites/wires/sets/" + wireVariant + "_forward.png");
+                }
+            case enumWireType.turn:
+                {
+                    return Loader.getSprite("sprites/wires/sets/" + wireVariant + "_turn.png");
+                }
+            case enumWireType.split:
+                {
+                    return Loader.getSprite("sprites/wires/sets/" + wireVariant + "_split.png");
+                }
+            case enumWireType.cross:
+                {
+                    return Loader.getSprite("sprites/wires/sets/" + wireVariant + "_cross.png");
+                }
+            default:
+                {
+                    assertAlways(false, "Invalid wire rotation variant");
+                }
         }
     }
 

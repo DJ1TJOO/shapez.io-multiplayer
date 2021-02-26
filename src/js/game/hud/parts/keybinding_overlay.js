@@ -45,11 +45,10 @@ export class HUDKeybindingOverlay extends BaseHUDPart {
      */
     get buildingPlacementSupportsBeltPlanner() {
         const placer = this.root.hud.parts.buildingPlacer;
-        return (
-            !this.mapOverviewActive &&
+        return (!this.mapOverviewActive &&
             placer &&
             placer.currentMetaBuilding.get() &&
-            placer.currentMetaBuilding.get().getHasDirectionLockAvailable()
+            placer.currentMetaBuilding.get().getHasDirectionLockAvailable(placer.currentVariant.get())
         );
     }
 
@@ -60,11 +59,10 @@ export class HUDKeybindingOverlay extends BaseHUDPart {
      */
     get buildingPlacementStaysInPlacement() {
         const placer = this.root.hud.parts.buildingPlacer;
-        return (
-            !this.mapOverviewActive &&
+        return (!this.mapOverviewActive &&
             placer &&
             placer.currentMetaBuilding.get() &&
-            placer.currentMetaBuilding.get().getStayInPlacementMode()
+            placer.currentMetaBuilding.get().getStayInPlacementMode(placer.currentVariant.get())
         );
     }
 
@@ -129,8 +127,7 @@ export class HUDKeybindingOverlay extends BaseHUDPart {
         const k = KEYMAPPINGS;
 
         /** @type {Array<KeyBinding>} */
-        this.keybindings = [
-            {
+        this.keybindings = [{
                 // Move map - Including mouse
                 label: T.ingame.keybindingsOverlay.moveMap,
                 keys: [

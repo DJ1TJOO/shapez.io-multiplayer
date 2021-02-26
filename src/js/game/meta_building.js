@@ -14,7 +14,7 @@ export class MetaBuilding {
     /**
      *
      * @param {string} id Building id
-     * @param {Array<MetaBuildingVariant>} variants Building variants
+     * @param {Object.<string, MetaBuildingVariant>} variants Building variants
      */
     constructor(id, variants) {
         this.id = id;
@@ -35,7 +35,8 @@ export class MetaBuilding {
      * @returns {Layer}
      */
     getLayer(root, variant = defaultBuildingVariant) {
-        return "regular";
+        if (!this.variants[variant]) return "regular";
+        return this.variants[variant].getLayer(root);
     }
 
     /**
@@ -43,21 +44,24 @@ export class MetaBuilding {
      * @param {string} variant
      */
     getDimensions(variant = defaultBuildingVariant) {
-        return new Vector(1, 1);
+        if (!this.variants[variant]) return new Vector(1, 1);
+        return this.variants[variant].getDimensions();
     }
 
     /**
      * Returns whether the building has the direction lock switch available
      */
-    getHasDirectionLockAvailable() {
-        return false;
+    getHasDirectionLockAvailable(variant = defaultBuildingVariant) {
+        if (!this.variants[variant]) return false;
+        return this.variants[variant].getHasDirectionLockAvailable();
     }
 
     /**
      * Whether to stay in placement mode after having placed a building
      */
-    getStayInPlacementMode() {
-        return false;
+    getStayInPlacementMode(variant = defaultBuildingVariant) {
+        if (!this.variants[variant]) return false;
+        return this.variants[variant].getStayInPlacementMode();
     }
 
     /**
@@ -69,7 +73,8 @@ export class MetaBuilding {
      * @returns {Array<number>|null}
      */
     getSpecialOverlayRenderMatrix(rotation, rotationVariant, variant, entity) {
-        return null;
+        if (!this.variants[variant]) return null;
+        return this.variants[variant].getSpecialOverlayRenderMatrix(rotation, rotationVariant, entity);
     }
 
     /**
@@ -79,22 +84,25 @@ export class MetaBuilding {
      * @returns {Array<[string, string]>}
      */
     getAdditionalStatistics(root, variant) {
-        return [];
+        if (!this.variants[variant]) return [];
+        return this.variants[variant].getAdditionalStatistics(root);
     }
 
     /**
      * Returns whether this building can get replaced
      */
     getIsReplaceable(variant = defaultBuildingVariant) {
-        return false;
+        if (!this.variants[variant]) return false;
+        return this.variants[variant].getIsReplaceable();
     }
 
     /**
      * Whether to flip the orientation after a building has been placed - useful
      * for tunnels.
      */
-    getFlipOrientationAfterPlacement() {
-        return false;
+    getFlipOrientationAfterPlacement(variant = defaultBuildingVariant) {
+        if (!this.variants[variant]) return false;
+        return this.variants[variant].getFlipOrientationAfterPlacement();
     }
 
     /**
@@ -102,7 +110,8 @@ export class MetaBuilding {
      * @param {string} variant
      */
     getShowLayerPreview(variant) {
-        return null;
+        if (!this.variants[variant]) return null;
+        return this.variants[variant].getShowLayerPreview();
     }
 
     /**
@@ -110,7 +119,8 @@ export class MetaBuilding {
      * @param {string} variant
      */
     getRotateAutomaticallyWhilePlacing(variant = defaultBuildingVariant) {
-        return false;
+        if (!this.variants[variant]) return false;
+        return this.variants[variant].getRotateAutomaticallyWhilePlacing();
     }
 
     /**
@@ -119,7 +129,8 @@ export class MetaBuilding {
      * @returns {boolean}
      */
     getIsRemovable(variant = defaultBuildingVariant) {
-        return true;
+        if (!this.variants[variant]) return true;
+        return this.variants[variant].getIsRemovable();
     }
 
     /**
@@ -128,14 +139,23 @@ export class MetaBuilding {
      * @returns {string}
      */
     getPlacementSound(variant = defaultBuildingVariant) {
-        return SOUNDS.placeBuilding;
+        if (!this.variants[variant]) return SOUNDS.placeBuilding;
+        return this.variants[variant].getPlacementSound();
     }
 
     /**
      * @param {GameRoot} root
      */
     getAvailableVariants(root) {
-        return [defaultBuildingVariant];
+        let avaibleVariants = [];
+
+        const variantKeys = Object.keys(this.variants);
+        for (let i = 0; i < variantKeys.length; i++) {
+            const id = variantKeys[i];
+            if (this.variants[id].getIsAvailable(root)) avaibleVariants.push(id);
+        }
+
+        return avaibleVariants;
     }
 
     /**
@@ -143,12 +163,14 @@ export class MetaBuilding {
      * @returns {AtlasSprite}
      */
     getPreviewSprite(rotationVariant = 0, variant = defaultBuildingVariant) {
-        return Loader.getSprite(
-            "sprites/buildings/" +
-            this.id +
-            (variant === defaultBuildingVariant ? "" : "-" + variant) +
-            ".png"
-        );
+        if (!this.variants[variant])
+            return Loader.getSprite(
+                "sprites/buildings/" +
+                this.id +
+                (variant === defaultBuildingVariant ? "" : "-" + variant) +
+                ".png"
+            );
+        return this.variants[variant].getPreviewSprite(rotationVariant);
     }
 
     /**
@@ -156,12 +178,14 @@ export class MetaBuilding {
      * @returns {AtlasSprite}
      */
     getBlueprintSprite(rotationVariant = 0, variant = defaultBuildingVariant) {
-        return Loader.getSprite(
-            "sprites/blueprints/" +
-            this.id +
-            (variant === defaultBuildingVariant ? "" : "-" + variant) +
-            ".png"
-        );
+        if (!this.variants[variant])
+            return Loader.getSprite(
+                "sprites/blueprints/" +
+                this.id +
+                (variant === defaultBuildingVariant ? "" : "-" + variant) +
+                ".png"
+            );
+        return this.variants[variant].getBlueprintSprite(rotationVariant);
     }
 
     /**
@@ -170,7 +194,8 @@ export class MetaBuilding {
      * @returns {boolean}
      */
     getIsRotateable(variant) {
-        return true;
+        if (!this.variants[variant]) return true;
+        return this.variants[variant].getIsRotateable();
     }
 
     /**
@@ -178,7 +203,7 @@ export class MetaBuilding {
      * @param {GameRoot} root
      */
     getIsUnlocked(root) {
-        return true;
+        return this.getAvailableVariants(root).length > 0;
     }
 
     /**
@@ -187,7 +212,8 @@ export class MetaBuilding {
      * @param {number} rotationVariant
      */
     getSilhouetteColor(variant, rotationVariant) {
-        return null;
+        if (!this.variants[variant]) return null;
+        return this.variants[variant].getSilhouetteColor(rotationVariant);
     }
 
     /**
@@ -196,7 +222,8 @@ export class MetaBuilding {
      * @returns {boolean}
      */
     getRenderPins(variant = defaultBuildingVariant) {
-        return true;
+        if (!this.variants[variant]) return true;
+        return this.variants[variant].getRenderPins();
     }
 
     /**
@@ -233,12 +260,14 @@ export class MetaBuilding {
      * @returns {AtlasSprite}
      */
     getSprite(rotationVariant, variant) {
-        return Loader.getSprite(
-            "sprites/buildings/" +
-            this.id +
-            (variant === defaultBuildingVariant ? "" : "-" + variant) +
-            ".png"
-        );
+        if (!this.variants[variant])
+            return Loader.getSprite(
+                "sprites/buildings/" +
+                this.id +
+                (variant === defaultBuildingVariant ? "" : "-" + variant) +
+                ".png"
+            );
+        return this.variants[variant].getBlueprintSprite(rotationVariant);
     }
 
     /**
@@ -252,16 +281,24 @@ export class MetaBuilding {
      * @return {{ rotation: number, rotationVariant: number, connectedEntities?: Array<Entity> }}
      */
     computeOptimalDirectionAndRotationVariantAtTile({ root, tile, rotation, variant, layer }) {
-        if (!this.getIsRotateable(variant)) {
+        if (!this.variants[variant]) {
+            if (!this.getIsRotateable(variant)) {
+                return {
+                    rotation: 0,
+                    rotationVariant: 0,
+                };
+            }
             return {
-                rotation: 0,
+                rotation,
                 rotationVariant: 0,
             };
         }
-        return {
+        return this.variants[variant].computeOptimalDirectionAndRotationVariantAtTile({
+            root,
+            tile,
             rotation,
-            rotationVariant: 0,
-        };
+            layer,
+        });
     }
 
     /**
@@ -270,7 +307,9 @@ export class MetaBuilding {
      * @param {number} rotationVariant
      * @param {string} variant
      */
-    updateVariants(entity, rotationVariant, variant) {}
+    updateVariants(entity, rotationVariant, variant) {
+        if (this.variants[variant]) this.variants[variant].updateVariants(entity, rotationVariant);
+    }
 
     // PRIVATE INTERFACE
 
