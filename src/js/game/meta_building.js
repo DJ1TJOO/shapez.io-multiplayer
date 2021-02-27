@@ -21,8 +21,10 @@ export class MetaBuilding {
         /**@typedef {Object.<string, MetaBuildingVariant>} */
         this.variants = {};
 
-        for (let i = 0; i < shapezAPI.ingame.buidlingVariants[id].length; i++) {
-            const variant = new shapezAPI.ingame.buidlingVariants[id][i](this);
+        // @ts-ignore
+        for (let i = 0; i < this.constructor.variants.length; i++) {
+            // @ts-ignore
+            const variant = new this.constructor.variants[id][i](this);
             this.variants[variant.getId()] = variant;
         }
     }
@@ -172,9 +174,9 @@ export class MetaBuilding {
         if (!this.variants[variant])
             return Loader.getSprite(
                 "sprites/buildings/" +
-                this.id +
-                (variant === defaultBuildingVariant ? "" : "-" + variant) +
-                ".png"
+                    this.id +
+                    (variant === defaultBuildingVariant ? "" : "-" + variant) +
+                    ".png"
             );
         return this.variants[variant].getPreviewSprite(rotationVariant);
     }
@@ -187,9 +189,9 @@ export class MetaBuilding {
         if (!this.variants[variant])
             return Loader.getSprite(
                 "sprites/blueprints/" +
-                this.id +
-                (variant === defaultBuildingVariant ? "" : "-" + variant) +
-                ".png"
+                    this.id +
+                    (variant === defaultBuildingVariant ? "" : "-" + variant) +
+                    ".png"
             );
         return this.variants[variant].getBlueprintSprite(rotationVariant);
     }
@@ -269,9 +271,9 @@ export class MetaBuilding {
         if (!this.variants[variant])
             return Loader.getSprite(
                 "sprites/buildings/" +
-                this.id +
-                (variant === defaultBuildingVariant ? "" : "-" + variant) +
-                ".png"
+                    this.id +
+                    (variant === defaultBuildingVariant ? "" : "-" + variant) +
+                    ".png"
             );
         return this.variants[variant].getBlueprintSprite(rotationVariant);
     }
@@ -328,3 +330,5 @@ export class MetaBuilding {
         abstract;
     }
 }
+
+MetaBuilding.variants = [];

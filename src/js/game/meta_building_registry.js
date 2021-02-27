@@ -40,7 +40,7 @@ import { defaultBuildingVariant, MetaBuilding } from "./meta_building";
 
 const logger = createLogger("building_registry");
 
-export function addBuildings() {
+export function addVanillaBuildingsToAPI() {
     var vanillaBuildings = [
         MetaAnalyzerBuilding,
         MetaBalancerBuilding,
@@ -72,23 +72,6 @@ export function addBuildings() {
     for (let i = 0; i < vanillaBuildings.length; i++) {
         shapezAPI.ingame.buildings[new vanillaBuildings[i]().getId()] = vanillaBuildings[i];
     }
-}
-
-export function addVariants() {
-    //Maybe change to static variable?
-    shapezAPI.ingame.buildingVariants["analyzer"] = [DefaultAnalyzerVariant];
-    shapezAPI.ingame.buildingVariants["balancer"] = [
-        DefaultBalancerVariant,
-        MergerBalancerVariant,
-        MergerInverseBalancerVariant,
-        SplitterBalancerVariant,
-        SplitterInverseBalancerVariant,
-    ];
-}
-
-export function addVanillaBuildingsToAPI() {
-    addBuildings();
-    addVariants();
 }
 
 export function initMetaBuildingRegistry() {

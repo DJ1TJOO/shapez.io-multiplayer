@@ -942,7 +942,8 @@ export class ShapezAPI {
         sourceImage.crossOrigin = "anonymous";
         sourceImage.onload = () => {
             // @ts-ignore
-            Loader.internalParseAtlas({
+            Loader.internalParseAtlas(
+                {
                     meta: atlasData.atlasData.meta,
                     sourceData: atlasData.atlasData.frames,
                     sourceFileName: null,

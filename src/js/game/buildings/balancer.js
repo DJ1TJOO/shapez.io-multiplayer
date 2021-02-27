@@ -4,6 +4,13 @@ import { enumItemProcessorTypes, ItemProcessorComponent } from "../components/it
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
 import { BeltUnderlaysComponent } from "../components/belt_underlays";
+import {
+    DefaultBalancerVariant,
+    MergerBalancerVariant,
+    MergerInverseBalancerVariant,
+    SplitterBalancerVariant,
+    SplitterInverseBalancerVariant,
+} from "./variants/balancer";
 
 export class MetaBalancerBuilding extends MetaBuilding {
     constructor() {
@@ -19,29 +26,37 @@ export class MetaBalancerBuilding extends MetaBuilding {
     }
 }
 
+MetaBalancerBuilding.variants = [
+    DefaultBalancerVariant,
+    MergerBalancerVariant,
+    MergerInverseBalancerVariant,
+    SplitterBalancerVariant,
+    SplitterInverseBalancerVariant,
+];
+
 MetaBalancerBuilding.setupEntityComponents = [
     entity =>
-    entity.addComponent(
-        new ItemAcceptorComponent({
-            slots: [], // set later
-        })
-    ),
+        entity.addComponent(
+            new ItemAcceptorComponent({
+                slots: [], // set later
+            })
+        ),
 
     entity =>
-    entity.addComponent(
-        new ItemProcessorComponent({
-            inputsPerCharge: 1,
-            processorType: enumItemProcessorTypes.balancer,
-        })
-    ),
+        entity.addComponent(
+            new ItemProcessorComponent({
+                inputsPerCharge: 1,
+                processorType: enumItemProcessorTypes.balancer,
+            })
+        ),
 
     entity =>
-    entity.addComponent(
-        new ItemEjectorComponent({
-            slots: [], // set later
-            renderFloatingItems: false,
-        })
-    ),
+        entity.addComponent(
+            new ItemEjectorComponent({
+                slots: [], // set later
+                renderFloatingItems: false,
+            })
+        ),
 
     entity => entity.addComponent(new BeltUnderlaysComponent({ underlays: [] })),
 ];
