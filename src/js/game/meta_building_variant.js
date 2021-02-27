@@ -29,6 +29,36 @@ export class MetaBuildingVariant {
     }
 
     /**
+     * Returns whether this building is rotateable
+     * @returns {boolean}
+     */
+    getIsRotateable() {
+        return true;
+    }
+
+    /**
+     * Returns whether this building can get replaced
+     */
+    getIsReplaceable() {
+        return false;
+    }
+
+    /**
+     * Returns whether this building is removable
+     * @returns {boolean}
+     */
+    getIsRemovable() {
+        return true;
+    }
+
+    /**
+     * Returns whether the building has the direction lock switch available
+     */
+    getHasDirectionLockAvailable() {
+        return false;
+    }
+
+    /**
      * Returns the edit layer of the building
      * @param {GameRoot} root
      * @returns {Layer}
@@ -42,13 +72,6 @@ export class MetaBuildingVariant {
      */
     getDimensions() {
         return new Vector(1, 1);
-    }
-
-    /**
-     * Returns whether the building has the direction lock switch available
-     */
-    getHasDirectionLockAvailable() {
-        return false;
     }
 
     /**
@@ -79,13 +102,6 @@ export class MetaBuildingVariant {
     }
 
     /**
-     * Returns whether this building can get replaced
-     */
-    getIsReplaceable() {
-        return false;
-    }
-
-    /**
      * Whether to flip the orientation after a building has been placed - useful
      * for tunnels.
      */
@@ -108,14 +124,6 @@ export class MetaBuildingVariant {
     }
 
     /**
-     * Returns whether this building is removable
-     * @returns {boolean}
-     */
-    getIsRemovable() {
-        return true;
-    }
-
-    /**
      * Returns the placement sound
      * @returns {string}
      */
@@ -130,9 +138,9 @@ export class MetaBuildingVariant {
     getPreviewSprite(rotationVariant = 0) {
         return Loader.getSprite(
             "sprites/buildings/" +
-                this.metaBuilding.getId() +
-                (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
-                ".png"
+            this.metaBuilding.getId() +
+            (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
+            ".png"
         );
     }
 
@@ -143,18 +151,24 @@ export class MetaBuildingVariant {
     getBlueprintSprite(rotationVariant = 0) {
         return Loader.getSprite(
             "sprites/blueprints/" +
-                this.metaBuilding.getId() +
-                (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
-                ".png"
+            this.metaBuilding.getId() +
+            (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
+            ".png"
         );
     }
 
     /**
-     * Returns whether this building is rotateable
-     * @returns {boolean}
+     * Returns the sprite for a given variant
+     * @param {number} rotationVariant
+     * @returns {AtlasSprite}
      */
-    getIsRotateable() {
-        return true;
+    getSprite(rotationVariant) {
+        return Loader.getSprite(
+            "sprites/buildings/" +
+            this.metaBuilding.getId() +
+            (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
+            ".png"
+        );
     }
 
     /**
@@ -173,18 +187,8 @@ export class MetaBuildingVariant {
         return true;
     }
 
-    /**
-     * Returns the sprite for a given variant
-     * @param {number} rotationVariant
-     * @returns {AtlasSprite}
-     */
-    getSprite(rotationVariant) {
-        return Loader.getSprite(
-            "sprites/buildings/" +
-                this.metaBuilding.getId() +
-                (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
-                ".png"
-        );
+    getRotationVariants() {
+        return [0];
     }
 
     /**
