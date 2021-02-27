@@ -23,6 +23,14 @@ import { MetaStorageBuilding } from "./buildings/storage";
 import { MetaTransistorBuilding } from "./buildings/transistor";
 import { MetaTrashBuilding } from "./buildings/trash";
 import { MetaUndergroundBeltBuilding } from "./buildings/underground_belt";
+import { DefaultAnalyzerVariant } from "./buildings/variants/analyzer";
+import {
+    DefaultBalancerVariant,
+    MergerBalancerVariant,
+    MergerInverseBalancerVariant,
+    SplitterBalancerVariant,
+    SplitterInverseBalancerVariant,
+} from "./buildings/variants/balancer";
 import { MetaVirtualProcessorBuilding } from "./buildings/virtual_processor";
 import { MetaWireBuilding } from "./buildings/wire";
 import { MetaWireTunnelBuilding } from "./buildings/wire_tunnel";
@@ -32,7 +40,7 @@ import { defaultBuildingVariant, MetaBuilding } from "./meta_building";
 
 const logger = createLogger("building_registry");
 
-export function addVanillaBuildingsToAPI() {
+export function addBuildings() {
     var vanillaBuildings = [
         MetaAnalyzerBuilding,
         MetaBalancerBuilding,
@@ -64,6 +72,23 @@ export function addVanillaBuildingsToAPI() {
     for (let i = 0; i < vanillaBuildings.length; i++) {
         shapezAPI.ingame.buildings[new vanillaBuildings[i]().getId()] = vanillaBuildings[i];
     }
+}
+
+export function addVariants() {
+    //Maybe change to static variable?
+    shapezAPI.ingame.buildingVariants["analyzer"] = [DefaultAnalyzerVariant];
+    shapezAPI.ingame.buildingVariants["balancer"] = [
+        DefaultBalancerVariant,
+        MergerBalancerVariant,
+        MergerInverseBalancerVariant,
+        SplitterBalancerVariant,
+        SplitterInverseBalancerVariant,
+    ];
+}
+
+export function addVanillaBuildingsToAPI() {
+    addBuildings();
+    addVariants();
 }
 
 export function initMetaBuildingRegistry() {

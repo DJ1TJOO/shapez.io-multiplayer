@@ -868,6 +868,7 @@ export class ShapezAPI {
 
         this.ingame = {
             buildings: {},
+            buildingVariants: {},
             components: {},
             //Must be array because of update order
             systems: [],
@@ -941,8 +942,7 @@ export class ShapezAPI {
         sourceImage.crossOrigin = "anonymous";
         sourceImage.onload = () => {
             // @ts-ignore
-            Loader.internalParseAtlas(
-                {
+            Loader.internalParseAtlas({
                     meta: atlasData.atlasData.meta,
                     sourceData: atlasData.atlasData.frames,
                     sourceFileName: null,
