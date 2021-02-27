@@ -33,7 +33,8 @@ export const gBuildingVariants = {
  */
 export function registerBuildingVariant(
     meta,
-    variant = "default" /* @TODO: Circular dependency, actually its defaultBuildingVariant */,
+    metaInstance,
+    variant = "default" /* @TODO: Circular dependency, actually its defaultBuildingVariant */ ,
     rotationVariant = 0
 ) {
     // @ts-ignore
@@ -41,6 +42,7 @@ export function registerBuildingVariant(
     assert(!gBuildingVariants[code], "Duplicate id: " + code);
     gBuildingVariants[code] = {
         metaClass: meta,
+        metaInstance,
         variant,
         rotationVariant,
         // @ts-ignore

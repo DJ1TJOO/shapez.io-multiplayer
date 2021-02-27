@@ -12,6 +12,7 @@ export class DefaultAnalyzerVariant extends MetaBuildingVariant {
     constructor(metaBuilding) {
         super(defaultBuildingVariant, metaBuilding);
     }
+
     getIsAvailable(root) {
         return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_virtual_processing);
     }
@@ -52,21 +53,12 @@ export class DefaultAnalyzerVariant extends MetaBuildingVariant {
     }
 
     /**
-     * Should return false if the pins are already included in the sprite of the building
-     * @returns {boolean}
-     */
-    getRenderPins() {
-        return false;
-    }
-
-    /**
      * Should update the entity to match the given variants
      * @param {Entity} entity
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.WiredPins.setSlots([
-            {
+        entity.components.WiredPins.setSlots([{
                 pos: new Vector(0, 0),
                 direction: enumDirection.left,
                 type: enumPinSlotType.logicalEjector,

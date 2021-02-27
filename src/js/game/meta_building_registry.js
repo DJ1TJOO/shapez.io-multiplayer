@@ -83,16 +83,9 @@ export function initMetaBuildingRegistry() {
             for (let i = 0; i < rotationVariants.length; i++) {
                 let rotationVariant = rotationVariants[i];
                 if (!Number.isInteger(rotationVariant)) rotationVariant = 0;
-                registerBuildingVariant(buildingClass, variantId, rotationVariant);
+                registerBuildingVariant(buildingClass, buildingInstance, variantId, rotationVariant);
             }
         }
-    }
-
-    // Propagate instances
-    for (const key in gBuildingVariants) {
-        gBuildingVariants[key].metaInstance = gMetaBuildingRegistry.findByClass(
-            gBuildingVariants[key].metaClass
-        );
     }
 
     for (const key in gBuildingVariants) {
