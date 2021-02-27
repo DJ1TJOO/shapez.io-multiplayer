@@ -416,10 +416,19 @@ import {
     TypeStructuredObject,
 } from "../savegame/serialization_data_types";
 import { SerializerInternal } from "../savegame/serializer_internal";
+import { DefaultAnalyzerVariant } from "../game/buildings/variants/analyzer";
+import {
+    DefaultBalancerVariant,
+    MergerBalancerVariant,
+    MergerInverseBalancerVariant,
+    SplitterBalancerVariant,
+    SplitterInverseBalancerVariant,
+} from "../game/buildings/variants/balancer";
 
 export class ShapezAPI {
     constructor(user) {
         this.user = user;
+
         this.exports = {
             //Core
             AtlasDefinition,
@@ -789,6 +798,14 @@ export class ShapezAPI {
             PreloadState,
             MobileWarningState,
 
+            //Variants
+            DefaultAnalyzerVariant,
+            DefaultBalancerVariant,
+            MergerBalancerVariant,
+            MergerInverseBalancerVariant,
+            SplitterBalancerVariant,
+            SplitterInverseBalancerVariant,
+
             //Systems
             ItemAcceptorSystem,
             BeltSystem,
@@ -941,8 +958,7 @@ export class ShapezAPI {
         sourceImage.crossOrigin = "anonymous";
         sourceImage.onload = () => {
             // @ts-ignore
-            Loader.internalParseAtlas(
-                {
+            Loader.internalParseAtlas({
                     meta: atlasData.atlasData.meta,
                     sourceData: atlasData.atlasData.frames,
                     sourceFileName: null,
