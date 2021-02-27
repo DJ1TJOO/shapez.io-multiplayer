@@ -52,7 +52,8 @@ export class DefaultBalancerVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.ItemAcceptor.setSlots([{
+        entity.components.ItemAcceptor.setSlots([
+            {
                 pos: new Vector(0, 0),
                 directions: [enumDirection.bottom],
             },
@@ -124,7 +125,8 @@ export class MergerBalancerVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.ItemAcceptor.setSlots([{
+        entity.components.ItemAcceptor.setSlots([
+            {
                 pos: new Vector(0, 0),
                 directions: [enumDirection.bottom],
             },
@@ -190,7 +192,8 @@ export class MergerInverseBalancerVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.ItemAcceptor.setSlots([{
+        entity.components.ItemAcceptor.setSlots([
+            {
                 pos: new Vector(0, 0),
                 directions: [enumDirection.bottom],
             },
@@ -256,12 +259,15 @@ export class SplitterBalancerVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.ItemAcceptor.setSlots([{
-            pos: new Vector(0, 0),
-            directions: [enumDirection.bottom],
-        }, ]);
+        entity.components.ItemAcceptor.setSlots([
+            {
+                pos: new Vector(0, 0),
+                directions: [enumDirection.bottom],
+            },
+        ]);
 
-        entity.components.ItemEjector.setSlots([{
+        entity.components.ItemEjector.setSlots([
+            {
                 pos: new Vector(0, 0),
                 direction: enumDirection.top,
             },
@@ -325,12 +331,15 @@ export class SplitterInverseBalancerVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.ItemAcceptor.setSlots([{
-            pos: new Vector(0, 0),
-            directions: [enumDirection.bottom],
-        }, ]);
+        entity.components.ItemAcceptor.setSlots([
+            {
+                pos: new Vector(0, 0),
+                directions: [enumDirection.bottom],
+            },
+        ]);
 
-        entity.components.ItemEjector.setSlots([{
+        entity.components.ItemEjector.setSlots([
+            {
                 pos: new Vector(0, 0),
                 direction: enumDirection.top,
             },

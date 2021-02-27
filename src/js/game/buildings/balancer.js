@@ -34,27 +34,27 @@ export class MetaBalancerBuilding extends MetaBuilding {
 
 MetaBalancerBuilding.setupEntityComponents = [
     entity =>
-    entity.addComponent(
-        new ItemAcceptorComponent({
-            slots: [], // set later
-        })
-    ),
+        entity.addComponent(
+            new ItemAcceptorComponent({
+                slots: [], // set later
+            })
+        ),
 
     entity =>
-    entity.addComponent(
-        new ItemProcessorComponent({
-            inputsPerCharge: 1,
-            processorType: enumItemProcessorTypes.balancer,
-        })
-    ),
+        entity.addComponent(
+            new ItemProcessorComponent({
+                inputsPerCharge: 1,
+                processorType: enumItemProcessorTypes.balancer,
+            })
+        ),
 
     entity =>
-    entity.addComponent(
-        new ItemEjectorComponent({
-            slots: [], // set later
-            renderFloatingItems: false,
-        })
-    ),
+        entity.addComponent(
+            new ItemEjectorComponent({
+                slots: [], // set later
+                renderFloatingItems: false,
+            })
+        ),
 
     entity => entity.addComponent(new BeltUnderlaysComponent({ underlays: [] })),
 ];
