@@ -28,7 +28,7 @@ import { MetaWireBuilding } from "./buildings/wire";
 import { MetaWireTunnelBuilding } from "./buildings/wire_tunnel";
 import { gBuildingVariants, registerBuildingVariant } from "./building_codes";
 import { KEYMAPPINGS } from "./key_action_mapper";
-import { defaultBuildingVariant } from "./meta_building";
+import { defaultBuildingVariant, MetaBuilding } from "./meta_building";
 
 const logger = createLogger("building_registry");
 
@@ -70,58 +70,23 @@ export function initMetaBuildingRegistry() {
     for (const buildingClassKey in shapezAPI.ingame.buildings) {
         const buildingClass = shapezAPI.ingame.buildings[buildingClassKey];
         gMetaBuildingRegistry.register(buildingClass);
+        /**
+         * @type {MetaBuilding}
+         */
+        const buildingInstance = gMetaBuildingRegistry.findByClass(buildingClass);
 
-        if (buildingClass.rotationVariants) {
-            for (const rotationVariant in buildingClass.rotationVariants) {
-                if (!buildingClass.rotationVariants.hasOwnProperty(rotationVariant)) continue;
-                registerBuildingVariant(
-                    buildingClass,
-                    defaultBuildingVariant,
-                    buildingClass.rotationVariants[rotationVariant]
-                );
-            }
-        } else {
-            registerBuildingVariant(buildingClass, defaultBuildingVariant);
-        }
-
-        if (buildingClass.variants) {
-            for (const variant in buildingClass.variants) {
-                if (!buildingClass.variants.hasOwnProperty(variant)) continue;
-                if (buildingClass.rotationVariants) {
-                    for (const rotationVariant in buildingClass.rotationVariants) {
-                        if (!buildingClass.rotationVariants.hasOwnProperty(rotationVariant)) continue;
-                        registerBuildingVariant(
-                            buildingClass,
-                            buildingClass.variants[variant],
-                            buildingClass.rotationVariants[rotationVariant]
-                        );
-                    }
-                } else {
-                    registerBuildingVariant(buildingClass, buildingClass.variants[variant]);
-                }
+        for (const variantId in buildingInstance.variants) {
+            if (!buildingInstance.variants.hasOwnProperty(variantId)) continue;
+            if (typeof variantId === "undefined") continue;
+            const variant = buildingInstance.variants[variantId];
+            const rotationVariants = variant.getRotationVariants();
+            for (let i = 0; i < rotationVariants.length; i++) {
+                let rotationVariant = rotationVariants[i];
+                if (!Number.isInteger(rotationVariant)) rotationVariant = 0;
+                registerBuildingVariant(buildingClass, variantId, rotationVariant);
             }
         }
     }
-
-    // gMetaBuildingRegistry.register(MetaStackerBuilding);
-    // gMetaBuildingRegistry.register(MetaMixerBuilding);
-    // gMetaBuildingRegistry.register(MetaPainterBuilding);
-    // gMetaBuildingRegistry.register(MetaTrashBuilding);
-    // gMetaBuildingRegistry.register(MetaStorageBuilding);
-    // gMetaBuildingRegistry.register(MetaUndergroundBeltBuilding);
-    // gMetaBuildingRegistry.register(MetaHubBuilding);
-    // gMetaBuildingRegistry.register(MetaWireBuilding);
-    // gMetaBuildingRegistry.register(MetaConstantSignalBuilding);
-    // gMetaBuildingRegistry.register(MetaLogicGateBuilding);
-    // gMetaBuildingRegistry.register(MetaLeverBuilding);
-    // gMetaBuildingRegistry.register(MetaFilterBuilding);
-    // gMetaBuildingRegistry.register(MetaWireTunnelBuilding);
-    // gMetaBuildingRegistry.register(MetaDisplayBuilding);
-    // gMetaBuildingRegistry.register(MetaVirtualProcessorBuilding);
-    // gMetaBuildingRegistry.register(MetaReaderBuilding);
-    // gMetaBuildingRegistry.register(MetaTransistorBuilding);
-    // gMetaBuildingRegistry.register(MetaComparatorBuilding);
-    // gMetaBuildingRegistry.register(MetaItemProducerBuilding);
 
     // Propagate instances
     for (const key in gBuildingVariants) {
@@ -133,13 +98,6 @@ export function initMetaBuildingRegistry() {
     for (const key in gBuildingVariants) {
         const variant = gBuildingVariants[key];
         assert(variant.metaClass, "Variant has no meta: " + key);
-
-        if (typeof variant.rotationVariant === "undefined") {
-            variant.rotationVariant = 0;
-        }
-        if (typeof variant.variant === "undefined") {
-            variant.variant = defaultBuildingVariant;
-        }
     }
 
     // Check for valid keycodes

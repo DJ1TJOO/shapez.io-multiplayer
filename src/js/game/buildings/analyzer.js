@@ -21,31 +21,32 @@ export class MetaAnalyzerBuilding extends MetaBuilding {
 
 MetaAnalyzerBuilding.setupEntityComponents = [
     entity =>
-    entity.addComponent(
-        new WiredPinsComponent({
-            slots: [{
-                    pos: new Vector(0, 0),
-                    direction: enumDirection.left,
-                    type: enumPinSlotType.logicalEjector,
-                },
-                {
-                    pos: new Vector(0, 0),
-                    direction: enumDirection.right,
-                    type: enumPinSlotType.logicalEjector,
-                },
-                {
-                    pos: new Vector(0, 0),
-                    direction: enumDirection.bottom,
-                    type: enumPinSlotType.logicalAcceptor,
-                },
-            ],
-        })
-    ),
+        entity.addComponent(
+            new WiredPinsComponent({
+                slots: [
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.left,
+                        type: enumPinSlotType.logicalEjector,
+                    },
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.right,
+                        type: enumPinSlotType.logicalEjector,
+                    },
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.bottom,
+                        type: enumPinSlotType.logicalAcceptor,
+                    },
+                ],
+            })
+        ),
 
     entity =>
-    entity.addComponent(
-        new LogicGateComponent({
-            type: enumLogicGateType.analyzer,
-        })
-    ),
+        entity.addComponent(
+            new LogicGateComponent({
+                type: enumLogicGateType.analyzer,
+            })
+        ),
 ];

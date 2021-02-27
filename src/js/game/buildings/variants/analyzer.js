@@ -65,7 +65,8 @@ export class DefaultAnalyzerVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.WiredPins.setSlots([{
+        entity.components.WiredPins.setSlots([
+            {
                 pos: new Vector(0, 0),
                 direction: enumDirection.left,
                 type: enumPinSlotType.logicalEjector,

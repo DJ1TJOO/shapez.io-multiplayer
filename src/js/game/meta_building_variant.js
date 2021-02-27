@@ -138,9 +138,9 @@ export class MetaBuildingVariant {
     getPreviewSprite(rotationVariant = 0) {
         return Loader.getSprite(
             "sprites/buildings/" +
-            this.metaBuilding.getId() +
-            (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
-            ".png"
+                this.metaBuilding.getId() +
+                (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
+                ".png"
         );
     }
 
@@ -151,9 +151,9 @@ export class MetaBuildingVariant {
     getBlueprintSprite(rotationVariant = 0) {
         return Loader.getSprite(
             "sprites/blueprints/" +
-            this.metaBuilding.getId() +
-            (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
-            ".png"
+                this.metaBuilding.getId() +
+                (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
+                ".png"
         );
     }
 
@@ -165,9 +165,9 @@ export class MetaBuildingVariant {
     getSprite(rotationVariant) {
         return Loader.getSprite(
             "sprites/buildings/" +
-            this.metaBuilding.getId() +
-            (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
-            ".png"
+                this.metaBuilding.getId() +
+                (this.id === defaultBuildingVariant ? "" : "-" + this.id) +
+                ".png"
         );
     }
 
