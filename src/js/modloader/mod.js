@@ -868,7 +868,6 @@ export class ShapezAPI {
 
         this.ingame = {
             buildings: {},
-            buildingVariants: {},
             components: {},
             //Must be array because of update order
             systems: [],

@@ -6,7 +6,6 @@ import { StaticMapEntityComponent } from "./components/static_map_entity";
 import { Entity } from "./entity";
 import { GameRoot } from "./root";
 import { getCodeFromBuildingData } from "./building_codes";
-import { MetaBuildingVariant } from "./meta_building_variant";
 
 export const defaultBuildingVariant = "default";
 
@@ -18,13 +17,13 @@ export class MetaBuilding {
     constructor(id) {
         this.id = id;
 
-        /**@typedef {Object.<string, MetaBuildingVariant>} */
+        /**@typedef {Object.<string, import("./meta_building_variant").MetaBuildingVariant>} */
         this.variants = {};
 
         // @ts-ignore
         for (let i = 0; i < this.constructor.variants.length; i++) {
             // @ts-ignore
-            const variant = new this.constructor.variants[id][i](this);
+            const variant = new this.constructor.variants[i](this);
             this.variants[variant.getId()] = variant;
         }
     }
