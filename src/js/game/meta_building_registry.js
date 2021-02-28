@@ -23,20 +23,12 @@ import { MetaStorageBuilding } from "./buildings/storage";
 import { MetaTransistorBuilding } from "./buildings/transistor";
 import { MetaTrashBuilding } from "./buildings/trash";
 import { MetaUndergroundBeltBuilding } from "./buildings/underground_belt";
-import { DefaultAnalyzerVariant } from "./buildings/variants/analyzer";
-import {
-    DefaultBalancerVariant,
-    MergerBalancerVariant,
-    MergerInverseBalancerVariant,
-    SplitterBalancerVariant,
-    SplitterInverseBalancerVariant,
-} from "./buildings/variants/balancer";
 import { MetaVirtualProcessorBuilding } from "./buildings/virtual_processor";
 import { MetaWireBuilding } from "./buildings/wire";
 import { MetaWireTunnelBuilding } from "./buildings/wire_tunnel";
 import { gBuildingVariants, registerBuildingVariant } from "./building_codes";
 import { KEYMAPPINGS } from "./key_action_mapper";
-import { defaultBuildingVariant, MetaBuilding } from "./meta_building";
+import { MetaBuilding } from "./meta_building";
 
 const logger = createLogger("building_registry");
 

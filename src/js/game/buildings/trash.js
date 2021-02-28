@@ -3,7 +3,8 @@ import { enumDirection, Vector } from "../../core/vector";
 import { ItemAcceptorComponent } from "../components/item_acceptor";
 import { enumItemProcessorTypes, ItemProcessorComponent } from "../components/item_processor";
 import { Entity } from "../entity";
-import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
+import { MetaBuilding } from "../meta_building";
+import { defaultBuildingVariant } from "../meta_building_variant";
 import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 

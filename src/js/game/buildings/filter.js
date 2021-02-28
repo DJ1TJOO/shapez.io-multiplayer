@@ -6,7 +6,8 @@ import { ItemAcceptorComponent } from "../components/item_acceptor";
 import { ItemEjectorComponent } from "../components/item_ejector";
 import { enumPinSlotType, WiredPinsComponent } from "../components/wired_pins";
 import { Entity } from "../entity";
-import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
+import { MetaBuilding } from "../meta_building";
+import { defaultBuildingVariant } from "../meta_building_variant";
 import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 

@@ -1,7 +1,8 @@
 import { enumDirection, Vector } from "../../core/vector";
 import { enumPinSlotType, WiredPinsComponent } from "../components/wired_pins";
 import { Entity } from "../entity";
-import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
+import { MetaBuilding } from "../meta_building";
+import { defaultBuildingVariant } from "../meta_building_variant";
 import { GameRoot } from "../root";
 import { ConstantSignalComponent } from "../components/constant_signal";
 import { generateMatrixRotations } from "../../core/utils";

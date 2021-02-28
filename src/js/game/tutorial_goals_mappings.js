@@ -13,7 +13,8 @@ import { MetaRotaterBuilding } from "./buildings/rotater";
 import { MetaStackerBuilding } from "./buildings/stacker";
 import { MetaStorageBuilding } from "./buildings/storage";
 import { MetaUndergroundBeltBuilding } from "./buildings/underground_belt";
-import { defaultBuildingVariant, MetaBuilding } from "./meta_building";
+import { MetaBuilding } from "./meta_building";
+import { defaultBuildingVariant } from "./meta_building_variant";
 /** @typedef {Array<[typeof MetaBuilding, string]>} TutorialGoalReward */
 import { enumHubGoalRewards } from "./tutorial_goals";
 

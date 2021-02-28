@@ -2,7 +2,8 @@ import { generateMatrixRotations } from "../../core/utils";
 import { Vector } from "../../core/vector";
 import { WireTunnelComponent } from "../components/wire_tunnel";
 import { Entity } from "../entity";
-import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
+import { MetaBuilding } from "../meta_building";
+import { defaultBuildingVariant } from "../meta_building_variant";
 import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 

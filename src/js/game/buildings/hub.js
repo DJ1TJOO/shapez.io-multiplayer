@@ -3,7 +3,8 @@ import { HubComponent } from "../components/hub";
 import { ItemAcceptorComponent } from "../components/item_acceptor";
 import { enumItemProcessorTypes, ItemProcessorComponent } from "../components/item_processor";
 import { Entity } from "../entity";
-import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
+import { MetaBuilding } from "../meta_building";
+import { defaultBuildingVariant } from "../meta_building_variant";
 import { WiredPinsComponent, enumPinSlotType } from "../components/wired_pins";
 import { GameRoot } from "../root";
 

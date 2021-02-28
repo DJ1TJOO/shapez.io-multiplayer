@@ -3,8 +3,10 @@ import { AtlasSprite } from "../core/sprites";
 import { Vector } from "../core/vector";
 import { SOUNDS } from "../platform/sound";
 import { Entity } from "./entity";
-import { defaultBuildingVariant, MetaBuilding } from "./meta_building";
+import { MetaBuilding } from "./meta_building";
 import { GameRoot } from "./root";
+
+export const defaultBuildingVariant = "default";
 
 export class MetaBuildingVariant {
     /**

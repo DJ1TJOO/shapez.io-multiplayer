@@ -5,7 +5,8 @@ import { SOUNDS } from "../../platform/sound";
 import { T } from "../../translations";
 import { BeltComponent } from "../components/belt";
 import { Entity } from "../entity";
-import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
+import { MetaBuilding } from "../meta_building";
+import { defaultBuildingVariant } from "../meta_building_variant";
 import { GameRoot } from "../root";
 import { THEME } from "../theme";
 

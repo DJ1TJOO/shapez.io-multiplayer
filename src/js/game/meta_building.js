@@ -6,8 +6,7 @@ import { StaticMapEntityComponent } from "./components/static_map_entity";
 import { Entity } from "./entity";
 import { GameRoot } from "./root";
 import { getCodeFromBuildingData } from "./building_codes";
-
-export const defaultBuildingVariant = "default";
+import { defaultBuildingVariant } from "./meta_building_variant";
 
 export class MetaBuilding {
     /**

@@ -2,6 +2,7 @@
 import { MetaBuilding } from "./meta_building";
 import { AtlasSprite } from "../core/sprites";
 import { Vector } from "../core/vector";
+import { defaultBuildingVariant } from "./meta_building_variant";
 /* typehints:end */
 
 /**
@@ -34,7 +35,7 @@ export const gBuildingVariants = {
 export function registerBuildingVariant(
     meta,
     metaInstance,
-    variant = "default" /* @TODO: Circular dependency, actually its defaultBuildingVariant */,
+    variant = defaultBuildingVariant,
     rotationVariant = 0
 ) {
     // @ts-ignore

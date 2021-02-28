@@ -4,7 +4,8 @@ import { enumDirection, Vector } from "../../core/vector";
 import { SOUNDS } from "../../platform/sound";
 import { enumWireType, WireComponent } from "../components/wire";
 import { Entity } from "../entity";
-import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
+import { MetaBuilding } from "../meta_building";
+import { defaultBuildingVariant } from "../meta_building_variant";
 import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 
