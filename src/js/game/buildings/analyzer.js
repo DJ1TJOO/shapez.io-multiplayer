@@ -11,6 +11,87 @@ export class MetaAnalyzerBuilding extends MetaBuilding {
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * @param {string} variant
+     */
+    getSilhouetteColor(variant) {
+        return MetaAnalyzerBuilding.silhouetteColors[variant]();
+    }
+
+    /**
+     * @param {string} variant
+     */
+    getIsRemovable(variant) {
+        return MetaAnalyzerBuilding.isRemovable[variant]();
+    }
+
+    /**
+     * @param {string} variant
+     */
+    getIsRotateable(variant) {
+        return MetaAnalyzerBuilding.isRotateable[variant]();
+    }
+
+    /**
+     * @param {GameRoot} root
+     */
+    getAvailableVariants(root) {
+        const variants = MetaAnalyzerBuilding.avaibleVariants;
+
+        let available = [];
+        for (const variant in variants) {
+            if (variants[variant](root)) available.push(variant);
+        }
+
+        return available;
+    }
+
+    /**
+     * Returns the edit layer of the building
+     * @param {GameRoot} root
+     * @param {string} variant
+     * @returns {Layer}
+     */
+    getLayer(root, variant) {
+        return MetaAnalyzerBuilding.layerByVariant[variant](root);
+    }
+
+    /**
+     * @param {string} variant
+     */
+    getDimensions(variant) {
+        return MetaAnalyzerBuilding.dimensions[variant]();
+    }
+
+    /**
+     * @param {string} variant
+     */
+    getShowLayerPreview(variant) {
+        return MetaAnalyzerBuilding.layerPreview[variant]();
+    }
+
+    /**
+     * @param {number} rotation
+     * @param {number} rotationVariant
+     * @param {string} variant
+     * @param {Entity} entity
+     * @returns {Array<number>|null}
+     */
+    getSpecialOverlayRenderMatrix(rotation, rotationVariant, variant, entity) {
+        let matrices = MetaAnalyzerBuilding.overlayMatrices[variant](entity, rotationVariant);
+        return matrices ? matrices[rotation] : null;
+    }
+
+    /**
+     * @param {string} variant
+     */
+    getRenderPins(variant) {
+        return MetaAnalyzerBuilding.renderPins[variant]();
+    }
+
+    /**
+>>>>>>> modloader
      * Creates the entity at the given location
      * @param {Entity} entity
      */
