@@ -3,8 +3,7 @@ import { enumDirection, Vector } from "../../../core/vector";
 import { enumLogicGateType } from "../../components/logic_gate";
 import { enumPinSlotType } from "../../components/wired_pins";
 import { Entity } from "../../entity";
-import { defaultBuildingVariant } from "../../meta_building";
-import { MetaBuildingVariant } from "../../meta_building_variant";
+import { defaultBuildingVariant, MetaBuildingVariant } from "../../meta_building_variant";
 import { GameRoot } from "../../root";
 import { enumHubGoalRewards } from "../../tutorial_goals";
 

@@ -3,8 +3,7 @@ import { Vector, enumDirection } from "../../../core/vector";
 import { T } from "../../../translations";
 import { enumItemProcessorTypes } from "../../components/item_processor";
 import { Entity } from "../../entity";
-import { defaultBuildingVariant } from "../../meta_building";
-import { MetaBuildingVariant } from "../../meta_building_variant";
+import { defaultBuildingVariant, MetaBuildingVariant } from "../../meta_building_variant";
 import { GameRoot } from "../../root";
 import { enumHubGoalRewards } from "../../tutorial_goals";
 
