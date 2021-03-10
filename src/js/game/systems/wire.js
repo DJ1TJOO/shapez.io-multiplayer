@@ -763,6 +763,5 @@ export class WireSystem extends GameSystemWithFilter {
             }
         }
     }
-
-    static getForwardedTile = (tunnelComp, staticComp, offset) => staticComp.origin.add(offset);
 }
+WireSystem.getForwardedTile = (tunnelComp, staticComp, offset) => staticComp.origin.add(offset);
