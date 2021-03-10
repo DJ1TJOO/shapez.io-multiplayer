@@ -6,22 +6,23 @@ const url = require("url");
 const childProcess = require("child_process");
 const { ipcMain, shell } = require("electron");
 const fs = require("fs");
+const steam = require("./steam");
 const isDev = process.argv.indexOf("--dev") >= 0;
 const isLocal = process.argv.indexOf("--local") >= 0;
 
+const protocol = "shapezio";
+
 const roamingFolder =
     process.env.APPDATA ||
-    (process.platform == "darwin" ?
-        process.env.HOME + "/Library/Preferences" :
-        process.env.HOME + "/.local/share");
-let storePath = path.join(roamingFolder, "shapez.io", "saves");
-let modsPath = path.join(roamingFolder, "shapez.io", "mods");
+    (process.platform == "darwin"
+        ? process.env.HOME + "/Library/Preferences"
+        : process.env.HOME + "/.local/share");
+const shapezIOFolder = path.join(roamingFolder, "shapez.io");
+let storePath = path.join(shapezIOFolder, "saves");
 
 if (!fs.existsSync(storePath))
-// No try-catch by design
+    // No try-catch by design
     fs.mkdirSync(storePath, { recursive: true });
-
-if (!fs.existsSync(modsPath)) fs.mkdirSync(modsPath);
 
 /** @type {BrowserWindow} */
 let win = null;
@@ -122,12 +123,21 @@ function createWindow() {
         win.show();
         win.focus();
     });
+
+    if (process.platform == "win32" && process.argv.length >= 2) {
+        emitOpenedWithFile(process.argv[1]);
+    }
 }
 
 if (!app.requestSingleInstanceLock()) {
     app.exit(0);
 } else {
     app.on("second-instance", (event, commandLine, workingDirectory) => {
+        if (process.platform !== "darwin") {
+            // Find the arg that is our custom protocol url and emit event
+            emitProtocol(argv.find(arg => arg.startsWith(`${protocol}://`)));
+        }
+
         // Someone tried to run a second instance, we should focus
         if (win) {
             if (win.isMinimized()) {
@@ -137,6 +147,25 @@ if (!app.requestSingleInstanceLock()) {
         }
     });
 }
+
+if (isDev && process.platform === "win32") {
+    // Set the path of electron.exe and your app.
+    // These two additional parameters are only available on windows.
+    // Setting this is required to get this working in dev mode.
+    app.setAsDefaultProtocolClient(protocol, process.execPath, [path.resolve(process.argv[1])]);
+} else {
+    app.setAsDefaultProtocolClient(protocol);
+}
+
+app.on("open-file", function (event, path) {
+    event.preventDefault();
+    emitOpenedWithFile(path);
+});
+
+app.on("open-url", function (event, url) {
+    event.preventDefault();
+    emitProtocol(url);
+});
 
 app.on("ready", createWindow);
 
@@ -155,79 +184,87 @@ ipcMain.on("exit-app", (event, flag) => {
 });
 
 function performFsJob(job) {
-    let fname = path.join(storePath, job.filename);
-    if (job.mods) fname = path.join(modsPath, job.filename);
+    let parent = storePath;
+
+    if (job.folder) parent = path.join(shapezIOFolder, job.folder);
+
+    const fname = path.join(parent, job.filename);
+    const relative = path.relative(shapezIOFolder, fname);
+
+    //If not a child of parent
+    if (!relative && !relative.startsWith("..") && !path.isAbsolute(relative))
+        return {
+            error: "Cannot get above parent folder",
+        };
+
+    if (!fs.existsSync(parent)) fs.mkdirSync(parent, { recursive: true });
 
     switch (job.type) {
-        case "readDir":
-            {
-                let contents = "";
-                try {
-                    contents = fs.readdirSync(fname, { encoding: "utf8" });
-                } catch (ex) {
-                    return {
-                        error: ex,
-                    };
-                }
+        case "readDir": {
+            let contents = "";
+            try {
+                contents = fs.readdirSync(fname, { encoding: "utf8" });
+            } catch (ex) {
                 return {
-                    success: true,
-                    data: contents,
+                    error: ex,
                 };
             }
-        case "read":
-            {
-                if (!fs.existsSync(fname)) {
-                    return {
-                        // Special FILE_NOT_FOUND error code
-                        error: "file_not_found",
-                    };
-                }
-
-                let contents = "";
-                try {
-                    contents = fs.readFileSync(fname, { encoding: "utf8" });
-                } catch (ex) {
-                    return {
-                        error: ex,
-                    };
-                }
-
+            return {
+                success: true,
+                data: contents,
+            };
+        }
+        case "read": {
+            if (!fs.existsSync(fname)) {
                 return {
-                    success: true,
-                    data: contents,
-                };
-            }
-        case "write":
-            {
-                try {
-                    fs.writeFileSync(fname, job.contents);
-                } catch (ex) {
-                    return {
-                        error: ex,
-                    };
-                }
-
-                return {
-                    success: true,
-                    data: job.contents,
+                    // Special FILE_NOT_FOUND error code
+                    error: "file_not_found",
                 };
             }
 
-        case "delete":
-            {
-                try {
-                    fs.unlinkSync(fname);
-                } catch (ex) {
-                    return {
-                        error: ex,
-                    };
-                }
-
+            let contents = "";
+            try {
+                contents = fs.readFileSync(fname, { encoding: "utf8" });
+            } catch (ex) {
                 return {
-                    success: true,
-                    data: null,
+                    error: ex,
                 };
             }
+
+            return {
+                success: true,
+                data: contents,
+            };
+        }
+        case "write": {
+            try {
+                fs.writeFileSync(fname, job.contents);
+            } catch (ex) {
+                return {
+                    error: ex,
+                };
+            }
+
+            return {
+                success: true,
+                data: job.contents,
+            };
+        }
+
+        case "delete": {
+            try {
+                fs.unlinkSync(fname);
+            } catch (ex) {
+                return {
+                    error: ex,
+                };
+            }
+
+            return {
+                success: true,
+                data: null,
+            };
+        }
 
         default:
             throw new Error("Unkown fs job: " + job.type);
@@ -243,3 +280,16 @@ ipcMain.on("fs-sync-job", (event, arg) => {
     const result = performFsJob(arg);
     event.returnValue = result;
 });
+
+const emitProtocol = url => {
+    const protocol = url.split("://")[0],
+        args = url.split("://")[1];
+    ipcMain.emit("protocol-request", protocol, args.split("/"));
+};
+
+const emitOpenedWithFile = path => {
+    const content = fs.readFileSync(path, "utf-8");
+    ipcMain.emit("opened-with-file", path, content);
+};
+steam.init(isDev);
+steam.listen();

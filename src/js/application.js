@@ -11,6 +11,7 @@ import { getPlatformName, waitNextFrame } from "./core/utils";
 import { Vector } from "./core/vector";
 import { AdProviderInterface } from "./platform/ad_provider";
 import { NoAdProvider } from "./platform/ad_providers/no_ad_provider";
+import { NoAchievementProvider } from "./platform/browser/no_achievement_provider";
 import { AnalyticsInterface } from "./platform/analytics";
 import { GoogleAnalyticsImpl } from "./platform/browser/google_analytics";
 import { SoundImplBrowser } from "./platform/browser/sound";
@@ -29,6 +30,7 @@ import { PreloadState } from "./states/preload";
 import { SettingsState } from "./states/settings";
 import { ShapezGameAnalytics } from "./platform/browser/game_analytics";
 import { RestrictionManager } from "./core/restriction_manager";
+import { AchievementProviderInterface } from "./platform/achievement_provider";
 
 const logger = createLogger("application");
 
@@ -49,6 +51,19 @@ if (typeof document.hidden !== "undefined") {
 }
 
 export class Application {
+    static trackClicks = undefined;
+    static getMainContentHTML = undefined;
+    static states = {
+        PreloadState,
+        MobileWarningState,
+        MainMenuState,
+        InGameState,
+        SettingsState,
+        KeybindingsState,
+        AboutState,
+        ChangelogState,
+    };
+
     constructor() {
         assert(!GLOBAL_APP, "Tried to construct application twice");
         logger.log("Creating application, platform =", getPlatformName());
@@ -77,6 +92,9 @@ export class Application {
 
         /** @type {PlatformWrapperInterface} */
         this.platformWrapper = null;
+
+        /** @type {AchievementProviderInterface} */
+        this.achievementProvider = null;
 
         /** @type {AdProviderInterface} */
         this.adProvider = null;
@@ -130,6 +148,7 @@ export class Application {
         this.sound = new SoundImplBrowser(this);
         this.analytics = new GoogleAnalyticsImpl(this);
         this.gameAnalytics = new ShapezGameAnalytics(this);
+        this.achievementProvider = new NoAchievementProvider(this);
     }
 
     /**
@@ -396,18 +415,3 @@ export class Application {
         this.checkResize(true);
     }
 }
-
-Application.trackClicks = undefined;
-
-Application.getMainContentHTML = undefined;
-
-Application.states = {
-    PreloadState,
-    MobileWarningState,
-    MainMenuState,
-    InGameState,
-    SettingsState,
-    KeybindingsState,
-    AboutState,
-    ChangelogState,
-};

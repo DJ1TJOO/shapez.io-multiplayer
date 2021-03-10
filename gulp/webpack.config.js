@@ -5,8 +5,9 @@ const webpack = require("webpack");
 const { getRevision, getVersion, getAllResourceImages } = require("./buildutils");
 const lzString = require("lz-string");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
+const StringReplacePlugin = require("string-replace-webpack-plugin");
 
-module.exports = ({ watch = false, standalone = false }) => {
+module.exports = ({ watch = false, standalone = false, chineseVersion = false }) => {
     return {
         mode: "development",
         devtool: "cheap-source-map",
@@ -27,12 +28,14 @@ module.exports = ({ watch = false, standalone = false }) => {
             new webpack.DefinePlugin({
                 assert: "window.assert",
                 assertAlways: "window.assert",
-                abstract: "window.assert(false, 'abstract method called of: ' + (this.name || (this.constructor && this.constructor.name)));",
+                abstract:
+                    "window.assert(false, 'abstract method called of: ' + (this.name || (this.constructor && this.constructor.name)));",
                 G_HAVE_ASSERT: "true",
                 G_APP_ENVIRONMENT: JSON.stringify("dev"),
                 G_TRACKING_ENDPOINT: JSON.stringify(
                     lzString.compressToEncodedURIComponent("http://localhost:10005/v1")
                 ),
+                G_CHINA_VERSION: JSON.stringify(chineseVersion),
                 G_IS_DEV: "true",
                 G_IS_RELEASE: "false",
                 G_IS_MOBILE_APP: "false",
@@ -60,7 +63,8 @@ module.exports = ({ watch = false, standalone = false }) => {
             }),
         ],
         module: {
-            rules: [{
+            rules: [
+                {
                     test: /\.json$/,
                     enforce: "pre",
                     use: ["./gulp/loader.compressjson"],
@@ -69,7 +73,8 @@ module.exports = ({ watch = false, standalone = false }) => {
                 { test: /\.(png|jpe?g|svg)$/, loader: "ignore-loader" },
                 {
                     test: /\.md$/,
-                    use: [{
+                    use: [
+                        {
                             loader: "html-loader",
                         },
                         "markdown-loader",
@@ -79,14 +84,41 @@ module.exports = ({ watch = false, standalone = false }) => {
                     test: /\.js$/,
                     enforce: "pre",
                     exclude: /node_modules/,
-                    use: [{
-                        loader: "webpack-strip-block",
-                        options: {
-                            start: "typehints:start",
-                            end: "typehints:end",
+                    use: [
+                        {
+                            loader: "webpack-strip-block",
+                            options: {
+                                start: "typehints:start",
+                                end: "typehints:end",
+                            },
                         },
-                    }, ],
+                    ],
                 },
+                //TODO: fix es6 static on dev
+                // {
+                //     test: /\.js$/,
+                //     use: [
+                //         // "thread-loader",
+                //         {
+                //             loader: "babel-loader?cacheDirectory",
+                //             options: {
+                //                 configFile: require.resolve("./babel.config.js"),
+                //             },
+                //         },
+                //         "uglify-template-string-loader", // Finally found this plugin
+                //         StringReplacePlugin.replace({
+                //             replacements: [
+                //                 { pattern: /globalConfig\.tileSize/g, replacement: () => "32" },
+                //                 { pattern: /globalConfig\.halfTileSize/g, replacement: () => "16" },
+                //                 {
+                //                     pattern: /globalConfig\.beltSpeedItemsPerSecond/g,
+                //                     replacement: () => "2.0",
+                //                 },
+                //                 { pattern: /globalConfig\.debug/g, replacement: () => "''" },
+                //             ],
+                //         }),
+                //     ],
+                // },
                 {
                     test: /\.worker\.js$/,
                     use: {

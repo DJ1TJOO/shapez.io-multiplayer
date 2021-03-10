@@ -13,6 +13,7 @@ import {
     enumInvertedDirections,
     Vector,
 } from "../../core/vector";
+import { ACHIEVEMENTS } from "../../platform/achievement_provider";
 import { BaseItem } from "../base_item";
 import { MetaWireBuilding } from "../buildings/wire";
 import { getCodeFromBuildingData } from "../building_codes";
@@ -702,6 +703,8 @@ export class WireSystem extends GameSystemWithFilter {
             return;
         }
 
+        this.root.signals.achievementCheck.dispatch(ACHIEVEMENTS.place5000Wires, entity);
+
         // Invalidate affected area
         const originalRect = staticComp.getTileSpaceBounds();
         const affectedArea = originalRect.expandedInAllDirections(1);
@@ -760,6 +763,6 @@ export class WireSystem extends GameSystemWithFilter {
             }
         }
     }
-}
 
-WireSystem.getForwardedTile = (tunnelComp, staticComp, offset) => staticComp.origin.add(offset);
+    static getForwardedTile = (tunnelComp, staticComp, offset) => staticComp.origin.add(offset);
+}

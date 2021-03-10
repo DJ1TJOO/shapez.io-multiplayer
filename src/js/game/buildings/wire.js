@@ -14,86 +14,86 @@ export class MetaWireBuilding extends MetaBuilding {
         super("wire");
     }
 
-    // /**
-    //  * @param {string} variant
-    //  */
-    // getSilhouetteColor(variant) {
-    //     return MetaWireBuilding.silhouetteColors[variant]();
-    // }
+    /**
+     * @param {string} variant
+     */
+    getSilhouetteColor(variant) {
+        return MetaWireBuilding.silhouetteColors[variant]();
+    }
 
-    // /**
-    //  * @param {GameRoot} root
-    //  */
-    // getIsUnlocked(root) {
-    //     return this.getAvailableVariants(root).length > 0;
-    // }
+    /**
+     * @param {GameRoot} root
+     */
+    getIsUnlocked(root) {
+        return this.getAvailableVariants(root).length > 0;
+    }
 
-    // /**
-    //  * @param {string} variant
-    //  */
-    // getIsRemovable(variant) {
-    //     return MetaWireBuilding.isRemovable[variant]();
-    // }
+    /**
+     * @param {string} variant
+     */
+    getIsRemovable(variant) {
+        return MetaWireBuilding.isRemovable[variant]();
+    }
 
-    // /**
-    //  * @param {string} variant
-    //  */
-    // getIsRotateable(variant) {
-    //     return MetaWireBuilding.isRotateable[variant]();
-    // }
+    /**
+     * @param {string} variant
+     */
+    getIsRotateable(variant) {
+        return MetaWireBuilding.isRotateable[variant]();
+    }
 
-    // /**
-    //  * @param {GameRoot} root
-    //  */
-    // getAvailableVariants(root) {
-    //     const variants = MetaWireBuilding.avaibleVariants;
+    /**
+     * @param {GameRoot} root
+     */
+    getAvailableVariants(root) {
+        const variants = MetaWireBuilding.avaibleVariants;
 
-    //     let available = [];
-    //     for (const variant in variants) {
-    //         if (variants[variant](root)) available.push(variant);
-    //     }
+        let available = [];
+        for (const variant in variants) {
+            if (variants[variant](root)) available.push(variant);
+        }
 
-    //     return available;
-    // }
+        return available;
+    }
 
-    // /**
-    //  * Returns the edit layer of the building
-    //  * @param {GameRoot} root
-    //  * @param {string} variant
-    //  * @returns {Layer}
-    //  */
-    // getLayer(root, variant) {
-    //     // @ts-ignore
-    //     return MetaWireBuilding.layerByVariant[variant](root);
-    // }
+    /**
+     * Returns the edit layer of the building
+     * @param {GameRoot} root
+     * @param {string} variant
+     * @returns {Layer}
+     */
+    getLayer(root, variant) {
+        // @ts-ignore
+        return MetaWireBuilding.layerByVariant[variant](root);
+    }
 
-    // /**
-    //  * @param {string} variant
-    //  */
-    // getDimensions(variant) {
-    //     return MetaWireBuilding.dimensions[variant]();
-    // }
+    /**
+     * @param {string} variant
+     */
+    getDimensions(variant) {
+        return MetaWireBuilding.dimensions[variant]();
+    }
 
-    // /**
-    //  * @param {string} variant
-    //  */
-    // getShowLayerPreview(variant) {
-    //     return MetaWireBuilding.layerPreview[variant]();
-    // }
+    /**
+     * @param {string} variant
+     */
+    getShowLayerPreview(variant) {
+        return MetaWireBuilding.layerPreview[variant]();
+    }
 
-    // /**
-    //  * @param {number} rotation
-    //  * @param {number} rotationVariant
-    //  * @param {string} variant
-    //  * @param {Entity} entity
-    //  * @returns {Array<number>|null}
-    //  */
-    // getSpecialOverlayRenderMatrix(rotation, rotationVariant, variant, entity) {
-    //     let matrices = MetaWireBuilding.overlayMatrices[
-    //         MetaWireBuilding.rotationVariantToType[rotationVariant]
-    //     ](entity, rotationVariant);
-    //     return matrices ? matrices[rotation] : null;
-    // }
+    /**
+     * @param {number} rotation
+     * @param {number} rotationVariant
+     * @param {string} variant
+     * @param {Entity} entity
+     * @returns {Array<number>|null}
+     */
+    getSpecialOverlayRenderMatrix(rotation, rotationVariant, variant, entity) {
+        let matrices = MetaWireBuilding.overlayMatrices[
+            MetaWireBuilding.rotationVariantToType[rotationVariant]
+        ](entity, rotationVariant);
+        return matrices ? matrices[rotation] : null;
+    }
 
     /**
      * @param {string} variant
@@ -299,99 +299,103 @@ export class MetaWireBuilding extends MetaBuilding {
             rotationVariant: MetaWireBuilding.rotationVariantToType.indexOf(targetType),
         };
     }
+
+    static setupEntityComponents = [entity => entity.addComponent(new WireComponent({}))];
+
+    static variants = {
+        second: "second",
+    };
+    static wireVariants = {
+        first: "first",
+        [MetaWireBuilding.variants.second]: "second",
+    };
+
+    static rotationVariants = [0, 1, 2, 3];
+
+    static placementSounds = {
+        [defaultBuildingVariant]: SOUNDS.placeBelt,
+        [MetaWireBuilding.variants.second]: SOUNDS.placeBelt,
+    };
+
+    static wireVariantToVariant = {
+        [defaultBuildingVariant]: "first",
+        [MetaWireBuilding.variants.second]: "second",
+    };
+
+    static rotationVariantToType = [
+        enumWireType.forward,
+        enumWireType.turn,
+        enumWireType.split,
+        enumWireType.cross,
+    ];
+
+    static overlayMatrices = {
+        [enumWireType.forward]: (entity, rotationVariant) =>
+            generateMatrixRotations([0, 1, 0, 0, 1, 0, 0, 1, 0]),
+        [enumWireType.split]: (entity, rotationVariant) =>
+            generateMatrixRotations([0, 0, 0, 1, 1, 1, 0, 1, 0]),
+        [enumWireType.turn]: (entity, rotationVariant) =>
+            generateMatrixRotations([0, 0, 0, 0, 1, 1, 0, 1, 0]),
+        [enumWireType.cross]: (entity, rotationVariant) =>
+            generateMatrixRotations([0, 1, 0, 1, 1, 1, 0, 1, 0]),
+    };
+
+    static avaibleVariants = {
+        [defaultBuildingVariant]: root =>
+            root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers),
+        [MetaWireBuilding.variants.second]: root =>
+            root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers),
+    };
+
+    static dimensions = {
+        [defaultBuildingVariant]: () => new Vector(1, 1),
+        [MetaWireBuilding.variants.second]: () => new Vector(1, 1),
+    };
+
+    static isRemovable = {
+        [defaultBuildingVariant]: () => true,
+        [MetaWireBuilding.variants.second]: () => true,
+    };
+
+    static isReplaceable = {
+        [defaultBuildingVariant]: () => true,
+        [MetaWireBuilding.variants.second]: () => true,
+    };
+
+    static isRotateable = {
+        [defaultBuildingVariant]: () => true,
+        [MetaWireBuilding.variants.second]: () => true,
+    };
+
+    static renderPins = {
+        [defaultBuildingVariant]: () => null,
+        [MetaWireBuilding.variants.second]: () => null,
+    };
+
+    static layerPreview = {
+        [defaultBuildingVariant]: () => "wires",
+        [MetaWireBuilding.variants.second]: () => "wires",
+    };
+
+    static layerByVariant = {
+        [defaultBuildingVariant]: root => "wires",
+        [MetaWireBuilding.variants.second]: root => "wires",
+    };
+
+    static silhouetteColors = {
+        [defaultBuildingVariant]: () => "#61ef6f",
+        [MetaWireBuilding.variants.second]: () => "#61ef6f",
+    };
+
+    static componentVariations = {
+        [defaultBuildingVariant]: (entity, rotationVariant) => {
+            entity.components.Wire.type = MetaWireBuilding.rotationVariantToType[rotationVariant];
+            entity.components.Wire.variant = "first";
+        },
+
+        [MetaWireBuilding.variants.second]: (entity, rotationVariant) => {
+            entity.components.Wire.type = MetaWireBuilding.rotationVariantToType[rotationVariant];
+            entity.components.Wire.variant = "second";
+        },
+    };
 }
-
-MetaWireBuilding.setupEntityComponents = [entity => entity.addComponent(new WireComponent({}))];
-
-MetaWireBuilding.variants = {
-    second: "second",
-};
-MetaWireBuilding.wireVariants = {
-    first: "first",
-    [MetaWireBuilding.variants.second]: "second",
-};
-
-MetaWireBuilding.rotationVariants = [0, 1, 2, 3];
-
-MetaWireBuilding.placementSounds = {
-    [defaultBuildingVariant]: SOUNDS.placeBelt,
-    [MetaWireBuilding.variants.second]: SOUNDS.placeBelt,
-};
-
-MetaWireBuilding.wireVariantToVariant = {
-    [defaultBuildingVariant]: "first",
-    [MetaWireBuilding.variants.second]: "second",
-};
-
-MetaWireBuilding.rotationVariantToType = [
-    enumWireType.forward,
-    enumWireType.turn,
-    enumWireType.split,
-    enumWireType.cross,
-];
-
-MetaWireBuilding.overlayMatrices = {
-    [enumWireType.forward]: (entity, rotationVariant) => generateMatrixRotations([0, 1, 0, 0, 1, 0, 0, 1, 0]),
-    [enumWireType.split]: (entity, rotationVariant) => generateMatrixRotations([0, 0, 0, 1, 1, 1, 0, 1, 0]),
-    [enumWireType.turn]: (entity, rotationVariant) => generateMatrixRotations([0, 0, 0, 0, 1, 1, 0, 1, 0]),
-    [enumWireType.cross]: (entity, rotationVariant) => generateMatrixRotations([0, 1, 0, 1, 1, 1, 0, 1, 0]),
-};
-
-MetaWireBuilding.avaibleVariants = {
-    [defaultBuildingVariant]: root =>
-        root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers),
-    [MetaWireBuilding.variants.second]: root =>
-        root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers),
-};
-
-MetaWireBuilding.dimensions = {
-    [defaultBuildingVariant]: () => new Vector(1, 1),
-    [MetaWireBuilding.variants.second]: () => new Vector(1, 1),
-};
-
-MetaWireBuilding.isRemovable = {
-    [defaultBuildingVariant]: () => true,
-    [MetaWireBuilding.variants.second]: () => true,
-};
-
-MetaWireBuilding.isReplaceable = {
-    [defaultBuildingVariant]: () => true,
-    [MetaWireBuilding.variants.second]: () => true,
-};
-
-MetaWireBuilding.isRotateable = {
-    [defaultBuildingVariant]: () => true,
-    [MetaWireBuilding.variants.second]: () => true,
-};
-
-MetaWireBuilding.renderPins = {
-    [defaultBuildingVariant]: () => null,
-    [MetaWireBuilding.variants.second]: () => null,
-};
-
-MetaWireBuilding.layerPreview = {
-    [defaultBuildingVariant]: () => "wires",
-    [MetaWireBuilding.variants.second]: () => "wires",
-};
-
-MetaWireBuilding.layerByVariant = {
-    [defaultBuildingVariant]: root => "wires",
-    [MetaWireBuilding.variants.second]: root => "wires",
-};
-
-MetaWireBuilding.silhouetteColors = {
-    [defaultBuildingVariant]: () => "#61ef6f",
-    [MetaWireBuilding.variants.second]: () => "#61ef6f",
-};
-
-MetaWireBuilding.componentVariations = {
-    [defaultBuildingVariant]: (entity, rotationVariant) => {
-        entity.components.Wire.type = MetaWireBuilding.rotationVariantToType[rotationVariant];
-        entity.components.Wire.variant = "first";
-    },
-
-    [MetaWireBuilding.variants.second]: (entity, rotationVariant) => {
-        entity.components.Wire.type = MetaWireBuilding.rotationVariantToType[rotationVariant];
-        entity.components.Wire.variant = "second";
-    },
-};
