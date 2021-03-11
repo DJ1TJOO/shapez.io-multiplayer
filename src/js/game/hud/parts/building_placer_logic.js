@@ -359,7 +359,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         // Disable pipetting the hub
         if (
             extracted.metaInstance.getId() === gMetaBuildingRegistry.findByClass(MetaHubBuilding).getId() &&
-            !MetaHubBuilding.canPipet()
+            !MetaHubBuilding.canPipet(this.root)
         ) {
             this.currentMetaBuilding.set(null);
             return;
