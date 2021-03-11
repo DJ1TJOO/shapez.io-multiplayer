@@ -12,24 +12,26 @@ import { MetaStackerBuilding } from "../../game/buildings/stacker.js";
 import { MetaStorageBuilding } from "../../game/buildings/storage.js";
 import { MetaTrashBuilding } from "../../game/buildings/trash.js";
 import { MetaUndergroundBeltBuilding } from "../../game/buildings/underground_belt.js";
+import {
+    MergerBalancerVariant,
+    MergerInverseBalancerVariant,
+} from "../../game/buildings/variants/balancer.js";
+import { QuadCutterVariant } from "../../game/buildings/variants/cutter.js";
+import { ChainableMinerVariant } from "../../game/buildings/variants/miner.js";
+import {
+    DoublePainterVariant,
+    MirroredPainterVariant,
+    QuadPainterVariant,
+} from "../../game/buildings/variants/painter.js";
 import { getCodeFromBuildingData } from "../../game/building_codes.js";
 import { StaticMapEntityComponent } from "../../game/components/static_map_entity.js";
 import { Entity } from "../../game/entity.js";
-import { defaultBuildingVariant, MetaBuilding } from "../../game/meta_building.js";
+import { MetaBuilding } from "../../game/meta_building.js";
+import { defaultBuildingVariant } from "../../game/meta_building_variant.js";
 import { SavegameInterface_V1005 } from "./1005.js";
 
 const schema = require("./1006.json");
 const logger = createLogger("savegame_interface/1006");
-
-/**
- *
- * @param {typeof MetaBuilding} metaBuilding
- * @param {string=} variant
- * @param {number=} rotationVariant
- */
-function findCode(metaBuilding, variant = defaultBuildingVariant, rotationVariant = 0) {
-    return getCodeFromBuildingData(gMetaBuildingRegistry.findByClass(metaBuilding), variant, rotationVariant);
-}
 
 /**
  * Rebalances a value from the old balancing to the new one
@@ -52,92 +54,49 @@ export class SavegameInterface_V1006 extends SavegameInterface_V1005 {
     static computeSpriteMapping() {
         return {
             // Belt
-            "sprites/blueprints/belt_top.png": findCode(MetaBeltBuilding, defaultBuildingVariant, 0),
-            "sprites/blueprints/belt_left.png": findCode(MetaBeltBuilding, defaultBuildingVariant, 1),
-            "sprites/blueprints/belt_right.png": findCode(MetaBeltBuilding, defaultBuildingVariant, 2),
+            "sprites/blueprints/belt_top.png": 1,
+            "sprites/blueprints/belt_left.png": 2,
+            "sprites/blueprints/belt_right.png": 3,
 
             // Splitter (=Balancer)
-            "sprites/blueprints/splitter.png": findCode(MetaBalancerBuilding),
-            "sprites/blueprints/splitter-compact.png": findCode(
-                MetaBalancerBuilding,
-                MetaBalancerBuilding.variants.merger
-            ),
-            "sprites/blueprints/splitter-compact-inverse.png": findCode(
-                MetaBalancerBuilding,
-                MetaBalancerBuilding.variants.mergerInverse
-            ),
+            "sprites/blueprints/splitter.png": 47,
+            "sprites/blueprints/splitter-compact-inverse.png": 48,
 
             // Underground belt
-            "sprites/blueprints/underground_belt_entry.png": findCode(
-                MetaUndergroundBeltBuilding,
-                defaultBuildingVariant,
-                0
-            ),
-            "sprites/blueprints/underground_belt_exit.png": findCode(
-                MetaUndergroundBeltBuilding,
-                defaultBuildingVariant,
-                1
-            ),
+            "sprites/blueprints/underground_belt_entry.png": 22,
+            "sprites/blueprints/underground_belt_exit.png": 23,
 
-            "sprites/blueprints/underground_belt_entry-tier2.png": findCode(
-                MetaUndergroundBeltBuilding,
-                MetaUndergroundBeltBuilding.variants.tier2,
-                0
-            ),
-            "sprites/blueprints/underground_belt_exit-tier2.png": findCode(
-                MetaUndergroundBeltBuilding,
-                MetaUndergroundBeltBuilding.variants.tier2,
-                1
-            ),
+            "sprites/blueprints/underground_belt_entry-tier2.png": 24,
+            "sprites/blueprints/underground_belt_exit-tier2.png": 25,
 
             // Miner
-            "sprites/blueprints/miner.png": findCode(MetaMinerBuilding),
-            "sprites/blueprints/miner-chainable.png": findCode(
-                MetaMinerBuilding,
-                MetaMinerBuilding.variants.chainable,
-                0
-            ),
+            "sprites/blueprints/miner.png": 7,
+            "sprites/blueprints/miner-chainable.png": 8,
 
             // Cutter
-            "sprites/blueprints/cutter.png": findCode(MetaCutterBuilding),
-            "sprites/blueprints/cutter-quad.png": findCode(
-                MetaCutterBuilding,
-                MetaCutterBuilding.variants.quad
-            ),
+            "sprites/blueprints/cutter.png": 9,
+            "sprites/blueprints/cutter-quad.png": 10,
 
             // Rotater
-            "sprites/blueprints/rotater.png": findCode(MetaRotaterBuilding),
-            "sprites/blueprints/rotater-ccw.png": findCode(
-                MetaRotaterBuilding,
-                MetaRotaterBuilding.variants.ccw
-            ),
+            "sprites/blueprints/rotater.png": 11,
 
             // Stacker
-            "sprites/blueprints/stacker.png": findCode(MetaStackerBuilding),
+            "sprites/blueprints/stacker.png": 14,
 
             // Mixer
-            "sprites/blueprints/mixer.png": findCode(MetaMixerBuilding),
+            "sprites/blueprints/mixer.png": 15,
 
             // Painter
-            "sprites/blueprints/painter.png": findCode(MetaPainterBuilding),
-            "sprites/blueprints/painter-mirrored.png": findCode(
-                MetaPainterBuilding,
-                MetaPainterBuilding.variants.mirrored
-            ),
-            "sprites/blueprints/painter-double.png": findCode(
-                MetaPainterBuilding,
-                MetaPainterBuilding.variants.double
-            ),
-            "sprites/blueprints/painter-quad.png": findCode(
-                MetaPainterBuilding,
-                MetaPainterBuilding.variants.quad
-            ),
+            "sprites/blueprints/painter.png": 16,
+            "sprites/blueprints/painter-mirrored.png": 17,
+            "sprites/blueprints/painter-double.png": 18,
+            "sprites/blueprints/painter-quad.png": 19,
 
             // Trash
-            "sprites/blueprints/trash.png": findCode(MetaTrashBuilding),
+            "sprites/blueprints/trash.png": 20,
 
             // Storage
-            "sprites/blueprints/trash-storage.png": findCode(MetaStorageBuilding),
+            "sprites/blueprints/trash-storage.png": 21,
         };
     }
 
@@ -280,15 +239,16 @@ export class SavegameInterface_V1006 extends SavegameInterface_V1005 {
 
         // Hub special case
         if (entity.components.Hub) {
-            newStaticComp.code = findCode(MetaHubBuilding);
+            // @ts-ignore
+            newStaticComp.code = 26;
         }
 
         // Belt special case
         if (entity.components.Belt) {
             const actualCode = {
-                top: findCode(MetaBeltBuilding, defaultBuildingVariant, 0),
-                left: findCode(MetaBeltBuilding, defaultBuildingVariant, 1),
-                right: findCode(MetaBeltBuilding, defaultBuildingVariant, 2),
+                top: 1,
+                left: 2,
+                right: 3,
             }[entity.components.Belt.direction];
             if (actualCode !== newStaticComp.code) {
                 if (G_IS_DEV) {

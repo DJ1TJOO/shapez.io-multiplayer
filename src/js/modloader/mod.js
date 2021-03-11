@@ -143,7 +143,7 @@ import { ColorItem } from "../game/items/color_item";
 import { ShapeItem } from "../game/items/shape_item";
 import { KeyActionMapper, Keybinding, KEYMAPPINGS } from "../game/key_action_mapper";
 import { MapChunk } from "../game/map_chunk";
-import { defaultBuildingVariant, MetaBuilding } from "../game/meta_building";
+import { MetaBuilding } from "../game/meta_building";
 import { RegularGameMode } from "../game/modes/regular";
 import { enumAnalyticsDataSource, ProductionAnalytics } from "../game/production_analytics";
 import { BeltSystem } from "../game/systems/belt";
@@ -424,6 +424,7 @@ import {
     SplitterBalancerVariant,
     SplitterInverseBalancerVariant,
 } from "../game/buildings/variants/balancer";
+import { defaultBuildingVariant } from "../game/meta_building_variant";
 
 export class ShapezAPI {
     constructor(user) {
@@ -959,7 +960,8 @@ export class ShapezAPI {
         sourceImage.crossOrigin = "anonymous";
         sourceImage.onload = () => {
             // @ts-ignore
-            Loader.internalParseAtlas({
+            Loader.internalParseAtlas(
+                {
                     meta: atlasData.atlasData.meta,
                     sourceData: atlasData.atlasData.frames,
                     sourceFileName: null,
