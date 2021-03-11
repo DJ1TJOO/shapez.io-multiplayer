@@ -1,6 +1,5 @@
 import { generateMatrixRotations } from "../../../core/utils";
 import { Vector, enumDirection } from "../../../core/vector";
-import { enumLogicGateType } from "../../components/logic_gate";
 import { enumPinSlotType } from "../../components/wired_pins";
 import { MetaBuildingVariant, defaultBuildingVariant } from "../../meta_building_variant";
 import { GameRoot } from "../../root";
