@@ -1,14 +1,9 @@
-import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils";
 import { enumDirection, Vector } from "../../core/vector";
-import { T } from "../../translations";
 import { ItemAcceptorComponent } from "../components/item_acceptor";
 import { ItemEjectorComponent } from "../components/item_ejector";
 import { enumItemProcessorTypes, ItemProcessorComponent } from "../components/item_processor";
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
-import { defaultBuildingVariant } from "../meta_building_variant";
-import { GameRoot } from "../root";
-import { enumHubGoalRewards } from "../tutorial_goals";
 import { CcwRotatorVariant, DefaultRotatorVariant, Rotate180RotatorVariant } from "./variants/rotator";
 
 export class MetaRotaterBuilding extends MetaBuilding {
