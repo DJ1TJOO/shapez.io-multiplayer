@@ -15,6 +15,7 @@ import {
 } from "../../core/vector";
 import { ACHIEVEMENTS } from "../../platform/achievement_provider";
 import { BaseItem } from "../base_item";
+import { wireRotationVariantToType, wireVariants } from "../buildings/variants/wire";
 import { MetaWireBuilding } from "../buildings/wire";
 import { getCodeFromBuildingData } from "../building_codes";
 import { enumWireType, WireComponent } from "../components/wire";
@@ -95,11 +96,11 @@ export class WireSystem extends GameSystemWithFilter {
         super(root, [WireComponent]);
 
         /**
-         * @type {Object<MetaWireBuilding.wireVariants, Object<enumWireType, AtlasSprite>>}
+         * @type {Object<wireVariants, Object<enumWireType, AtlasSprite>>}
          */
         this.wireSprites = {};
 
-        const variants = ["conflict", ...Object.keys(MetaWireBuilding.wireVariants)];
+        const variants = ["conflict", ...Object.keys(wireVariants)];
         for (let i = 0; i < variants.length; ++i) {
             const wireVariant = variants[i];
             const sprites = {};
@@ -228,7 +229,7 @@ export class WireSystem extends GameSystemWithFilter {
         /**
          * Once we occur a wire, we store its variant so we don't connect to
          * mismatching ones
-         * @type {MetaWireBuilding.wireVariants}
+         * @type {wireVariants}
          */
         let variantMask = null;
 
@@ -369,7 +370,7 @@ export class WireSystem extends GameSystemWithFilter {
      * @param {Vector} initialTile
      * @param {Array<enumDirection>} directions
      * @param {WireNetwork} network
-     * @param {MetaWireBuilding.wireVariants=} variantMask Only accept connections to this mask
+     * @param {wireVariants=} variantMask Only accept connections to this mask
      * @returns {Array<any>}
      */
     findSurroundingWireTargets(initialTile, directions, network, variantMask = null) {
@@ -746,7 +747,7 @@ export class WireSystem extends GameSystemWithFilter {
                     });
 
                     // Compute delta to see if anything changed
-                    const newType = MetaWireBuilding.rotationVariantToType[rotationVariant];
+                    const newType = wireRotationVariantToType[rotationVariant];
 
                     if (targetStaticComp.rotation !== rotation || newType !== targetWireComp.type) {
                         // Change stuff
@@ -764,4 +765,5 @@ export class WireSystem extends GameSystemWithFilter {
         }
     }
 }
+
 WireSystem.getForwardedTile = (tunnelComp, staticComp, offset) => staticComp.origin.add(offset);

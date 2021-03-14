@@ -53,7 +53,7 @@ export class ItemProcessorOverlaysSystem extends GameSystem {
                 this.drawnUids.add(entity.uid);
 
                 if (ItemProcessorOverlaysSystem.processorOverlayStatic[requirement])
-                    ItemProcessorOverlaysSystem.processorOverlayStatic[requirement](
+                    ItemProcessorOverlaysSystem.processorOverlayStatic[requirement].bind(this)(
                         parameters,
                         chunk,
                         entity,
@@ -145,6 +145,7 @@ export class ItemProcessorOverlaysSystem extends GameSystem {
         parameters.context.globalAlpha = 1;
     }
 }
+
 ItemProcessorOverlaysSystem.processorOverlayStatic = {
     [enumItemProcessorRequirements.painterQuad]: function (parameters, chunk, entity, processorComp) {
         this.drawConnectedSlotRequirement(parameters, entity, { drawIfFalse: true });

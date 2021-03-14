@@ -80,7 +80,10 @@ export class DefaultUndergroundBeltVariant extends MetaBuildingVariant {
      */
     updateVariants(entity, rotationVariant) {
         entity.components.UndergroundBelt.tier = undergroundBeltVariantToTier[this.id];
-        undergroundBeltComponentVariationsByRotation[rotationVariant](entity, rotationVariant);
+        undergroundBeltComponentVariationsByRotation[undergroundBeltRotationVariantToMode[rotationVariant]](
+            entity,
+            rotationVariant
+        );
     }
 }
 
@@ -148,7 +151,10 @@ export class Tier2UndergroundBeltVariant extends MetaBuildingVariant {
      */
     updateVariants(entity, rotationVariant) {
         entity.components.UndergroundBelt.tier = undergroundBeltVariantToTier[this.id];
-        undergroundBeltComponentVariationsByRotation[rotationVariant](entity, rotationVariant);
+        undergroundBeltComponentVariationsByRotation[undergroundBeltRotationVariantToMode[rotationVariant]](
+            entity,
+            rotationVariant
+        );
     }
 }
 

@@ -105,7 +105,7 @@ export class CcwRotatorVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.ItemProcessor.type = enumItemProcessorTypes.rotater180;
+        entity.components.ItemProcessor.type = enumItemProcessorTypes.rotaterCCW;
     }
 }
 

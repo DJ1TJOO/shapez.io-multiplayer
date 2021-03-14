@@ -1,5 +1,5 @@
 /* typehints:start */
-import { MetaWireBuilding } from "../buildings/wire";
+import { wireVariants } from "../buildings/variants/wire";
 /* typehints:end */
 
 import { Component } from "../component";
@@ -20,7 +20,7 @@ export class WireComponent extends Component {
     /**
      * @param {object} param0
      * @param {enumWireType=} param0.type
-     * @param {String=} param0.variant
+     * @param {wireVariants=} param0.variant
      */
     // @ts-ignore
     constructor({ type = enumWireType.forward, variant = "first" /*MetaWireBuilding.wireVariants.first*/ }) {
@@ -29,7 +29,7 @@ export class WireComponent extends Component {
 
         /**
          * The variant of the wire, different variants do not connect
-         * @type {String}
+         * @type {wireVariants}
          */
         this.variant = variant;
 

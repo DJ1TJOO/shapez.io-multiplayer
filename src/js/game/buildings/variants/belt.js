@@ -1,12 +1,12 @@
 import { AtlasSprite } from "../../../core/sprites";
-import { formatItemsPerSecond } from "../../../core/utils";
+import { formatItemsPerSecond, generateMatrixRotations } from "../../../core/utils";
+import { enumDirection } from "../../../core/vector";
 import { SOUNDS } from "../../../platform/sound";
 import { T } from "../../../translations";
 import { MetaBuilding } from "../../meta_building";
 import { defaultBuildingVariant, MetaBuildingVariant } from "../../meta_building_variant";
 import { GameRoot } from "../../root";
 import { THEME } from "../../theme";
-import { MetaBeltBuilding } from "../belt";
 
 export class DefaultBeltVariant extends MetaBuildingVariant {
     /**
@@ -49,7 +49,7 @@ export class DefaultBeltVariant extends MetaBuildingVariant {
      * @returns {Array<number>|null}
      */
     getSpecialOverlayRenderMatrix(rotation, rotationVariant, entity) {
-        return null;
+        return beltOverlayMatrices[beltVariantToRotation[rotationVariant]](entity, rotationVariant)[rotation];
     }
 
     /**
@@ -108,6 +108,14 @@ export class DefaultBeltVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.Belt.direction = MetaBeltBuilding.variantToRotation[rotationVariant];
+        entity.components.Belt.direction = beltVariantToRotation[rotationVariant];
     }
 }
+
+export const beltVariantToRotation = [enumDirection.top, enumDirection.left, enumDirection.right];
+
+export const beltOverlayMatrices = {
+    [enumDirection.top]: (entity, rotationVariant) => generateMatrixRotations([0, 1, 0, 0, 1, 0, 0, 1, 0]),
+    [enumDirection.left]: (entity, rotationVariant) => generateMatrixRotations([0, 0, 0, 1, 1, 0, 0, 1, 0]),
+    [enumDirection.right]: (entity, rotationVariant) => generateMatrixRotations([0, 0, 0, 0, 1, 1, 0, 1, 0]),
+};

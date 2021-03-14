@@ -88,6 +88,10 @@ export class DefaultWireVariant extends MetaBuildingVariant {
         return "#61ef6f";
     }
 
+    getSprite(variant) {
+        return null;
+    }
+
     getRotationVariants() {
         return [0, 1, 2, 3];
     }
@@ -99,6 +103,7 @@ export class DefaultWireVariant extends MetaBuildingVariant {
      */
     updateVariants(entity, rotationVariant) {
         entity.components.Wire.type = wireRotationVariantToType[rotationVariant];
+        // @ts-ignore
         entity.components.Wire.variant = wireVariantToVariant[this.getId()];
     }
 }
@@ -185,6 +190,14 @@ export class SecondWireVariant extends MetaBuildingVariant {
         return "#61ef6f";
     }
 
+    getSprite(variant) {
+        return null;
+    }
+
+    getRotationVariants() {
+        return [0, 1, 2, 3];
+    }
+
     /**
      * Should update the entity to match the given variants
      * @param {Entity} entity
@@ -192,9 +205,15 @@ export class SecondWireVariant extends MetaBuildingVariant {
      */
     updateVariants(entity, rotationVariant) {
         entity.components.Wire.type = wireRotationVariantToType[rotationVariant];
+        // @ts-ignore
         entity.components.Wire.variant = wireVariantToVariant[this.getId()];
     }
 }
+
+export const wireVariants = {
+    first: "first",
+    [new SecondWireVariant().getId()]: "second",
+};
 
 export const wireVariantToVariant = {
     [defaultBuildingVariant]: "first",

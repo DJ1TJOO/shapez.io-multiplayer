@@ -35,7 +35,7 @@ export class MetaTrashBuilding extends MetaBuilding {
      * @param {Entity} entity
      */
     setupEntityComponents(entity) {
-        MetaTrashBuilding.setupEntityComponents.forEach(func => func(entity));
+        MetaTrashBuilding.setupEntityComponents.forEach(func => func.bind(this)(entity));
     }
 }
 

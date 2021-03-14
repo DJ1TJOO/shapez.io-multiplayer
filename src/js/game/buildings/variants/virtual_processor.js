@@ -84,7 +84,7 @@ export class DefaultVirtualProcessorVariant extends MetaBuildingVariant {
 
 export class RotatorVirtualProcessorVariant extends MetaBuildingVariant {
     constructor(metaBuilding) {
-        super("rotator", metaBuilding);
+        super("rotater", metaBuilding);
     }
 
     getIsAvailable(root) {

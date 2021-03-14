@@ -12,7 +12,7 @@ import { globalConfig } from "../core/config";
 import { getDeviceDPI, resizeHighDPICanvas } from "../core/dpi_manager";
 import { DrawParameters } from "../core/draw_parameters";
 import { ExplainedResult } from "../core/explained_result";
-import { gGameModeRegistry, gMetaBuildingRegistry } from "../core/global_registries";
+import { gMetaBuildingRegistry } from "../core/global_registries";
 import { createLogger } from "../core/logging";
 import { Rectangle } from "../core/rectangle";
 import { ORIGINAL_SPRITE_SCALE } from "../core/sprites";
@@ -38,6 +38,7 @@ import { ShapeDefinitionManager } from "./shape_definition_manager";
 import { AchievementProxy } from "./achievement_proxy";
 import { SoundProxy } from "./sound_proxy";
 import { GameTime } from "./time/game_time";
+import { defaultBuildingVariant } from "./meta_building_variant";
 
 const logger = createLogger("ingame/core");
 

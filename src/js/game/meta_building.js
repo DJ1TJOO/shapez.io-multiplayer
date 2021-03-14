@@ -273,7 +273,7 @@ export class MetaBuilding {
                     (variant === defaultBuildingVariant ? "" : "-" + variant) +
                     ".png"
             );
-        return this.variants[variant].getBlueprintSprite(rotationVariant);
+        return this.variants[variant].getSprite(rotationVariant);
     }
 
     /**

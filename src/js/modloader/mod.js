@@ -436,6 +436,7 @@ import {
     undergroundBeltSilhouetteColorsByRotation,
     undergroundBeltComponentVariationsByRotation,
 } from "../game/buildings/variants/underground_belt";
+import { beltOverlayMatrices, beltVariantToRotation } from "../game/buildings/variants/belt";
 
 export class ShapezAPI {
     constructor(user) {
@@ -818,6 +819,9 @@ export class ShapezAPI {
             SplitterBalancerVariant,
             SplitterInverseBalancerVariant,
             //TODO: add all variants
+
+            beltVariantToRotation,
+            beltOverlayMatrices,
 
             wireVariantToVariant,
             wireRotationVariantToType,

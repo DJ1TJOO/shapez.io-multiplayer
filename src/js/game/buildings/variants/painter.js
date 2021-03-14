@@ -159,7 +159,7 @@ export class DoublePainterVariant extends MetaBuildingVariant {
      * Should return the dimensions of the building
      */
     getDimensions() {
-        return new Vector(2, 1);
+        return new Vector(2, 2);
     }
 
     /**

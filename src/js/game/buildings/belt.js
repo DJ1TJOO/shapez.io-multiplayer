@@ -1,10 +1,10 @@
 import { Loader } from "../../core/loader";
-import { generateMatrixRotations } from "../../core/utils";
 import { enumAngleToDirection, enumDirection, Vector } from "../../core/vector";
 import { BeltComponent } from "../components/belt";
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
 import { GameRoot } from "../root";
+import { beltVariantToRotation, DefaultBeltVariant } from "./variants/belt";
 
 export class MetaBeltBuilding extends MetaBuilding {
     constructor() {
@@ -12,7 +12,7 @@ export class MetaBeltBuilding extends MetaBuilding {
     }
 
     getPreviewSprite(rotationVariant) {
-        switch (MetaBeltBuilding.variantToRotation[rotationVariant]) {
+        switch (beltVariantToRotation[rotationVariant]) {
             case enumDirection.top: {
                 return Loader.getSprite("sprites/buildings/belt_top.png");
             }
@@ -29,7 +29,7 @@ export class MetaBeltBuilding extends MetaBuilding {
     }
 
     getBlueprintSprite(rotationVariant) {
-        switch (MetaBeltBuilding.variantToRotation[rotationVariant]) {
+        switch (beltVariantToRotation[rotationVariant]) {
             case enumDirection.top: {
                 return Loader.getSprite("sprites/blueprints/belt_top.png");
             }
@@ -156,6 +156,8 @@ export class MetaBeltBuilding extends MetaBuilding {
     }
 }
 
+MetaBeltBuilding.variants = [DefaultBeltVariant];
+
 MetaBeltBuilding.setupEntityComponents = [
     entity =>
         entity.addComponent(
@@ -164,11 +166,3 @@ MetaBeltBuilding.setupEntityComponents = [
             })
         ),
 ];
-
-MetaBeltBuilding.variantToRotation = [enumDirection.top, enumDirection.left, enumDirection.right];
-
-MetaBeltBuilding.overlayMatrices = {
-    [enumDirection.top]: (entity, rotationVariant) => generateMatrixRotations([0, 1, 0, 0, 1, 0, 0, 1, 0]),
-    [enumDirection.left]: (entity, rotationVariant) => generateMatrixRotations([0, 0, 0, 1, 1, 0, 0, 1, 0]),
-    [enumDirection.right]: (entity, rotationVariant) => generateMatrixRotations([0, 0, 0, 0, 1, 1, 0, 1, 0]),
-};

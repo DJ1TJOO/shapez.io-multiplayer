@@ -1,33 +1,6 @@
-import { gMetaBuildingRegistry } from "../../core/global_registries.js";
 import { createLogger } from "../../core/logging.js";
-import { MetaBalancerBuilding } from "../../game/buildings/balancer.js";
-import { MetaBeltBuilding } from "../../game/buildings/belt.js";
-import { MetaCutterBuilding } from "../../game/buildings/cutter.js";
-import { MetaHubBuilding } from "../../game/buildings/hub.js";
-import { MetaMinerBuilding } from "../../game/buildings/miner.js";
-import { MetaMixerBuilding } from "../../game/buildings/mixer.js";
-import { MetaPainterBuilding } from "../../game/buildings/painter.js";
-import { MetaRotaterBuilding } from "../../game/buildings/rotater.js";
-import { MetaStackerBuilding } from "../../game/buildings/stacker.js";
-import { MetaStorageBuilding } from "../../game/buildings/storage.js";
-import { MetaTrashBuilding } from "../../game/buildings/trash.js";
-import { MetaUndergroundBeltBuilding } from "../../game/buildings/underground_belt.js";
-import {
-    MergerBalancerVariant,
-    MergerInverseBalancerVariant,
-} from "../../game/buildings/variants/balancer.js";
-import { QuadCutterVariant } from "../../game/buildings/variants/cutter.js";
-import { ChainableMinerVariant } from "../../game/buildings/variants/miner.js";
-import {
-    DoublePainterVariant,
-    MirroredPainterVariant,
-    QuadPainterVariant,
-} from "../../game/buildings/variants/painter.js";
-import { getCodeFromBuildingData } from "../../game/building_codes.js";
 import { StaticMapEntityComponent } from "../../game/components/static_map_entity.js";
 import { Entity } from "../../game/entity.js";
-import { MetaBuilding } from "../../game/meta_building.js";
-import { defaultBuildingVariant } from "../../game/meta_building_variant.js";
 import { SavegameInterface_V1005 } from "./1005.js";
 
 const schema = require("./1006.json");
