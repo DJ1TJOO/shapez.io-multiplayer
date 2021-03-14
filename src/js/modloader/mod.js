@@ -429,14 +429,62 @@ import {
     wireVariantToVariant,
     wireRotationVariantToType,
     wireOverlayMatrices,
+    DefaultWireVariant,
+    SecondWireVariant,
 } from "../game/buildings/variants/wire";
 import {
     undergroundBeltRotationVariantToMode,
     undergroundBeltVariantToTier,
     undergroundBeltSilhouetteColorsByRotation,
     undergroundBeltComponentVariationsByRotation,
+    DefaultUndergroundBeltVariant,
+    Tier2UndergroundBeltVariant,
 } from "../game/buildings/variants/underground_belt";
-import { beltOverlayMatrices, beltVariantToRotation } from "../game/buildings/variants/belt";
+import {
+    beltOverlayMatrices,
+    beltVariantToRotation,
+    DefaultBeltVariant,
+} from "../game/buildings/variants/belt";
+import { DefaultComparatorVariant } from "../game/buildings/variants/comparator";
+import { DefaultConstantSignalVariant } from "../game/buildings/variants/constant_signal";
+import { DefaultCutterVariant, QuadCutterVariant } from "../game/buildings/variants/cutter";
+import { DefaultDisplayVariant } from "../game/buildings/variants/display";
+import { DefaultFilterVariant } from "../game/buildings/variants/filter";
+import { DefaultHubVariant } from "../game/buildings/variants/hub";
+import { DefaultItemProducerVariant } from "../game/buildings/variants/item_producer";
+import { DefaultLeverVariant } from "../game/buildings/variants/lever";
+import {
+    DefaultLogicGateVariant,
+    NotLogicGateVariant,
+    OrLogicGateVariant,
+    XorLogicGateVariant,
+} from "../game/buildings/variants/logic_gate";
+import { ChainableMinerVariant, DefaultMinerVariant } from "../game/buildings/variants/miner";
+import { DefaultMixerVariant } from "../game/buildings/variants/mixer";
+import {
+    DefaultPainterVariant,
+    DoublePainterVariant,
+    MirroredPainterVariant,
+    QuadPainterVariant,
+} from "../game/buildings/variants/painter";
+import { DefaultReaderVariant } from "../game/buildings/variants/reader";
+import {
+    CcwRotatorVariant,
+    DefaultRotatorVariant,
+    Rotate180RotatorVariant,
+} from "../game/buildings/variants/rotator";
+import { DefaultStackerVariant } from "../game/buildings/variants/stacker";
+import { DefaultStorageVariant } from "../game/buildings/variants/storage";
+import { DefaultTransistorVariant, MirroredTransistorVariant } from "../game/buildings/variants/transistor";
+import { DefaultTrashVariant } from "../game/buildings/variants/trash";
+import {
+    DefaultVirtualProcessorVariant,
+    PainterVirtualProcessorVariant,
+    RotatorVirtualProcessorVariant,
+    StackerVirtualProcessorVariant,
+    UnstackerVirtualProcessorVariant,
+} from "../game/buildings/variants/virtual_processor";
+import { DefaultWireTunnelVariant } from "../game/buildings/variants/wire_tunnel";
 
 export class ShapezAPI {
     constructor(user) {
@@ -818,7 +866,46 @@ export class ShapezAPI {
             MergerInverseBalancerVariant,
             SplitterBalancerVariant,
             SplitterInverseBalancerVariant,
-            //TODO: add all variants
+            DefaultBeltVariant,
+            DefaultComparatorVariant,
+            DefaultConstantSignalVariant,
+            DefaultCutterVariant,
+            QuadCutterVariant,
+            DefaultDisplayVariant,
+            DefaultFilterVariant,
+            DefaultHubVariant,
+            DefaultItemProducerVariant,
+            DefaultLeverVariant,
+            DefaultLogicGateVariant,
+            OrLogicGateVariant,
+            NotLogicGateVariant,
+            XorLogicGateVariant,
+            DefaultMinerVariant,
+            ChainableMinerVariant,
+            DefaultMixerVariant,
+            DefaultPainterVariant,
+            QuadPainterVariant,
+            DoublePainterVariant,
+            MirroredPainterVariant,
+            DefaultReaderVariant,
+            DefaultRotatorVariant,
+            Rotate180RotatorVariant,
+            CcwRotatorVariant,
+            DefaultStackerVariant,
+            DefaultStorageVariant,
+            DefaultTransistorVariant,
+            MirroredTransistorVariant,
+            DefaultTrashVariant,
+            DefaultUndergroundBeltVariant,
+            Tier2UndergroundBeltVariant,
+            DefaultVirtualProcessorVariant,
+            PainterVirtualProcessorVariant,
+            RotatorVirtualProcessorVariant,
+            StackerVirtualProcessorVariant,
+            UnstackerVirtualProcessorVariant,
+            DefaultWireTunnelVariant,
+            DefaultWireVariant,
+            SecondWireVariant,
 
             beltVariantToRotation,
             beltOverlayMatrices,
