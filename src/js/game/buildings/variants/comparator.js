@@ -39,6 +39,14 @@ export class DefaultComparatorVariant extends MetaBuildingVariant {
     }
 
     /**
+     * Should return false if the pins are already included in the sprite of the building
+     * @returns {boolean}
+     */
+    getRenderPins() {
+        return false;
+    }
+
+    /**
      * Should update the entity to match the given variants
      * @param {import("../../../savegame/savegame_typedefs").Entity} entity
      * @param {number} rotationVariant
