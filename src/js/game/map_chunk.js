@@ -360,7 +360,6 @@ export class MapChunk {
         }
     }
 }
-
 MapChunk.predefined = [
     (self, rng) => {
         if (self.x === 0 && self.y === 0) {

@@ -569,7 +569,6 @@ export class ShapeDefinition extends BasicSerializableObject {
         return new ShapeDefinition({ layers: newLayers });
     }
 }
-
 ShapeDefinition.renderQuad = {
     [enumSubShape.rect]: (context, quadrantSize, quadrantHalfSize, layerScale, insetPadding) => {
         context.beginPath();

@@ -366,6 +366,7 @@ export class ItemEjectorSystem extends GameSystemWithFilter {
         }
     }
 }
+
 ItemEjectorSystem.tryPassOverItemComponents = {
     Belt: (comp, item, receiver, slotIndex, itemEjector) => {
         const path = comp.assignedPath;

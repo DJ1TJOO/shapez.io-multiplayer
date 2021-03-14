@@ -71,8 +71,8 @@ export class DisplaySystem extends GameSystemWithFilter {
         }
     }
 }
-DisplaySystem.displaySprites = [];
 
+DisplaySystem.displaySprites = [];
 DisplaySystem.displayItemType = {
     boolean: value => (isTrueItem(value) ? ColorItem.ITEM_SINGLETONS[enumColors.white] : null),
 
