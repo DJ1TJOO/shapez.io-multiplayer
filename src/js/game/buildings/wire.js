@@ -1,12 +1,15 @@
 import { Loader } from "../../core/loader";
-import { generateMatrixRotations } from "../../core/utils";
 import { enumDirection, Vector } from "../../core/vector";
 import { enumWireType, WireComponent } from "../components/wire";
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
-import { defaultBuildingVariant } from "../meta_building_variant";
 import { GameRoot } from "../root";
-import { DefaultWireVariant, SecondWireVariant } from "./variants/wire";
+import {
+    DefaultWireVariant,
+    SecondWireVariant,
+    wireRotationVariantToType,
+    wireVariantToVariant,
+} from "./variants/wire";
 
 export class MetaWireBuilding extends MetaBuilding {
     constructor() {
@@ -28,8 +31,8 @@ export class MetaWireBuilding extends MetaBuilding {
      * @returns {import("../../core/sprites").AtlasSprite}
      */
     getPreviewSprite(rotationVariant, variant) {
-        const wireVariant = MetaWireBuilding.wireVariantToVariant[variant];
-        switch (MetaWireBuilding.rotationVariantToType[rotationVariant]) {
+        const wireVariant = wireVariantToVariant[variant];
+        switch (wireRotationVariantToType[rotationVariant]) {
             case enumWireType.forward: {
                 return Loader.getSprite("sprites/wires/sets/" + wireVariant + "_forward.png");
             }
@@ -63,7 +66,7 @@ export class MetaWireBuilding extends MetaBuilding {
      * @return {{ rotation: number, rotationVariant: number, connectedEntities?: Array<Entity> }}
      */
     computeOptimalDirectionAndRotationVariantAtTile({ root, tile, rotation, variant, layer }) {
-        const wireVariant = MetaWireBuilding.wireVariantToVariant[variant];
+        const wireVariant = wireVariantToVariant[variant];
         const connections = {
             // @ts-ignore
             top: root.logic.computeWireEdgeStatus({ tile, wireVariant, edge: enumDirection.top }),
@@ -174,7 +177,7 @@ export class MetaWireBuilding extends MetaBuilding {
         return {
             // Clamp rotation
             rotation: (rotation + 360 * 10) % 360,
-            rotationVariant: MetaWireBuilding.rotationVariantToType.indexOf(targetType),
+            rotationVariant: wireRotationVariantToType.indexOf(targetType),
         };
     }
 }
@@ -182,22 +185,3 @@ export class MetaWireBuilding extends MetaBuilding {
 MetaWireBuilding.setupEntityComponents = [entity => entity.addComponent(new WireComponent({}))];
 
 MetaWireBuilding.variants = [DefaultWireVariant, SecondWireVariant];
-
-MetaWireBuilding.wireVariantToVariant = {
-    [defaultBuildingVariant]: "first",
-    [new SecondWireVariant().getId()]: "second",
-};
-
-MetaWireBuilding.rotationVariantToType = [
-    enumWireType.forward,
-    enumWireType.turn,
-    enumWireType.split,
-    enumWireType.cross,
-];
-
-MetaWireBuilding.overlayMatrices = {
-    [enumWireType.forward]: (entity, rotationVariant) => generateMatrixRotations([0, 1, 0, 0, 1, 0, 0, 1, 0]),
-    [enumWireType.split]: (entity, rotationVariant) => generateMatrixRotations([0, 0, 0, 1, 1, 1, 0, 1, 0]),
-    [enumWireType.turn]: (entity, rotationVariant) => generateMatrixRotations([0, 0, 0, 0, 1, 1, 0, 1, 0]),
-    [enumWireType.cross]: (entity, rotationVariant) => generateMatrixRotations([0, 1, 0, 1, 1, 1, 0, 1, 0]),
-};

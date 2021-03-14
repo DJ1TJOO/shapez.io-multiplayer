@@ -1,9 +1,10 @@
+import { generateMatrixRotations } from "../../../core/utils";
 import { SOUNDS } from "../../../platform/sound";
+import { enumWireType } from "../../components/wire";
 import { Entity } from "../../entity";
 import { defaultBuildingVariant, MetaBuildingVariant } from "../../meta_building_variant";
 import { GameRoot } from "../../root";
 import { enumHubGoalRewards } from "../../tutorial_goals";
-import { MetaWireBuilding } from "../wire";
 
 export class DefaultWireVariant extends MetaBuildingVariant {
     constructor(metaBuilding) {
@@ -22,10 +23,9 @@ export class DefaultWireVariant extends MetaBuildingVariant {
      * @returns {Array<number>|null}
      */
     getSpecialOverlayRenderMatrix(rotation, rotationVariant, entity) {
-        return MetaWireBuilding.overlayMatrices[MetaWireBuilding.rotationVariantToType[rotationVariant]](
-            entity,
-            rotationVariant
-        )[rotation];
+        return wireOverlayMatrices[wireRotationVariantToType[rotationVariant]](entity, rotationVariant)[
+            rotation
+        ];
     }
 
     /**
@@ -98,8 +98,8 @@ export class DefaultWireVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.Wire.type = MetaWireBuilding.rotationVariantToType[rotationVariant];
-        entity.components.Wire.variant = MetaWireBuilding.wireVariantToVariant[this.getId()];
+        entity.components.Wire.type = wireRotationVariantToType[rotationVariant];
+        entity.components.Wire.variant = wireVariantToVariant[this.getId()];
     }
 }
 
@@ -120,10 +120,9 @@ export class SecondWireVariant extends MetaBuildingVariant {
      * @returns {Array<number>|null}
      */
     getSpecialOverlayRenderMatrix(rotation, rotationVariant, entity) {
-        return MetaWireBuilding.overlayMatrices[MetaWireBuilding.rotationVariantToType[rotationVariant]](
-            entity,
-            rotationVariant
-        )[rotation];
+        return wireOverlayMatrices[wireRotationVariantToType[rotationVariant]](entity, rotationVariant)[
+            rotation
+        ];
     }
 
     /**
@@ -192,7 +191,26 @@ export class SecondWireVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.Wire.type = MetaWireBuilding.rotationVariantToType[rotationVariant];
-        entity.components.Wire.variant = MetaWireBuilding.wireVariantToVariant[this.getId()];
+        entity.components.Wire.type = wireRotationVariantToType[rotationVariant];
+        entity.components.Wire.variant = wireVariantToVariant[this.getId()];
     }
 }
+
+export const wireVariantToVariant = {
+    [defaultBuildingVariant]: "first",
+    [new SecondWireVariant().getId()]: "second",
+};
+
+export const wireRotationVariantToType = [
+    enumWireType.forward,
+    enumWireType.turn,
+    enumWireType.split,
+    enumWireType.cross,
+];
+
+export const wireOverlayMatrices = {
+    [enumWireType.forward]: (entity, rotationVariant) => generateMatrixRotations([0, 1, 0, 0, 1, 0, 0, 1, 0]),
+    [enumWireType.split]: (entity, rotationVariant) => generateMatrixRotations([0, 0, 0, 1, 1, 1, 0, 1, 0]),
+    [enumWireType.turn]: (entity, rotationVariant) => generateMatrixRotations([0, 0, 0, 0, 1, 1, 0, 1, 0]),
+    [enumWireType.cross]: (entity, rotationVariant) => generateMatrixRotations([0, 1, 0, 1, 1, 1, 0, 1, 0]),
+};

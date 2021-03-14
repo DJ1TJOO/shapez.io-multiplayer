@@ -4,7 +4,7 @@ import { InputReceiver } from "../../../core/input_receiver";
 import { makeDiv } from "../../../core/utils";
 import { SOUNDS } from "../../../platform/sound";
 import { T } from "../../../translations";
-import { defaultBuildingVariant } from "../../meta_building";
+import { defaultBuildingVariant } from "../../meta_building_variant";
 import { enumHubGoalRewards } from "../../tutorial_goals";
 import { enumHubGoalRewardsToContentUnlocked } from "../../tutorial_goals_mappings";
 import { BaseHUDPart } from "../base_hud_part";
@@ -75,7 +75,7 @@ export class HUDUnlockNotification extends BaseHUDPart {
         <div class="rewardName">
             ${T.ingame.levelCompleteNotification.unlockText.replace("<reward>", rewardName)}
         </div>
-        
+
         <div class="rewardDesc">
             ${T.storyRewards[reward].desc}
         </div>

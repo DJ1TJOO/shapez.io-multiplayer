@@ -5,9 +5,7 @@ import { StorageComponent } from "../components/storage";
 import { enumPinSlotType, WiredPinsComponent } from "../components/wired_pins";
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
-import { DefaultStorageVariant } from "./variants/storage";
-
-export const storageSize = 5000;
+import { DefaultStorageVariant, storageSize } from "./variants/storage";
 
 export class MetaStorageBuilding extends MetaBuilding {
     constructor() {

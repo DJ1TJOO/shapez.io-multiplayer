@@ -1,11 +1,12 @@
 import { globalConfig } from "../../../core/config";
 import { formatItemsPerSecond, generateMatrixRotations } from "../../../core/utils";
+import { Vector, enumDirection } from "../../../core/vector";
 import { T } from "../../../translations";
+import { enumUndergroundBeltMode } from "../../components/underground_belt";
 import { Entity } from "../../entity";
 import { defaultBuildingVariant, MetaBuildingVariant } from "../../meta_building_variant";
 import { GameRoot } from "../../root";
 import { enumHubGoalRewards } from "../../tutorial_goals";
-import { MetaUndergroundBeltBuilding } from "../underground_belt";
 
 export class DefaultUndergroundBeltVariant extends MetaBuildingVariant {
     constructor(metaBuilding) {
@@ -57,7 +58,7 @@ export class DefaultUndergroundBeltVariant extends MetaBuildingVariant {
      * @returns {Array<number>|null}
      */
     getSpecialOverlayRenderMatrix(rotation, rotationVariant, entity) {
-        return MetaUndergroundBeltBuilding.overlayMatricesByRotation[rotationVariant]()[rotation];
+        return undergroundBeltOverlayMatricesByRotation[rotationVariant]()[rotation];
     }
 
     /**
@@ -65,7 +66,7 @@ export class DefaultUndergroundBeltVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     getSilhouetteColor(rotationVariant) {
-        return MetaUndergroundBeltBuilding.silhouetteColorsByRotation[rotationVariant]();
+        return undergroundBeltSilhouetteColorsByRotation[rotationVariant]();
     }
 
     getRotationVariants() {
@@ -78,8 +79,8 @@ export class DefaultUndergroundBeltVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.UndergroundBelt.tier = MetaUndergroundBeltBuilding.variantToTier[this.id];
-        MetaUndergroundBeltBuilding.componentVariationsByRotation[rotationVariant](entity, rotationVariant);
+        entity.components.UndergroundBelt.tier = undergroundBeltVariantToTier[this.id];
+        undergroundBeltComponentVariationsByRotation[rotationVariant](entity, rotationVariant);
     }
 }
 
@@ -125,7 +126,7 @@ export class Tier2UndergroundBeltVariant extends MetaBuildingVariant {
      * @returns {Array<number>|null}
      */
     getSpecialOverlayRenderMatrix(rotation, rotationVariant, entity) {
-        return MetaUndergroundBeltBuilding.overlayMatricesByRotation[rotationVariant]()[rotation];
+        return undergroundBeltOverlayMatricesByRotation[rotationVariant]()[rotation];
     }
 
     /**
@@ -133,7 +134,7 @@ export class Tier2UndergroundBeltVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     getSilhouetteColor(rotationVariant) {
-        return MetaUndergroundBeltBuilding.silhouetteColorsByRotation[rotationVariant]();
+        return undergroundBeltSilhouetteColorsByRotation[rotationVariant]();
     }
 
     getRotationVariants() {
@@ -146,7 +147,49 @@ export class Tier2UndergroundBeltVariant extends MetaBuildingVariant {
      * @param {number} rotationVariant
      */
     updateVariants(entity, rotationVariant) {
-        entity.components.UndergroundBelt.tier = MetaUndergroundBeltBuilding.variantToTier[this.id];
-        MetaUndergroundBeltBuilding.componentVariationsByRotation[rotationVariant](entity, rotationVariant);
+        entity.components.UndergroundBelt.tier = undergroundBeltVariantToTier[this.id];
+        undergroundBeltComponentVariationsByRotation[rotationVariant](entity, rotationVariant);
     }
 }
+
+export const undergroundBeltRotationVariantToMode = [
+    enumUndergroundBeltMode.sender,
+    enumUndergroundBeltMode.receiver,
+];
+
+export const undergroundBeltVariantToTier = {
+    [defaultBuildingVariant]: 0,
+    [new Tier2UndergroundBeltVariant().getId()]: 1,
+};
+export const undergroundBeltOverlayMatricesByRotation = [
+    // Sender
+    (entity, rotationVariant) => generateMatrixRotations([1, 1, 1, 0, 1, 0, 0, 1, 0]),
+    // Receiver
+    (entity, rotationVariant) => generateMatrixRotations([0, 1, 0, 0, 1, 0, 1, 1, 1]),
+];
+
+export const undergroundBeltSilhouetteColorsByRotation = [() => "#6d9dff", () => "#71ff9c"];
+
+export const undergroundBeltComponentVariationsByRotation = {
+    [enumUndergroundBeltMode.sender]: (entity, rotationVariant) => {
+        entity.components.UndergroundBelt.mode = enumUndergroundBeltMode.sender;
+        entity.components.ItemEjector.setSlots([]);
+        entity.components.ItemAcceptor.setSlots([
+            {
+                pos: new Vector(0, 0),
+                directions: [enumDirection.bottom],
+            },
+        ]);
+    },
+
+    [enumUndergroundBeltMode.receiver]: (entity, rotationVariant) => {
+        entity.components.UndergroundBelt.mode = enumUndergroundBeltMode.receiver;
+        entity.components.ItemAcceptor.setSlots([]);
+        entity.components.ItemEjector.setSlots([
+            {
+                pos: new Vector(0, 0),
+                direction: enumDirection.top,
+            },
+        ]);
+    },
+};

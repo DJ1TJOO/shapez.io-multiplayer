@@ -7,7 +7,7 @@ import { enumMouseButton } from "../../camera";
 import { StaticMapEntityComponent } from "../../components/static_map_entity";
 import { Entity } from "../../entity";
 import { KEYMAPPINGS } from "../../key_action_mapper";
-import { defaultBuildingVariant, MetaBuilding } from "../../meta_building";
+import { MetaBuilding } from "../../meta_building";
 import { BaseHUDPart } from "../base_hud_part";
 import { SOUNDS } from "../../../platform/sound";
 import { MetaMinerBuilding } from "../../buildings/miner";
@@ -15,6 +15,8 @@ import { enumHubGoalRewards } from "../../tutorial_goals";
 import { getBuildingDataFromCode, getCodeFromBuildingData } from "../../building_codes";
 import { MetaHubBuilding } from "../../buildings/hub";
 import { safeModulo } from "../../../core/utils";
+import { defaultBuildingVariant } from "../../meta_building_variant";
+import { ChainableMinerVariant } from "../../buildings/variants/miner";
 
 /**
  * Contains all logic for the building placer - this doesn't include the rendering
@@ -372,7 +374,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
 
                 // Select chained miner if available, since that's always desired once unlocked
                 if (this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_miner_chainable)) {
-                    this.currentVariant.set(MetaMinerBuilding.variants.chainable);
+                    this.currentVariant.set(new ChainableMinerVariant().getId());
                 }
             } else {
                 this.currentMetaBuilding.set(null);

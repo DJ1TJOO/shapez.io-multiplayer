@@ -1,4 +1,4 @@
-import { formatBigNumber, generateMatrixRotations } from "../../../core/utils";
+import { formatBigNumber } from "../../../core/utils";
 import { enumDirection, Vector } from "../../../core/vector";
 import { T } from "../../../translations";
 import { enumPinSlotType } from "../../components/wired_pins";
@@ -6,7 +6,8 @@ import { Entity } from "../../entity";
 import { defaultBuildingVariant, MetaBuildingVariant } from "../../meta_building_variant";
 import { GameRoot } from "../../root";
 import { enumHubGoalRewards } from "../../tutorial_goals";
-import { storageSize } from "../storage";
+
+export const storageSize = 5000;
 
 export class DefaultStorageVariant extends MetaBuildingVariant {
     constructor(metaBuilding) {

@@ -425,6 +425,17 @@ import {
     SplitterInverseBalancerVariant,
 } from "../game/buildings/variants/balancer";
 import { defaultBuildingVariant } from "../game/meta_building_variant";
+import {
+    wireVariantToVariant,
+    wireRotationVariantToType,
+    wireOverlayMatrices,
+} from "../game/buildings/variants/wire";
+import {
+    undergroundBeltRotationVariantToMode,
+    undergroundBeltVariantToTier,
+    undergroundBeltSilhouetteColorsByRotation,
+    undergroundBeltComponentVariationsByRotation,
+} from "../game/buildings/variants/underground_belt";
 
 export class ShapezAPI {
     constructor(user) {
@@ -806,6 +817,16 @@ export class ShapezAPI {
             MergerInverseBalancerVariant,
             SplitterBalancerVariant,
             SplitterInverseBalancerVariant,
+            //TODO: add all variants
+
+            wireVariantToVariant,
+            wireRotationVariantToType,
+            wireOverlayMatrices,
+
+            undergroundBeltRotationVariantToMode,
+            undergroundBeltVariantToTier,
+            undergroundBeltSilhouetteColorsByRotation,
+            undergroundBeltComponentVariationsByRotation,
 
             //Systems
             ItemAcceptorSystem,

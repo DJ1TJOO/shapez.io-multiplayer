@@ -13,7 +13,7 @@ import { BeltComponent } from "../components/belt";
 import { Entity } from "../entity";
 import { GameSystemWithFilter } from "../game_system_with_filter";
 import { MapChunkView } from "../map_chunk_view";
-import { defaultBuildingVariant } from "../meta_building";
+import { defaultBuildingVariant } from "../meta_building_variant";
 
 export const BELT_ANIM_COUNT = 14;
 

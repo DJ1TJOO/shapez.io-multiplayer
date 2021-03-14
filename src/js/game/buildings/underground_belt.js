@@ -1,5 +1,5 @@
 import { Loader } from "../../core/loader";
-import { enumDirection, Vector, enumAngleToDirection, enumDirectionToVector } from "../../core/vector";
+import { Vector, enumAngleToDirection, enumDirectionToVector } from "../../core/vector";
 import { ItemAcceptorComponent } from "../components/item_acceptor";
 import { ItemEjectorComponent } from "../components/item_ejector";
 import { enumUndergroundBeltMode, UndergroundBeltComponent } from "../components/underground_belt";
@@ -7,8 +7,12 @@ import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
 import { GameRoot } from "../root";
 import { globalConfig } from "../../core/config";
-import { generateMatrixRotations } from "../../core/utils";
-import { DefaultUndergroundBeltVariant, Tier2UndergroundBeltVariant } from "./variants/underground_belt";
+import {
+    DefaultUndergroundBeltVariant,
+    Tier2UndergroundBeltVariant,
+    undergroundBeltRotationVariantToMode,
+    undergroundBeltVariantToTier,
+} from "./variants/underground_belt";
 import { defaultBuildingVariant } from "../meta_building_variant";
 
 export class MetaUndergroundBeltBuilding extends MetaBuilding {
@@ -34,7 +38,7 @@ export class MetaUndergroundBeltBuilding extends MetaBuilding {
             suffix = "-" + variant;
         }
 
-        switch (MetaUndergroundBeltBuilding.rotationVariantToMode[rotationVariant]) {
+        switch (undergroundBeltRotationVariantToMode[rotationVariant]) {
             case enumUndergroundBeltMode.sender:
                 return Loader.getSprite("sprites/buildings/underground_belt_entry" + suffix + ".png");
             case enumUndergroundBeltMode.receiver:
@@ -54,7 +58,7 @@ export class MetaUndergroundBeltBuilding extends MetaBuilding {
             suffix = "-" + variant;
         }
 
-        switch (MetaUndergroundBeltBuilding.rotationVariantToMode[rotationVariant]) {
+        switch (undergroundBeltRotationVariantToMode[rotationVariant]) {
             case enumUndergroundBeltMode.sender:
                 return Loader.getSprite("sprites/blueprints/underground_belt_entry" + suffix + ".png");
             case enumUndergroundBeltMode.receiver:
@@ -93,7 +97,7 @@ export class MetaUndergroundBeltBuilding extends MetaBuilding {
     computeOptimalDirectionAndRotationVariantAtTile({ root, tile, rotation, variant, layer }) {
         const searchDirection = enumAngleToDirection[rotation];
         const searchVector = enumDirectionToVector[searchDirection];
-        const tier = MetaUndergroundBeltBuilding.variantToTier[variant];
+        const tier = undergroundBeltVariantToTier[variant];
 
         const targetRotation = (rotation + 180) % 360;
         const targetSenderRotation = rotation;
@@ -160,47 +164,4 @@ MetaUndergroundBeltBuilding.setupEntityComponents = [
         ),
 ];
 
-MetaUndergroundBeltBuilding.rotationVariantToMode = [
-    enumUndergroundBeltMode.sender,
-    enumUndergroundBeltMode.receiver,
-];
-
-MetaUndergroundBeltBuilding.variantToTier = {
-    [defaultBuildingVariant]: 0,
-    [new Tier2UndergroundBeltVariant().getId()]: 1,
-};
-
 MetaUndergroundBeltBuilding.variants = [DefaultUndergroundBeltVariant, Tier2UndergroundBeltVariant];
-
-MetaUndergroundBeltBuilding.overlayMatricesByRotation = [
-    // Sender
-    (entity, rotationVariant) => generateMatrixRotations([1, 1, 1, 0, 1, 0, 0, 1, 0]),
-    // Receiver
-    (entity, rotationVariant) => generateMatrixRotations([0, 1, 0, 0, 1, 0, 1, 1, 1]),
-];
-
-MetaUndergroundBeltBuilding.silhouetteColorsByRotation = [() => "#6d9dff", () => "#71ff9c"];
-
-MetaUndergroundBeltBuilding.componentVariationsByRotation = {
-    [enumUndergroundBeltMode.sender]: (entity, rotationVariant) => {
-        entity.components.UndergroundBelt.mode = enumUndergroundBeltMode.sender;
-        entity.components.ItemEjector.setSlots([]);
-        entity.components.ItemAcceptor.setSlots([
-            {
-                pos: new Vector(0, 0),
-                directions: [enumDirection.bottom],
-            },
-        ]);
-    },
-
-    [enumUndergroundBeltMode.receiver]: (entity, rotationVariant) => {
-        entity.components.UndergroundBelt.mode = enumUndergroundBeltMode.receiver;
-        entity.components.ItemAcceptor.setSlots([]);
-        entity.components.ItemEjector.setSlots([
-            {
-                pos: new Vector(0, 0),
-                direction: enumDirection.top,
-            },
-        ]);
-    },
-};
