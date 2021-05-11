@@ -540,49 +540,17 @@ export class RegularGameMode extends GameMode {
     constructor(root) {
         super(root);
 
-        this.additionalHudParts = {
-            wiresToolbar: HUDWiresToolbar,
-            blueprintPlacer: HUDBlueprintPlacer,
-            unlockNotification: HUDUnlockNotification,
-            massSelector: HUDMassSelector,
-            shop: HUDShop,
-            statistics: HUDStatistics,
-            waypoints: HUDWaypoints,
-            wireInfo: HUDWireInfo,
-            leverToggle: HUDLeverToggle,
-            pinnedShapes: HUDPinnedShapes,
-            notifications: HUDNotifications,
-            screenshotExporter: HUDScreenshotExporter,
-            wiresOverlay: HUDWiresOverlay,
-            shapeViewer: HUDShapeViewer,
-            layerPreview: HUDLayerPreview,
-            minerHighlight: HUDMinerHighlight,
-            tutorialVideoOffer: HUDTutorialVideoOffer,
-            gameMenu: HUDGameMenu,
-            constantSignalEdit: HUDConstantSignalEdit,
-        };
-
-        if (!IS_MOBILE) {
-            this.additionalHudParts.keybindingOverlay = HUDKeybindingOverlay;
+        for (const key in RegularGameMode.additionalHudParts) {
+            this.additionalHudParts[key] = RegularGameMode.additionalHudParts[key](this.root);
         }
 
-        if (this.root.app.restrictionMgr.getIsStandaloneMarketingActive()) {
-            this.additionalHudParts.watermark = HUDWatermark;
-            this.additionalHudParts.standaloneAdvantages = HUDStandaloneAdvantages;
-            this.additionalHudParts.catMemes = HUDCatMemes;
+        for (let i = 0; i < RegularGameMode.hiddenBuildings.length; i++) {
+            const hiddenBuilding = RegularGameMode.hiddenBuildings[i];
+            let building = hiddenBuilding(this.root);
+            if (building) {
+                this.hiddenBuildings.push(building);
+            }
         }
-
-        if (this.root.app.settings.getAllSettings().offerHints) {
-            this.additionalHudParts.tutorialHints = HUDPartTutorialHints;
-            this.additionalHudParts.interactiveTutorial = HUDInteractiveTutorial;
-        }
-
-        // @ts-ignore
-        if (queryParamOptions.sandboxMode || window.sandboxMode || G_IS_DEV) {
-            this.additionalHudParts.sandboxController = HUDSandboxController;
-        }
-
-        this.hiddenBuildings = [MetaConstantProducerBuilding, MetaGoalAcceptorBuilding, MetaBlockBuilding];
     }
 
     /**
@@ -614,3 +582,67 @@ export class RegularGameMode extends GameMode {
         return this.root.app.restrictionMgr.getHasExtendedLevelsAndFreeplay();
     }
 }
+
+RegularGameMode.additionalHudParts = {
+    wiresToolbar: root => HUDWiresToolbar,
+    blueprintPlacer: root => HUDBlueprintPlacer,
+    unlockNotification: root => HUDUnlockNotification,
+    massSelector: root => HUDMassSelector,
+    shop: root => HUDShop,
+    statistics: root => HUDStatistics,
+    waypoints: root => HUDWaypoints,
+    wireInfo: root => HUDWireInfo,
+    leverToggle: root => HUDLeverToggle,
+    pinnedShapes: root => HUDPinnedShapes,
+    notifications: root => HUDNotifications,
+    screenshotExporter: root => HUDScreenshotExporter,
+    wiresOverlay: root => HUDWiresOverlay,
+    shapeViewer: root => HUDShapeViewer,
+    layerPreview: root => HUDLayerPreview,
+    minerHighlight: root => HUDMinerHighlight,
+    tutorialVideoOffer: root => HUDTutorialVideoOffer,
+    gameMenu: root => HUDGameMenu,
+    constantSignalEdit: root => HUDConstantSignalEdit,
+    keybindingOverlay: root => {
+        if (!IS_MOBILE) {
+            return HUDKeybindingOverlay;
+        }
+    },
+    watermark: root => {
+        if (root.app.restrictionMgr.getIsStandaloneMarketingActive()) {
+            return HUDWatermark;
+        }
+    },
+    standaloneAdvantages: root => {
+        if (root.app.restrictionMgr.getIsStandaloneMarketingActive()) {
+            return HUDStandaloneAdvantages;
+        }
+    },
+    catMemes: root => {
+        if (root.app.restrictionMgr.getIsStandaloneMarketingActive()) {
+            return HUDCatMemes;
+        }
+    },
+    tutorialHints: root => {
+        if (root.app.settings.getAllSettings().offerHints) {
+            return HUDPartTutorialHints;
+        }
+    },
+    interactiveTutorial: root => {
+        if (root.app.settings.getAllSettings().offerHints) {
+            return HUDInteractiveTutorial;
+        }
+    },
+    sandboxController: root => {
+        // @ts-ignore
+        if (queryParamOptions.sandboxMode || window.sandboxMode || G_IS_DEV) {
+            return HUDSandboxController;
+        }
+    },
+};
+
+RegularGameMode.hiddenBuildings = [
+    root => MetaConstantProducerBuilding,
+    root => MetaGoalAcceptorBuilding,
+    root => MetaBlockBuilding,
+];

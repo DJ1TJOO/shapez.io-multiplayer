@@ -27,10 +27,9 @@ export class PuzzleGameMode extends GameMode {
 
         const data = this.getSaveData();
 
-        this.additionalHudParts = {
-            puzzleBackToMenu: HUDPuzzleBackToMenu,
-            puzzleDlcLogo: HUDPuzzleDLCLogo,
-        };
+        for (const key in PuzzleGameMode.additionalHudParts) {
+            this.additionalHudParts[key] = PuzzleGameMode.additionalHudParts[key](this.root);
+        }
 
         this.zoneWidth = data.zoneWidth || 8;
         this.zoneHeight = data.zoneHeight || 6;
@@ -97,3 +96,7 @@ export class PuzzleGameMode extends GameMode {
         return true;
     }
 }
+PuzzleGameMode.additionalHudParts = {
+    puzzleBackToMenu: root => HUDPuzzleBackToMenu,
+    puzzleDlcLogo: root => HUDPuzzleDLCLogo,
+};

@@ -36,31 +36,48 @@ export class PuzzleEditGameMode extends PuzzleGameMode {
     constructor(root) {
         super(root);
 
-        this.hiddenBuildings = [
-            MetaStorageBuilding,
-            MetaReaderBuilding,
-            MetaFilterBuilding,
-            MetaDisplayBuilding,
-            MetaLeverBuilding,
-            MetaItemProducerBuilding,
-            MetaMinerBuilding,
+        for (let i = 0; i < PuzzleEditGameMode.hiddenBuildings.length; i++) {
+            const hiddenBuilding = PuzzleEditGameMode.hiddenBuildings[i];
+            let building = hiddenBuilding(this.root);
+            if (building) {
+                this.hiddenBuildings.push(building);
+            }
+        }
 
-            MetaWireBuilding,
-            MetaWireTunnelBuilding,
-            MetaConstantSignalBuilding,
-            MetaLogicGateBuilding,
-            MetaVirtualProcessorBuilding,
-            MetaAnalyzerBuilding,
-            MetaComparatorBuilding,
-            MetaTransistorBuilding,
-        ];
+        for (const key in PuzzleEditGameMode.additionalHudParts) {
+            this.additionalHudParts[key] = PuzzleEditGameMode.additionalHudParts[key](this.root);
+        }
 
-        this.additionalHudParts.puzzleEditorControls = HUDPuzzleEditorControls;
-        this.additionalHudParts.puzzleEditorReview = HUDPuzzleEditorReview;
-        this.additionalHudParts.puzzleEditorSettings = HUDPuzzleEditorSettings;
+        this.hiddenBuildings = [];
     }
 
     getIsEditor() {
         return true;
     }
 }
+
+PuzzleEditGameMode.additionalHudParts = {
+    ...PuzzleGameMode.additionalHudParts,
+    puzzleEditorControls: root => HUDPuzzleEditorControls,
+    puzzleEditorReview: root => HUDPuzzleEditorReview,
+    puzzleEditorSettings: root => HUDPuzzleEditorSettings,
+};
+
+PuzzleEditGameMode.hiddenBuildings = [
+    root => MetaStorageBuilding,
+    root => MetaReaderBuilding,
+    root => MetaFilterBuilding,
+    root => MetaDisplayBuilding,
+    root => MetaLeverBuilding,
+    root => MetaItemProducerBuilding,
+    root => MetaMinerBuilding,
+
+    root => MetaWireBuilding,
+    root => MetaWireTunnelBuilding,
+    root => MetaConstantSignalBuilding,
+    root => MetaLogicGateBuilding,
+    root => MetaVirtualProcessorBuilding,
+    root => MetaAnalyzerBuilding,
+    root => MetaComparatorBuilding,
+    root => MetaTransistorBuilding,
+];

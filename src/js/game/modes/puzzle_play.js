@@ -45,32 +45,17 @@ export class PuzzlePlayGameMode extends PuzzleGameMode {
     constructor(root, { puzzle }) {
         super(root);
 
-        this.hiddenBuildings = [
-            MetaConstantProducerBuilding,
-            MetaGoalAcceptorBuilding,
-            MetaBlockBuilding,
+        for (let i = 0; i < PuzzlePlayGameMode.hiddenBuildings.length; i++) {
+            const hiddenBuilding = PuzzlePlayGameMode.hiddenBuildings[i];
+            let building = hiddenBuilding(this.root);
+            if (building) {
+                this.hiddenBuildings.push(building);
+            }
+        }
 
-            MetaStorageBuilding,
-            MetaReaderBuilding,
-            MetaFilterBuilding,
-            MetaDisplayBuilding,
-            MetaLeverBuilding,
-            MetaItemProducerBuilding,
-            MetaMinerBuilding,
-
-            MetaWireBuilding,
-            MetaWireTunnelBuilding,
-            MetaConstantSignalBuilding,
-            MetaLogicGateBuilding,
-            MetaVirtualProcessorBuilding,
-            MetaAnalyzerBuilding,
-            MetaComparatorBuilding,
-            MetaTransistorBuilding,
-        ];
-
-        this.additionalHudParts.puzzlePlayMetadata = HUDPuzzlePlayMetadata;
-        this.additionalHudParts.puzzlePlaySettings = HUDPuzzlePlaySettings;
-        this.additionalHudParts.puzzleCompleteNotification = HUDPuzzleCompleteNotification;
+        for (const key in PuzzlePlayGameMode.additionalHudParts) {
+            this.additionalHudParts[key] = PuzzlePlayGameMode.additionalHudParts[key](this.root);
+        }
 
         root.signals.postLoadHook.add(this.loadPuzzle, this);
 
@@ -171,3 +156,33 @@ export class PuzzlePlayGameMode extends PuzzleGameMode {
         });
     }
 }
+
+PuzzlePlayGameMode.additionalHudParts = {
+    ...PuzzleGameMode.additionalHudParts,
+    puzzlePlayMetadata: root => HUDPuzzlePlayMetadata,
+    puzzlePlaySettings: root => HUDPuzzlePlaySettings,
+    puzzleCompleteNotification: root => HUDPuzzleCompleteNotification,
+};
+
+PuzzlePlayGameMode.hiddenBuildings = [
+    root => MetaConstantProducerBuilding,
+    root => MetaGoalAcceptorBuilding,
+    root => MetaBlockBuilding,
+
+    root => MetaStorageBuilding,
+    root => MetaReaderBuilding,
+    root => MetaFilterBuilding,
+    root => MetaDisplayBuilding,
+    root => MetaLeverBuilding,
+    root => MetaItemProducerBuilding,
+    root => MetaMinerBuilding,
+
+    root => MetaWireBuilding,
+    root => MetaWireTunnelBuilding,
+    root => MetaConstantSignalBuilding,
+    root => MetaLogicGateBuilding,
+    root => MetaVirtualProcessorBuilding,
+    root => MetaAnalyzerBuilding,
+    root => MetaComparatorBuilding,
+    root => MetaTransistorBuilding,
+];
