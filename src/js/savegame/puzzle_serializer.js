@@ -14,7 +14,7 @@ import { createLogger } from "../core/logging";
 import { BaseItem } from "../game/base_item";
 import trim from "trim";
 import { enumColors } from "../game/colors";
-import { COLOR_ITEM_SINGLETONS } from "../game/items/color_item";
+import { ColorItem } from "../game/items/color_item";
 import { ShapeDefinition } from "../game/shape_definition";
 import { MetaBlockBuilding } from "../game/buildings/block";
 
@@ -109,7 +109,7 @@ export class PuzzleSerializer {
         const codeLower = code.toLowerCase();
 
         if (enumColors[codeLower]) {
-            return COLOR_ITEM_SINGLETONS[codeLower];
+            return ColorItem.ITEM_SINGLETONS[codeLower];
         }
 
         if (ShapeDefinition.isValidShortKey(code)) {

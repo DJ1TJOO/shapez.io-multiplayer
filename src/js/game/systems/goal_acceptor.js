@@ -15,6 +15,10 @@ export class GoalAcceptorSystem extends GameSystemWithFilter {
         this.puzzleCompleted = false;
     }
 
+    static getId() {
+        return "goalAcceptor";
+    }
+
     update() {
         const now = this.root.time.now();
 

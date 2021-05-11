@@ -12,7 +12,7 @@ import { addVanillaBuildingsToAPI, initMetaBuildingRegistry } from "./game/meta_
 import { addVanillaGameSpeedToAPI, initGameSpeedRegistry } from "./game/game_speed_registry";
 import { ModManager } from "./modloader/modmanager";
 import { addVanillaSystemsToAPI } from "./game/game_system_manager";
-import { addVanillaGameModesToAPI } from "./game/game_mode_registry";
+import { addVanillaGameModesToAPI, initGameModeRegistry } from "./game/game_mode_registry";
 import { getIPCRenderer } from "./core/utils";
 const logger = createLogger("main");
 window.onload = async () => {
@@ -138,6 +138,7 @@ window.onload = async () => {
     initItemRegistry();
     initMetaBuildingRegistry();
     initGameSpeedRegistry();
+    initGameModeRegistry();
 
     function bootApp() {
         logger.log("Page Loaded");

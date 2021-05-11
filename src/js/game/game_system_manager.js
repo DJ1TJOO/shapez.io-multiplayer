@@ -86,9 +86,15 @@ export function addVanillaSystemsToAPI() {
 
         ConstantProducerSystem,
         GoalAcceptorSystem,
+        ZoneSystem,
     ];
 
-    shapezAPI.ingame["systemsRenderOrderBackground"] = [MapResourcesSystem, BeltUnderlaysSystem, BeltSystem];
+    shapezAPI.ingame["systemsRenderOrderBackground"] = [
+        ZoneSystem,
+        MapResourcesSystem,
+        BeltUnderlaysSystem,
+        BeltSystem,
+    ];
 
     shapezAPI.ingame["systemsRenderOrderDynamic"] = [ItemEjectorSystem, ItemAcceptorSystem, MinerSystem];
 

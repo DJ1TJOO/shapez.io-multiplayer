@@ -13,6 +13,10 @@ export class ConstantProducerSystem extends GameSystemWithFilter {
         super(root, [ConstantSignalComponent, ItemProducerComponent]);
     }
 
+    static getId() {
+        return "constantProducer";
+    }
+
     update() {
         for (let i = 0; i < this.allEntities.length; ++i) {
             const entity = this.allEntities[i];

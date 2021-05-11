@@ -31,6 +31,8 @@ import { SettingsState } from "./states/settings";
 import { ShapezGameAnalytics } from "./platform/browser/game_analytics";
 import { RestrictionManager } from "./core/restriction_manager";
 import { ClientAPI } from "./platform/api";
+import { LoginState } from "./states/login";
+import { PuzzleMenuState } from "./states/puzzle_menu";
 
 /**
  * @typedef {import("./platform/achievement_provider").AchievementProviderInterface} AchievementProviderInterface
@@ -422,4 +424,6 @@ Application.states = {
     KeybindingsState,
     AboutState,
     ChangelogState,
+    LoginState,
+    PuzzleMenuState,
 };

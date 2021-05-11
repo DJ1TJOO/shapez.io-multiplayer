@@ -47,9 +47,6 @@ export class GameHUD {
 
         this.parts = {
             buildingsToolbar: new HUDBuildingsToolbar(this.root),
-            wiresToolbar: new HUDWiresToolbar(this.root),
-            layerToolbars: [],
-            blueprintPlacer: new HUDBlueprintPlacer(this.root),
             buildingPlacer: new HUDBuildingPlacer(this.root),
 
             // Must always exist
@@ -73,10 +70,6 @@ export class GameHUD {
             const layer = shapezAPI.ingame.layers[i];
             if (shapezAPI.toolbars[layer])
                 this.parts.layerToolbars.push(new shapezAPI.toolbars[layer](this.root));
-        }
-
-        if (!IS_MOBILE) {
-            this.parts.keybindingOverlay = new HUDKeybindingOverlay(this.root);
         }
 
         if (G_IS_DEV && globalConfig.debug.enableEntityInspector) {

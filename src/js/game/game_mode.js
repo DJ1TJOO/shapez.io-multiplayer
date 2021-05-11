@@ -84,11 +84,6 @@ export class GameMode extends BasicSerializableObject {
         return this.constructor.getType();
     }
 
-    static getId() {
-        abstract;
-        return "unknow-gamemode";
-    }
-
     /**
      * @param {typeof MetaBuilding} building - Class name of building
      * @returns {boolean}

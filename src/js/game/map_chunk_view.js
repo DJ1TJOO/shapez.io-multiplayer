@@ -46,7 +46,7 @@ export class MapChunkView extends MapChunk {
         const renderOrder = [...systemsWithoutOrderd, ...order];
         for (let i = 0; i < renderOrder.length; i++) {
             const system = systems[renderOrder[i]];
-            if (typeof system.drawChunk_BackgroundLayer !== "function") continue;
+            if (!system || typeof system.drawChunk_BackgroundLayer !== "function") continue;
             system.drawChunk_BackgroundLayer(parameters, this);
         }
     }
@@ -62,7 +62,7 @@ export class MapChunkView extends MapChunk {
         const renderOrder = [...systemsWithoutOrderd, ...order];
         for (let i = 0; i < renderOrder.length; i++) {
             const system = systems[renderOrder[i]];
-            if (typeof system.drawChunk_ForegroundDynamicLayer !== "function") continue;
+            if (!system || typeof system.drawChunk_ForegroundDynamicLayer !== "function") continue;
             system.drawChunk_ForegroundDynamicLayer(parameters, this);
         }
     }
@@ -78,7 +78,7 @@ export class MapChunkView extends MapChunk {
         const renderOrder = [...systemsWithoutOrderd, ...order];
         for (let i = 0; i < renderOrder.length; i++) {
             const system = systems[renderOrder[i]];
-            if (typeof system.drawChunk_ForegroundStaticLayer !== "function") continue;
+            if (!system || typeof system.drawChunk_ForegroundStaticLayer !== "function") continue;
             system.drawChunk_ForegroundStaticLayer(parameters, this);
         }
     }

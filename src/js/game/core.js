@@ -110,10 +110,11 @@ export class GameCore {
         // Needs to come first
         root.dynamicTickrate = new DynamicTickrate(root);
 
+        //TODO: fix gamemodes
         // Init game mode
-        if (!savegame.currentData.gamemode) root.gameMode = new RegularGameMode(root);
-        else if (shapezAPI.ingame.gamemodes[savegame.currentData.gamemode])
-            root.gameMode = new shapezAPI.ingame.gamemodes[savegame.currentData.gamemode](root);
+        // if (!savegame.currentData.gamemode) root.gameMode = new RegularGameMode(root);
+        // else if (shapezAPI.ingame.gamemodes[savegame.currentData.gamemode])
+        //     root.gameMode = new shapezAPI.ingame.gamemodes[savegame.currentData.gamemode](root);
 
         // Init classes
         root.camera = new Camera(root);
