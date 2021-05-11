@@ -20,9 +20,10 @@ export class MetaConstantSignalBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaConstantSignalBuilding.isRemovable[variant]();
     }
 

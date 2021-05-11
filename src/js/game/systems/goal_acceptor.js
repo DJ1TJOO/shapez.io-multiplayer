@@ -52,7 +52,7 @@ export class GoalAcceptorSystem extends GameSystemWithFilter {
      * @param {MapChunk} chunk
      * @returns
      */
-    drawChunk(parameters, chunk) {
+    drawChunk_ForegroundStaticLayer(parameters, chunk) {
         const contents = chunk.containedEntitiesByLayer.regular;
         for (let i = 0; i < contents.length; ++i) {
             const goalComp = contents[i].components.GoalAcceptor;

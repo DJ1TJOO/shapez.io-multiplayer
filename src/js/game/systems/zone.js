@@ -12,6 +12,10 @@ import { Entity } from "../entity";
 import { Vector } from "../../core/vector";
 
 export class ZoneSystem extends GameSystem {
+    static getId() {
+        return "zone";
+    }
+
     /** @param {GameRoot} root */
     constructor(root) {
         super(root);
@@ -59,7 +63,7 @@ export class ZoneSystem extends GameSystem {
      * @param {DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk_BackgroundLayer(parameters, chunk) {
         if (this.drawn) {
             // oof
             return;

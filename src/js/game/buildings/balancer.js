@@ -237,52 +237,85 @@ MetaBalancerBuilding.additionalStatistics = {
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [defaultBuildingVariant]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.balancer)),
-        ],
-    ],
+    [defaultBuildingVariant]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.balancer)),
+            ],
+        ];
+    },
     /**
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [MetaBalancerBuilding.variants.merger]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.balancer) / 2),
-        ],
-    ],
+    [MetaBalancerBuilding.variants.merger]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(
+                    root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.balancer) / 2
+                ),
+            ],
+        ];
+    },
     /**
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [MetaBalancerBuilding.variants.mergerInverse]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.balancer) / 2),
-        ],
-    ],
+    [MetaBalancerBuilding.variants.mergerInverse]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(
+                    root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.balancer) / 2
+                ),
+            ],
+        ];
+    },
     /**
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [MetaBalancerBuilding.variants.splitter]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.balancer) / 2),
-        ],
-    ],
+    [MetaBalancerBuilding.variants.splitter]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(
+                    root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.balancer) / 2
+                ),
+            ],
+        ];
+    },
     /**
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [MetaBalancerBuilding.variants.splitterInverse]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.balancer) / 2),
-        ],
-    ],
+    [MetaBalancerBuilding.variants.splitterInverse]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(
+                    root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.balancer) / 2
+                ),
+            ],
+        ];
+    },
 };
 
 MetaBalancerBuilding.silhouetteColors = {

@@ -20,9 +20,10 @@ export class MetaTransistorBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaTransistorBuilding.isRemovable[variant]();
     }
 

@@ -35,7 +35,7 @@ export class ConstantProducerSystem extends GameSystemWithFilter {
      * @param {MapChunk} chunk
      * @returns
      */
-    drawChunk(parameters, chunk) {
+    drawChunk_ForegroundStaticLayer(parameters, chunk) {
         const contents = chunk.containedEntitiesByLayer.regular;
         for (let i = 0; i < contents.length; ++i) {
             const producerComp = contents[i].components.ItemProducer;

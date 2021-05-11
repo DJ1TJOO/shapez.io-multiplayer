@@ -20,9 +20,10 @@ export class MetaAnalyzerBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaAnalyzerBuilding.isRemovable[variant]();
     }
 

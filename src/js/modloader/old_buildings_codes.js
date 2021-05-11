@@ -104,4 +104,13 @@ export const codes = {
 
     //Item Producer
     61: "item_producer/default/0",
+
+    // Constant producer
+    62: "constant_producer/default/0",
+
+    // Goal acceptor
+    63: "goal_acceptor/default/0",
+
+    // Block
+    64: "block/default/0",
 };

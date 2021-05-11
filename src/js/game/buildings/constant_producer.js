@@ -7,6 +7,7 @@ import { enumConstantSignalType, ConstantSignalComponent } from "../components/c
 import { ItemEjectorComponent } from "../components/item_ejector";
 import { enumItemProducerType, ItemProducerComponent } from "../components/item_producer";
 import { MetaBuilding } from "../meta_building";
+import { GameRoot } from "../root";
 
 export class MetaConstantProducerBuilding extends MetaBuilding {
     constructor() {
@@ -19,7 +20,7 @@ export class MetaConstantProducerBuilding extends MetaBuilding {
 
     /**
      *
-     * @param {import("../../savegame/savegame_serializer").GameRoot} root
+     * @param {GameRoot} root
      * @returns
      */
     getIsRemovable(root) {

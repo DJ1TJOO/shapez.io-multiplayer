@@ -1,11 +1,11 @@
 import { createLogger } from "../../core/logging.js";
 import { codes } from "../../modloader/old_buildings_codes.js";
-import { SavegameInterface_V1007 } from "./1007.js";
+import { SavegameInterface_V1009 } from "./1009.js";
 
 const schema = require("./ML01.json");
 const logger = createLogger("savegame_interface/modloader");
 
-export class SavegameInterface_ML01 extends SavegameInterface_V1007 {
+export class SavegameInterface_ML01 extends SavegameInterface_V1009 {
     // @ts-ignore
     getVersion() {
         return "ML01";
@@ -18,8 +18,8 @@ export class SavegameInterface_ML01 extends SavegameInterface_V1007 {
     /**
      * @param {import("../savegame_typedefs.js").SavegameData} data
      */
-    static migrate1008toML01(data) {
-        logger.log("Migrating 1008 to ML01");
+    static migrate1009toML01(data) {
+        logger.log("Migrating 1009 to ML01");
         const dump = data.dump;
         if (!dump) {
             return true;

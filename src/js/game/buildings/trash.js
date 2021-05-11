@@ -23,9 +23,10 @@ export class MetaTrashBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaTrashBuilding.isRemovable[variant]();
     }
 

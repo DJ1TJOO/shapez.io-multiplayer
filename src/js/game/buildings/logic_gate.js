@@ -27,9 +27,10 @@ export class MetaLogicGateBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaLogicGateBuilding.isRemovable[variant]();
     }
 

@@ -9,6 +9,7 @@ import { ItemEjectorComponent } from "../components/item_ejector";
 import { ItemAcceptorComponent } from "../components/item_acceptor";
 import { enumItemProcessorTypes, ItemProcessorComponent } from "../components/item_processor";
 import { MetaBuilding } from "../meta_building";
+import { GameRoot } from "../root";
 
 export class MetaGoalAcceptorBuilding extends MetaBuilding {
     constructor() {
@@ -21,7 +22,7 @@ export class MetaGoalAcceptorBuilding extends MetaBuilding {
 
     /**
      *
-     * @param {import("../../savegame/savegame_serializer").GameRoot} root
+     * @param {GameRoot} root
      * @returns
      */
     getIsRemovable(root) {

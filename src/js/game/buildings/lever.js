@@ -26,9 +26,10 @@ export class MetaLeverBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaLeverBuilding.isRemovable[variant]();
     }
 

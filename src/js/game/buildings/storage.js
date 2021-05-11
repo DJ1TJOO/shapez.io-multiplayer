@@ -25,9 +25,10 @@ export class MetaStorageBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaStorageBuilding.isRemovable[variant]();
     }
 

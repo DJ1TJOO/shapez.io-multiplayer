@@ -33,9 +33,10 @@ export class MetaDisplayBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaDisplayBuilding.isRemovable[variant]();
     }
 

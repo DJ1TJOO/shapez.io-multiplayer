@@ -23,9 +23,10 @@ export class MetaVirtualProcessorBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaVirtualProcessorBuilding.isRemovable[variant]();
     }
 
