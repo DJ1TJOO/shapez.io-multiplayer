@@ -102,20 +102,26 @@ window.onload = async () => {
     } else if (!G_IS_DEV) {
         user = JSON.parse(localStorage.getItem("user"));
         instance = JSON.parse(localStorage.getItem("instance"));
+    } else {
+        instance = {
+            mods: [
+                {
+                    url:
+                        "http://mods.thomasbrants.nl/static/mods/a18121cf-fc7c-4f23-906d-b7ab0512bbc8/1.0.0.js",
+                    id: "a18121cf-fc7c-4f23-906d-b7ab0512bbc8",
+                    config: {},
+                    settings: {},
+                },
+                {
+                    url:
+                        "http://mods.thomasbrants.nl/static/mods/b1b23b5d-d6b5-4b72-8239-365391d09046/1.0.0.js",
+                    id: "b1b23b5d-d6b5-4b72-8239-365391d09046",
+                    config: {},
+                    settings: {},
+                },
+            ],
+        };
     }
-    // else {
-    //     instance = {
-    //         mods: [
-    //             {
-    //                 url:
-    //                     "http://mods.thomasbrants.nl/static/mods/a18121cf-fc7c-4f23-906d-b7ab0512bbc8/1.0.0.js",
-    //                 id: "a18121cf-fc7c-4f23-906d-b7ab0512bbc8",
-    //                 config: {},
-    //                 settings: {},
-    //             },
-    //         ],
-    //     };
-    // }
     var modMgr = new ModManager(user, instance);
     addVanillaBuildingsToAPI();
     addVanillaComponentsToAPI();

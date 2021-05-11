@@ -2,6 +2,7 @@
 import { cachebust } from "../core/cachebust";
 import { A_B_TESTING_LINK_TYPE, globalConfig, THIRDPARTY_URLS } from "../core/config";
 import { GameState } from "../core/game_state";
+import { gGameModeRegistry } from "../core/global_registries";
 import { DialogWithForm } from "../core/modal_dialog_elements";
 import { FormElementInput } from "../core/modal_dialog_forms";
 import { ReadWriteProxy } from "../core/read_write_proxy";
@@ -16,7 +17,7 @@ import {
     startFileChoose,
     waitNextFrame,
 } from "../core/utils";
-import { enumGameModeIds } from "../game/game_mode";
+import { enumGameModeIds, enumGameModeTypes } from "../game/game_mode";
 import { HUDModalDialogs } from "../game/hud/parts/modal_dialogs";
 import { RegularGameMode } from "../game/modes/regular";
 import { getApplicationSettingById } from "../profile/application_settings";
@@ -544,10 +545,12 @@ export class MainMenuState extends GameState {
         savegame.readAsync().then(() => {
             const { optionSelected } = this.dialogs.showOptionChooser(T.settings.labels.gamemodes.title, {
                 active: savegame.currentData.gamemode,
-                options: Object.keys(shapezAPI.ingame.gamemodes).map(option => ({
-                    value: option,
-                    text: capitalizeFirstLetter(option.toLowerCase()),
-                })),
+                options: gGameModeRegistry.entries
+                    .filter(gamemode => !gamemode.getType || gamemode.getType() === enumGameModeTypes.default)
+                    .map(gamemode => ({
+                        value: gamemode.getId(),
+                        text: gamemode.getId(),
+                    })),
             });
 
             optionSelected.add(value => {
@@ -576,7 +579,9 @@ export class MainMenuState extends GameState {
             savegame
                 .readAsync()
                 .then(() => {
+                    console.log(savegame.currentData.gamemode);
                     this.moveToState("InGameState", {
+                        gameModeId: savegame.currentData.gamemode || RegularGameMode.getId(),
                         savegame,
                     });
                 })
@@ -670,13 +675,15 @@ export class MainMenuState extends GameState {
         }
 
         let gamemode = RegularGameMode.getId();
-        if (Object.keys(shapezAPI.ingame.gamemodes).length > 1) {
+        if (gGameModeRegistry.entries.length > 1) {
             const { optionSelected } = this.dialogs.showOptionChooser(T.settings.labels.gamemodes.title, {
                 active: null,
-                options: Object.keys(shapezAPI.ingame.gamemodes).map(option => ({
-                    value: option,
-                    text: capitalizeFirstLetter(option.toLowerCase()),
-                })),
+                options: gGameModeRegistry.entries
+                    .filter(gamemode => !gamemode.getType || gamemode.getType() === enumGameModeTypes.default)
+                    .map(gamemode => ({
+                        value: gamemode.getId(),
+                        text: gamemode.getId(),
+                    })),
             });
 
             optionSelected.add(value => {
@@ -686,6 +693,7 @@ export class MainMenuState extends GameState {
                     const savegame = this.app.savegameMgr.createNewSavegame(gamemode);
 
                     this.moveToState("InGameState", {
+                        gameModeId: gamemode,
                         savegame,
                     });
                     this.app.analytics.trackUiClick("startgame_adcomplete");
@@ -697,6 +705,7 @@ export class MainMenuState extends GameState {
                 const savegame = this.app.savegameMgr.createNewSavegame(gamemode);
 
                 this.moveToState("InGameState", {
+                    gameModeId: gamemode,
                     savegame,
                 });
                 this.app.analytics.trackUiClick("startgame_adcomplete");
@@ -717,6 +726,7 @@ export class MainMenuState extends GameState {
         const savegame = this.app.savegameMgr.getSavegameById(latestInternalId);
         savegame.readAsync().then(() => {
             this.moveToState("InGameState", {
+                gameModeId: savegame.currentData.gamemode || RegularGameMode.getId(),
                 savegame,
             });
         });

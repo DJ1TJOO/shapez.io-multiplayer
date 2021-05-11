@@ -416,6 +416,9 @@ import {
     TypeStructuredObject,
 } from "../savegame/serialization_data_types";
 import { SerializerInternal } from "../savegame/serializer_internal";
+import { PuzzleGameMode } from "../game/modes/puzzle";
+import { PuzzleEditGameMode } from "../game/modes/puzzle_edit";
+import { PuzzlePlayGameMode } from "../game/modes/puzzle_play";
 
 export class ShapezAPI {
     constructor(user) {
@@ -768,6 +771,9 @@ export class ShapezAPI {
 
             //Gamemodes
             RegularGameMode,
+            PuzzleGameMode,
+            PuzzleEditGameMode,
+            PuzzlePlayGameMode,
 
             //Gamespeed
             PausedGameSpeed,
@@ -878,6 +884,7 @@ export class ShapezAPI {
             gamemodes: {},
             gamespeed: {},
             layers: [], //List of layer names
+            hub_goals: HubGoals,
         };
 
         this.toolbars = {
