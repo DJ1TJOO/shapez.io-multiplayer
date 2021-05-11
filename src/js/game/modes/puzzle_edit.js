@@ -36,19 +36,17 @@ export class PuzzleEditGameMode extends PuzzleGameMode {
     constructor(root) {
         super(root);
 
+        for (const key in PuzzleEditGameMode.additionalHudParts) {
+            const hudPart = PuzzleEditGameMode.additionalHudParts[key](this.root);
+            if (hudPart) this.additionalHudParts[key] = hudPart;
+        }
+
         for (let i = 0; i < PuzzleEditGameMode.hiddenBuildings.length; i++) {
-            const hiddenBuilding = PuzzleEditGameMode.hiddenBuildings[i];
-            let building = hiddenBuilding(this.root);
+            let building = PuzzleEditGameMode.hiddenBuildings[i](this.root);
             if (building) {
                 this.hiddenBuildings.push(building);
             }
         }
-
-        for (const key in PuzzleEditGameMode.additionalHudParts) {
-            this.additionalHudParts[key] = PuzzleEditGameMode.additionalHudParts[key](this.root);
-        }
-
-        this.hiddenBuildings = [];
     }
 
     getIsEditor() {

@@ -28,7 +28,8 @@ export class PuzzleGameMode extends GameMode {
         const data = this.getSaveData();
 
         for (const key in PuzzleGameMode.additionalHudParts) {
-            this.additionalHudParts[key] = PuzzleGameMode.additionalHudParts[key](this.root);
+            const hudPart = PuzzleGameMode.additionalHudParts[key](this.root);
+            if (hudPart) this.additionalHudParts[key] = hudPart;
         }
 
         this.zoneWidth = data.zoneWidth || 8;

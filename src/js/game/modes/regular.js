@@ -541,12 +541,12 @@ export class RegularGameMode extends GameMode {
         super(root);
 
         for (const key in RegularGameMode.additionalHudParts) {
-            this.additionalHudParts[key] = RegularGameMode.additionalHudParts[key](this.root);
+            const hudPart = RegularGameMode.additionalHudParts[key](this.root);
+            if (hudPart) this.additionalHudParts[key] = hudPart;
         }
 
         for (let i = 0; i < RegularGameMode.hiddenBuildings.length; i++) {
-            const hiddenBuilding = RegularGameMode.hiddenBuildings[i];
-            let building = hiddenBuilding(this.root);
+            let building = RegularGameMode.hiddenBuildings[i](this.root);
             if (building) {
                 this.hiddenBuildings.push(building);
             }

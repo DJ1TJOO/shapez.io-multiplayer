@@ -45,16 +45,16 @@ export class PuzzlePlayGameMode extends PuzzleGameMode {
     constructor(root, { puzzle }) {
         super(root);
 
+        for (const key in PuzzlePlayGameMode.additionalHudParts) {
+            const hudPart = PuzzlePlayGameMode.additionalHudParts[key](this.root);
+            if (hudPart) this.additionalHudParts[key] = hudPart;
+        }
+
         for (let i = 0; i < PuzzlePlayGameMode.hiddenBuildings.length; i++) {
-            const hiddenBuilding = PuzzlePlayGameMode.hiddenBuildings[i];
-            let building = hiddenBuilding(this.root);
+            let building = PuzzlePlayGameMode.hiddenBuildings[i](this.root);
             if (building) {
                 this.hiddenBuildings.push(building);
             }
-        }
-
-        for (const key in PuzzlePlayGameMode.additionalHudParts) {
-            this.additionalHudParts[key] = PuzzlePlayGameMode.additionalHudParts[key](this.root);
         }
 
         root.signals.postLoadHook.add(this.loadPuzzle, this);
