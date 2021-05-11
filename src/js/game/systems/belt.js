@@ -168,7 +168,10 @@ export class BeltSystem extends GameSystemWithFilter {
                     // Compute delta to see if anything changed
                     const newDirection = MetaBeltBuilding.variantToRotation[rotationVariant];
 
-                    if (targetStaticComp.rotation !== rotation || newDirection !== targetBeltComp.direction) {
+                    if (
+                        !this.root.immutableOperationRunning &&
+                        (targetStaticComp.rotation !== rotation || newDirection !== targetBeltComp.direction)
+                    ) {
                         const originalPath = targetBeltComp.assignedPath;
 
                         // Ok, first remove it from its current path

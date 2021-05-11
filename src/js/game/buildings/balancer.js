@@ -23,9 +23,10 @@ export class MetaBalancerBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaBalancerBuilding.isRemovable[variant]();
     }
 
@@ -168,10 +169,14 @@ MetaBalancerBuilding.overlayMatrices = {
 };
 
 MetaBalancerBuilding.avaibleVariants = {
-    [defaultBuildingVariant]: root => root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_balancer),
+    [defaultBuildingVariant]: root =>
+        !root.gameMode.getIsDeterministic() &&
+        root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_balancer),
     [MetaBalancerBuilding.variants.merger]: root =>
+        !root.gameMode.getIsDeterministic() &&
         root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger),
     [MetaBalancerBuilding.variants.mergerInverse]: root =>
+        !root.gameMode.getIsDeterministic() &&
         root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger),
     [MetaBalancerBuilding.variants.splitter]: root =>
         root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_splitter),

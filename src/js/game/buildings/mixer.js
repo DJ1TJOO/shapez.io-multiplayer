@@ -22,9 +22,10 @@ export class MetaMixerBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaMixerBuilding.isRemovable[variant]();
     }
 
@@ -173,12 +174,17 @@ MetaMixerBuilding.additionalStatistics = {
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [defaultBuildingVariant]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.mixer)),
-        ],
-    ],
+    [defaultBuildingVariant]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.mixer)),
+            ],
+        ];
+    },
 };
 
 MetaMixerBuilding.componentVariations = {

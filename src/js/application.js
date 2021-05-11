@@ -30,7 +30,14 @@ import { PreloadState } from "./states/preload";
 import { SettingsState } from "./states/settings";
 import { ShapezGameAnalytics } from "./platform/browser/game_analytics";
 import { RestrictionManager } from "./core/restriction_manager";
-import { AchievementProviderInterface } from "./platform/achievement_provider";
+import { ClientAPI } from "./platform/api";
+
+/**
+ * @typedef {import("./platform/achievement_provider").AchievementProviderInterface} AchievementProviderInterface
+ * @typedef {import("./platform/game_analytics").GameAnalyticsInterface} GameAnalyticsInterface
+ * @typedef {import("./platform/sound").SoundInterface} SoundInterface
+ * @typedef {import("./platform/storage").StorageInterface} StorageInterface
+ */
 
 const logger = createLogger("application");
 
@@ -65,6 +72,7 @@ export class Application {
         this.savegameMgr = new SavegameManager(this);
         this.inputMgr = new InputDistributor(this);
         this.backgroundResourceLoader = new BackgroundResourcesLoader(this);
+        this.clientApi = new ClientAPI(this);
 
         // Restrictions (Like demo etc)
         this.restrictionMgr = new RestrictionManager(this);

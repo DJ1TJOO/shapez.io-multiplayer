@@ -11,7 +11,7 @@ try {
     appId = parseInt(fs.readFileSync(path.join(__dirname, "steam_appid.txt"), "utf8"));
 } catch (err) {
     // greenworks is not installed
-    // throw err;
+    console.warn("Failed to load steam api:", err);
 }
 
 function init(isDev) {
@@ -37,8 +37,13 @@ function init(isDev) {
 function listen() {
     ipcMain.handle("steam:is-initialized", isInitialized);
 
-    if (!greenworks || !initialized) {
-        console.log("Ignoring Steam IPC events");
+    if (!initialized) {
+        console.warn("Steam not initialized, won't be able to listen");
+        return;
+    }
+
+    if (!greenworks) {
+        console.warn("Greenworks not loaded, won't be able to listen");
         return;
     }
 

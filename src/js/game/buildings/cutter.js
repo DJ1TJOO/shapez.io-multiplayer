@@ -154,23 +154,35 @@ MetaCutterBuilding.additionalStatistics = {
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [defaultBuildingVariant]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.cutter) / 2),
-        ],
-    ],
+    [defaultBuildingVariant]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.cutter) / 2),
+            ],
+        ];
+    },
 
     /**
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [MetaCutterBuilding.variants.quad]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.cutterQuad) / 2),
-        ],
-    ],
+    [MetaCutterBuilding.variants.quad]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(
+                    root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.cutterQuad) / 2
+                ),
+            ],
+        ];
+    },
 };
 
 MetaCutterBuilding.componentVariations = {

@@ -4,11 +4,14 @@ import { T } from "../translations";
 import { MetaAnalyzerBuilding } from "./buildings/analyzer";
 import { MetaBalancerBuilding } from "./buildings/balancer";
 import { MetaBeltBuilding } from "./buildings/belt";
+import { MetaBlockBuilding } from "./buildings/block";
 import { MetaComparatorBuilding } from "./buildings/comparator";
+import { MetaConstantProducerBuilding } from "./buildings/constant_producer";
 import { MetaConstantSignalBuilding } from "./buildings/constant_signal";
 import { MetaCutterBuilding } from "./buildings/cutter";
 import { MetaDisplayBuilding } from "./buildings/display";
 import { MetaFilterBuilding } from "./buildings/filter";
+import { MetaGoalAcceptorBuilding } from "./buildings/goal_acceptor";
 import { MetaHubBuilding } from "./buildings/hub";
 import { MetaItemProducerBuilding } from "./buildings/item_producer";
 import { MetaLeverBuilding } from "./buildings/lever";
@@ -59,6 +62,9 @@ export function addVanillaBuildingsToAPI() {
         MetaVirtualProcessorBuilding,
         MetaWireBuilding,
         MetaWireTunnelBuilding,
+        MetaConstantProducerBuilding,
+        MetaGoalAcceptorBuilding,
+        MetaBlockBuilding,
     ];
 
     for (let i = 0; i < vanillaBuildings.length; i++) {
@@ -122,6 +128,15 @@ export function initMetaBuildingRegistry() {
     // gMetaBuildingRegistry.register(MetaTransistorBuilding);
     // gMetaBuildingRegistry.register(MetaComparatorBuilding);
     // gMetaBuildingRegistry.register(MetaItemProducerBuilding);
+
+    // Constant producer
+    // registerBuildingVariant(62, MetaConstantProducerBuilding);
+
+    // Goal acceptor
+    // registerBuildingVariant(63, MetaGoalAcceptorBuilding);
+
+    // Block
+    // registerBuildingVariant(64, MetaBlockBuilding);
 
     // Propagate instances
     for (const key in gBuildingVariants) {

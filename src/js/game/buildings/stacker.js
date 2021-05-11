@@ -22,9 +22,10 @@ export class MetaStackerBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaStackerBuilding.isRemovable[variant]();
     }
 
@@ -194,12 +195,17 @@ MetaStackerBuilding.additionalStatistics = {
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [defaultBuildingVariant]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.stacker)),
-        ],
-    ],
+    [defaultBuildingVariant]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.stacker)),
+            ],
+        ];
+    },
 };
 
 MetaStackerBuilding.componentVariations = {

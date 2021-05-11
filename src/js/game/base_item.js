@@ -8,6 +8,7 @@ import { BasicSerializableObject } from "../savegame/serialization";
 export class BaseItem extends BasicSerializableObject {
     constructor() {
         super();
+        this._type = this.getItemType();
     }
 
     static getId() {

@@ -18,6 +18,7 @@ import { WireTunnelComponent } from "./components/wire_tunnel";
 import { DisplayComponent } from "./components/display";
 import { BeltReaderComponent } from "./components/belt_reader";
 import { FilterComponent } from "./components/filter";
+import { GoalAcceptorComponent } from "./components/goal_acceptor";
 import { ItemProducerComponent } from "./components/item_producer";
 import { Component } from "./component";
 
@@ -46,6 +47,7 @@ export function addVanillaComponentsToAPI() {
         BeltReaderComponent,
         FilterComponent,
         ItemProducerComponent,
+        GoalAcceptorComponent,
     ];
     // IMPORTANT ^^^^^ UPDATE ENTITY COMPONENT STORAGE AFTERWARDS
 

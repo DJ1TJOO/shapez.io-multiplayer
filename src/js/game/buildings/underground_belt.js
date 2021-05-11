@@ -24,9 +24,10 @@ export class MetaUndergroundBeltBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaUndergroundBeltBuilding.isRemovable[variant]();
     }
 
@@ -320,6 +321,10 @@ MetaUndergroundBeltBuilding.additionalStatistics = {
      * @returns {Array<[string, string]>}
      */
     [defaultBuildingVariant]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+
         const rangeTiles = globalConfig.undergroundBeltMaxTilesByTier[0];
 
         const beltSpeed = root.hubGoals.getUndergroundBeltBaseSpeed();
@@ -337,6 +342,10 @@ MetaUndergroundBeltBuilding.additionalStatistics = {
      * @returns {Array<[string, string]>}
      */
     [MetaUndergroundBeltBuilding.variants.tier2]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+
         const rangeTiles = globalConfig.undergroundBeltMaxTilesByTier[1];
 
         const beltSpeed = root.hubGoals.getUndergroundBeltBaseSpeed();

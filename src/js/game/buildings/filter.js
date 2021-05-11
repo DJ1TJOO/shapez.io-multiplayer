@@ -23,9 +23,10 @@ export class MetaFilterBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaFilterBuilding.isRemovable[variant]();
     }
 
@@ -199,9 +200,17 @@ MetaFilterBuilding.layerPreview = {
 };
 
 MetaFilterBuilding.additionalStatistics = {
-    [defaultBuildingVariant]: root => [
-        [T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(root.hubGoals.getBeltBaseSpeed())],
-    ],
+    [defaultBuildingVariant]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(root.hubGoals.getBeltBaseSpeed()),
+            ],
+        ];
+    },
 };
 
 MetaFilterBuilding.renderPins = {

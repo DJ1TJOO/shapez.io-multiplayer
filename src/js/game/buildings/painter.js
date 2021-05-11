@@ -27,9 +27,10 @@ export class MetaPainterBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaPainterBuilding.isRemovable[variant]();
     }
 
@@ -193,6 +194,7 @@ MetaPainterBuilding.avaibleVariants = {
     [MetaPainterBuilding.variants.double]: root =>
         root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_painter_double),
     [MetaPainterBuilding.variants.quad]: root =>
+        root.gameMode.getSupportsWires() &&
         root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers),
 };
 
@@ -201,42 +203,64 @@ MetaPainterBuilding.additionalStatistics = {
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [defaultBuildingVariant]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painter)),
-        ],
-    ],
+    [defaultBuildingVariant]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painter)),
+            ],
+        ];
+    },
     /**
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [MetaPainterBuilding.variants.mirrored]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painter)),
-        ],
-    ],
+    [MetaPainterBuilding.variants.mirrored]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painter)),
+            ],
+        ];
+    },
     /**
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [MetaPainterBuilding.variants.double]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painterDouble)),
-        ],
-    ],
+    [MetaPainterBuilding.variants.double]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(
+                    root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painterDouble)
+                ),
+            ],
+        ];
+    },
     /**
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [MetaPainterBuilding.variants.quad]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painterQuad)),
-        ],
-    ],
+    [MetaPainterBuilding.variants.quad]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painterQuad)),
+            ],
+        ];
+    },
 };
 
 MetaPainterBuilding.componentVariations = {

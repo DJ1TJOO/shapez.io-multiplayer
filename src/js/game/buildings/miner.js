@@ -21,9 +21,10 @@ export class MetaMinerBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaMinerBuilding.isRemovable[variant]();
     }
 
@@ -162,16 +163,32 @@ MetaMinerBuilding.additionalStatistics = {
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [defaultBuildingVariant]: root => [
-        [T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(root.hubGoals.getMinerBaseSpeed())],
-    ],
+    [defaultBuildingVariant]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(root.hubGoals.getMinerBaseSpeed()),
+            ],
+        ];
+    },
     /**
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [MetaMinerBuilding.variants.chainable]: root => [
-        [T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(root.hubGoals.getMinerBaseSpeed())],
-    ],
+    [MetaMinerBuilding.variants.chainable]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(root.hubGoals.getMinerBaseSpeed()),
+            ],
+        ];
+    },
 };
 
 MetaMinerBuilding.componentVariations = {

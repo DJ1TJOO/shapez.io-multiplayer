@@ -22,9 +22,10 @@ export class MetaRotaterBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaRotaterBuilding.isRemovable[variant]();
     }
 
@@ -217,32 +218,47 @@ MetaRotaterBuilding.additionalStatistics = {
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [defaultBuildingVariant]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.rotater)),
-        ],
-    ],
+    [defaultBuildingVariant]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.rotater)),
+            ],
+        ];
+    },
     /**
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [MetaRotaterBuilding.variants.ccw]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.rotaterCCW)),
-        ],
-    ],
+    [MetaRotaterBuilding.variants.ccw]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.rotaterCCW)),
+            ],
+        ];
+    },
     /**
      * @param {*} root
      * @returns {Array<[string, string]>}
      */
-    [MetaRotaterBuilding.variants.rotate180]: root => [
-        [
-            T.ingame.buildingPlacement.infoTexts.speed,
-            formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.rotater180)),
-        ],
-    ],
+    [MetaRotaterBuilding.variants.rotate180]: root => {
+        if (root.gameMode.throughputDoesNotMatter()) {
+            return [];
+        }
+        return [
+            [
+                T.ingame.buildingPlacement.infoTexts.speed,
+                formatItemsPerSecond(root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.rotater180)),
+            ],
+        ];
+    },
 };
 
 MetaRotaterBuilding.componentVariations = {

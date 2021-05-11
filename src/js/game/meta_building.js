@@ -112,10 +112,11 @@ export class MetaBuilding {
 
     /**
      * Returns whether this building is removable
+     * @param {GameRoot} root
      * @param {string} variant
      * @returns {boolean}
      */
-    getIsRemovable(variant = defaultBuildingVariant) {
+    getIsRemovable(root, variant = defaultBuildingVariant) {
         return true;
     }
 

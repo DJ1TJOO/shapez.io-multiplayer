@@ -26,6 +26,9 @@ import { FilterSystem } from "./systems/filter";
 import { ItemProducerSystem } from "./systems/item_producer";
 import { ItemAcceptorComponent } from "./components/item_acceptor";
 import { GameSystem } from "./game_system";
+import { ConstantProducerSystem } from "./systems/constant_producer";
+import { GoalAcceptorSystem } from "./systems/goal_acceptor";
+import { ZoneSystem } from "./systems/zone";
 
 const logger = createLogger("game_system_manager");
 
@@ -80,6 +83,9 @@ export function addVanillaSystemsToAPI() {
         DisplaySystem,
 
         ItemProcessorOverlaysSystem,
+
+        ConstantProducerSystem,
+        GoalAcceptorSystem,
     ];
 
     shapezAPI.ingame["systemsRenderOrderBackground"] = [MapResourcesSystem, BeltUnderlaysSystem, BeltSystem];
@@ -125,6 +131,9 @@ export class GameSystemManager {
         const systems = shapezAPI.ingame["systems"];
         for (let i = 0; i < systems.length; i++) {
             const system = systems[i];
+            if (system.getId() === "mapResources" && !this.root.gameMode.hasResources()) continue;
+            if (system.getId() === "zone" && !this.root.gameMode.getBuildableZones()) continue;
+
             this.systems[system.getId()] = new system(this.root);
             this.systemUpdateOrder.push(system.getId());
         }

@@ -24,6 +24,12 @@ export class BeltComponent extends Component {
         this.assignedPath = null;
     }
 
+    clear() {
+        if (this.assignedPath) {
+            this.assignedPath.clearAllItems();
+        }
+    }
+
     /**
      * Returns the effective length of this belt in tile space
      * @returns {number}

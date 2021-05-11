@@ -26,9 +26,10 @@ export class MetaItemProducerBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaItemProducerBuilding.isRemovable[variant]();
     }
 
@@ -109,7 +110,7 @@ MetaItemProducerBuilding.setupEntityComponents = [
             })
         ),
 
-    entity => entity.addComponent(new ItemProducerComponent()),
+    entity => entity.addComponent(new ItemProducerComponent({})),
 ];
 
 MetaItemProducerBuilding.overlayMatrices = {

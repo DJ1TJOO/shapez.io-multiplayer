@@ -366,7 +366,8 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             if (
                 tileBelow &&
                 this.root.app.settings.getAllSettings().pickMinerOnPatch &&
-                this.root.currentLayer === "regular"
+                this.root.currentLayer === "regular" &&
+                this.root.gameMode.hasResources()
             ) {
                 this.currentMetaBuilding.set(gMetaBuildingRegistry.findByClass(MetaMinerBuilding));
 
@@ -389,6 +390,12 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             extracted.metaInstance.getId() === gMetaBuildingRegistry.findByClass(MetaHubBuilding).getId() &&
             !MetaHubBuilding.canPipet()
         ) {
+            this.currentMetaBuilding.set(null);
+            return;
+        }
+
+        // Disallow picking excluded buildings
+        if (this.root.gameMode.isBuildingExcluded(extracted.metaClass)) {
             this.currentMetaBuilding.set(null);
             return;
         }
@@ -433,7 +440,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
      * @param {Vector} tile
      */
     tryPlaceCurrentBuildingAt(tile) {
-        if (this.root.camera.zoomLevel < globalConfig.mapChunkOverviewMinZoom) {
+        if (this.root.camera.getIsMapOverlayActive()) {
             // Dont allow placing in overview mode
             return;
         }

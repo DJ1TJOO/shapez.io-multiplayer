@@ -25,9 +25,10 @@ export class MetaReaderBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {GameRoot} root
      * @param {string} variant
      */
-    getIsRemovable(variant) {
+    getIsRemovable(root, variant) {
         return MetaReaderBuilding.isRemovable[variant]();
     }
 
@@ -181,7 +182,7 @@ MetaReaderBuilding.setupEntityComponents = [
                 ],
             })
         ),
-    entity => entity.addComponent(new BeltReaderComponent()),
+    entity => entity.addComponent(new BeltReaderComponent({})),
 ];
 
 MetaReaderBuilding.dimensions = {
