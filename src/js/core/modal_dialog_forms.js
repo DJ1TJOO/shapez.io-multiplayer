@@ -235,3 +235,97 @@ export class FormElementItemChooser extends FormElement {
 
     focus() {}
 }
+
+export class FormElementOptionsChooser extends FormElement {
+    /**
+     * @param {object} param0
+     * @param {string} param0.id
+     * @param {string=} param0.label
+     * @param {Array<any>} param0.options
+     */
+    constructor({ id, label, options = [] }) {
+        super(id, label);
+        this.options = options;
+        this.element = null;
+
+        /**
+         * @type {Array<string>}
+         */
+        this.valuesChosen = [];
+    }
+
+    getHtml() {
+        let classes = [];
+
+        let html = `<div class="formElement">
+                        ${this.label ? `<label>${this.label}</label>` : ""}
+                        <div class='optionParent' data-formId="${this.id}">
+                   `;
+
+        this.options.forEach(({ value, text, desc = null, iconPrefix = null }) => {
+            const descHtml = desc ? `<span class="desc">${desc}</span>` : "";
+            let iconHtml = iconPrefix ? `<span class="icon icon-${iconPrefix}-${value}"></span>` : "";
+            html += `
+                <div class='option ${this.valuesChosen.includes(value) ? "active" : ""} ${
+                iconPrefix ? "hasIcon" : ""
+            }' data-optionvalue='${value}'>
+                    ${iconHtml}
+                    <span class='title'>${text}</span>
+                    ${descHtml}
+                </div>
+                `;
+        });
+
+        html += "</div></div>";
+
+        return html;
+    }
+
+    /**
+     * @param {HTMLElement} parent
+     * @param {Array<ClickDetector>} clickTrackers
+     */
+    bindEvents(parent, clickTrackers) {
+        this.element = this.getFormElement(parent);
+
+        const dialogElem = this.element.closest(".dialogInner");
+        if (dialogElem) dialogElem.classList.add("optionChooserDialog");
+
+        this.element.querySelectorAll("[data-optionvalue]").forEach(handle => {
+            const value = handle.getAttribute("data-optionvalue");
+            if (!handle) {
+                return;
+            }
+            // Need click detector here to forward elements, otherwise scrolling does not work
+            const detector = new ClickDetector(handle, {
+                consumeEvents: false,
+                preventDefault: false,
+                clickSound: null,
+                applyCssClass: "pressedOption",
+                targetOnly: true,
+            });
+
+            clickTrackers.push(detector);
+
+            detector.click.add(() => {
+                if (this.valuesChosen.includes(value)) {
+                    handle.classList.remove("active");
+                    this.valuesChosen.splice(this.valuesChosen.indexOf(value));
+                } else {
+                    handle.classList.add("active");
+                    this.valuesChosen.push(value);
+                }
+            });
+        });
+    }
+
+    isValid() {
+        return true;
+    }
+
+    getValue() {
+        return this.valuesChosen;
+    }
+
+    focus() {}
+}

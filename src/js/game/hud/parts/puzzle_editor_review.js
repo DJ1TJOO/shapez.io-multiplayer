@@ -1,7 +1,11 @@
 import { globalConfig, THIRDPARTY_URLS } from "../../../core/config";
 import { createLogger } from "../../../core/logging";
 import { DialogWithForm } from "../../../core/modal_dialog_elements";
-import { FormElementInput, FormElementItemChooser } from "../../../core/modal_dialog_forms";
+import {
+    FormElementInput,
+    FormElementItemChooser,
+    FormElementOptionsChooser,
+} from "../../../core/modal_dialog_forms";
 import { STOP_PROPAGATION } from "../../../core/signal";
 import { fillInLinkIntoTranslation, makeDiv } from "../../../core/utils";
 import { PuzzleSerializer } from "../../../savegame/puzzle_serializer";
@@ -122,11 +126,22 @@ export class HUDPuzzleEditorReview extends BaseHUDPart {
             validator: val => ShapeDefinition.isValidShortKey(trim(val)),
         });
 
+        const allowedModsInput = new FormElementOptionsChooser({
+            label: "Allowed Mods",
+            id: "allowedModsInput",
+            options: [...shapezAPI.mods.keys()].map(id => {
+                return {
+                    value: id,
+                    text: shapezAPI.mods.get(id).title,
+                };
+            }),
+        });
+
         const dialog = new DialogWithForm({
             app: this.root.app,
             title: T.dialogs.submitPuzzle.title,
             desc: "",
-            formElements: [nameInput, itemInput, shapeKeyInput],
+            formElements: [nameInput, itemInput, shapeKeyInput, allowedModsInput],
             buttons: ["ok:good:enter"],
         });
 
