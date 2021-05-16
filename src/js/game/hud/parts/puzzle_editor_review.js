@@ -170,12 +170,12 @@ export class HUDPuzzleEditorReview extends BaseHUDPart {
         dialog.buttonSignals.ok.add(() => {
             const title = trim(nameInput.getValue());
             const shortKey = trim(shapeKeyInput.getValue());
-            this.doSubmitPuzzle(title, shortKey);
+            this.doSubmitPuzzle(title, shortKey, allowedModsInput.getValue());
         });
     }
 
-    doSubmitPuzzle(title, shortKey) {
-        const serialized = new PuzzleSerializer().generateDumpFromGameRoot(this.root);
+    doSubmitPuzzle(title, shortKey, allowedMods) {
+        const serialized = new PuzzleSerializer().generateDumpFromGameRoot(this.root, allowedMods);
 
         logger.log("Submitting puzzle, title=", title, "shortKey=", shortKey);
         logger.log("Serialized data:", serialized);

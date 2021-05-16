@@ -28,7 +28,7 @@ import { createLogger } from "../../core/logging";
 import { HUDPuzzleCompleteNotification } from "../hud/parts/puzzle_complete_notification";
 import { HUDPuzzlePlaySettings } from "../hud/parts/puzzle_play_settings";
 import { MetaBlockBuilding } from "../buildings/block";
-import { MetaBuilding } from "../meta_building";
+import { gMetaBuildingRegistry } from "../../core/global_registries";
 
 const logger = createLogger("puzzle-play");
 const copy = require("clipboard-copy");
@@ -58,6 +58,15 @@ export class PuzzlePlayGameMode extends PuzzleGameMode {
             }
         }
 
+        const notAllowedMods = [...shapezAPI.mods.keys()].filter(id => id !== puzzle.game.allowedMods);
+        for (let i = 0; i < notAllowedMods.length; i++) {
+            const buildings = shapezAPI.mods.get(notAllowedMods[i]).buildings;
+            if (!buildings) continue;
+
+            this.hiddenBuildings = this.hiddenBuildings.concat(
+                buildings.map(id => gMetaBuildingRegistry.findById(id))
+            );
+        }
         this.hiddenBuildings = this.hiddenBuildings.concat(puzzle.game.excludedBuildings);
 
         this.additionalHudParts.puzzlePlayMetadata = HUDPuzzlePlayMetadata;

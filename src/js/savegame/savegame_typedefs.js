@@ -89,6 +89,7 @@ import { MetaBuilding } from "../game/meta_building";
  *   bounds: { w: number; h: number; },
  *   buildings: (PuzzleGameBuildingGoal | PuzzleGameBuildingConstantProducer | PuzzleGameBuildingBlock)[],
  *   excludedBuildings: Array<typeof MetaBuilding>,
+ *   allowedMods: Array<string>
  * }} PuzzleGameData
  */
 

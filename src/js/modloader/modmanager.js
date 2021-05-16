@@ -81,6 +81,9 @@ export class ModManager {
             return;
         }
 
+        const script = /** @type {HTMLScriptElement} */ (document.currentScript);
+        script.id = mod.id;
+
         this.mods.set(mod.id, mod);
     }
 
@@ -202,7 +205,7 @@ export class ModManager {
         shapezAPI.mods = this.mods;
 
         if (!this.modPack || !this.modPack.modOrder) {
-            var sorter = new Toposort();
+            const sorter = new Toposort();
             for (const [id, mod] of this.mods.entries()) {
                 let isMissingDependecie = false;
                 let missingDependecie = "";
@@ -243,7 +246,7 @@ export class ModManager {
      * @param {String} id
      */
     loadMod(id) {
-        var mod = this.mods.get(id);
+        const mod = this.mods.get(id);
         for (const [id, currentMod] of this.mods.entries()) {
             if (mod.incompatible.indexOf(id) >= 0) {
                 console.warn(

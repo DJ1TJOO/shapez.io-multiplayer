@@ -944,8 +944,8 @@ export class ShapezAPI {
      * @param {string} atlasDataString
      */
     registerAtlas(atlasDataString) {
-        var atlasData = JSON.parse(atlasDataString);
-        var sourceImage = new Image();
+        const atlasData = JSON.parse(atlasDataString);
+        const sourceImage = new Image();
         sourceImage.crossOrigin = "anonymous";
         sourceImage.onload = () => {
             // @ts-ignore
@@ -977,8 +977,8 @@ export class ShapezAPI {
      * @param {string} css
      */
     injectCss(css, id) {
-        var head = document.head || document.getElementsByTagName("head")[0];
-        var style = document.createElement("style");
+        const head = document.head || document.getElementsByTagName("head")[0];
+        const style = document.createElement("style");
         style.id = id;
 
         head.appendChild(style);
@@ -992,27 +992,31 @@ export class ShapezAPI {
      * @param {string} iconDataURL
      */
     registerIcon(id, iconDataURL) {
-        var css = ``;
-        var style = document.getElementById("mod-loader-icons");
+        let css = ``;
+        let style = document.getElementById("mod-loader-icons");
         if (!style) {
-            var head = document.head || document.getElementsByTagName("head")[0];
+            let head = document.head || document.getElementsByTagName("head")[0];
             style = document.createElement("style");
             style.id = "mod-loader-icons";
             style.appendChild(document.createTextNode(css));
             head.appendChild(style);
         }
-        css = `
-                  [data-icon="${id}.png"] {
-                      background-image: url(${iconDataURL}) !important;
-                  }
-              `;
+        css = `[data-icon="${id}.png"] .icon {
+            background-image: url(${iconDataURL}) !important;
+        }`;
         style.appendChild(document.createTextNode(css));
     }
 
-    registerBuilding(buildingClass, iconDataURL, key) {
-        var id = new buildingClass().getId();
+    registerBuilding(buildingClass, iconDataURL, key, modId) {
+        let id = new buildingClass().getId();
         this.ingame.buildings[id] = buildingClass;
         this.registerIcon("building_icons/" + id, iconDataURL);
         this.KEYMAPPINGS.buildings[id] = { keyCode: this.KEYMAPPINGS.key(key), id: id };
+
+        const mod = this.mods.get(modId);
+        if (mod) {
+            if (!mod.buildings) mod.buildings = [];
+            mod.buildings.push(id);
+        }
     }
 }

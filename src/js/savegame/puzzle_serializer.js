@@ -24,9 +24,10 @@ export class PuzzleSerializer {
     /**
      * Serializes the game root into a dump
      * @param {GameRoot} root
+     * @param {Array<string>}allowedMods
      * @returns {import("./savegame_typedefs").PuzzleGameData}
      */
-    generateDumpFromGameRoot(root) {
+    generateDumpFromGameRoot(root, allowedMods) {
         console.log("serializing", root);
 
         /**
@@ -103,6 +104,7 @@ export class PuzzleSerializer {
             },
             //read from the toolbar when making a puzzle
             excludedBuildings,
+            allowedMods,
         };
     }
 
