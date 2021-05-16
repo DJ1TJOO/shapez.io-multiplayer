@@ -1,5 +1,6 @@
 /* typehints:start */
 import { GameRoot } from "../root";
+import { MetaBuilding } from "../meta_building";
 /* typehints:end */
 
 import { findNiceIntegerValue } from "../../core/utils";
