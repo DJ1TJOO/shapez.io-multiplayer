@@ -1,5 +1,7 @@
 # Shapez.io multiplayer
 
+The server for multiplayer are not longer running. See [Setting up a server]()
+
 This fork adds multiplayer to shapez.io. 
 - The game is hosted at `https://thomasbrants.nl/shapez.io-multiplayer/?fullVersion=1`
 - Its only in English and Dutch (Not much more text has been added).
@@ -18,6 +20,13 @@ This fork adds multiplayer to shapez.io.
 2. click join
 3. enter wss://thomasbrants.nl:8889
 4. enter room code
+
+## Setting up a server
+1. Have nodejs and yarn installed (https://nodejs.org/en/download/, https://classic.yarnpkg.com/en/docs/install/#windows-stable)
+2. Download the files from https://github.com/DJ1TJOO/shapez.io/tree/multiplayer/websocketserver
+3. Change secure, in server.js, too true/false depening on if you have a ssl certificate.
+4. Open a terminal/cmd in the folder and run `yarn`
+5. Then to start run `node server`
 
 -------------------------------------------------------------------------------------------------
 
