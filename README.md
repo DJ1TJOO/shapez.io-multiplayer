@@ -1,6 +1,6 @@
 # Shapez.io multiplayer
 
-The server for multiplayer are not longer running. See [Setting up a server]()
+The server for multiplayer are not longer running. See [Setting up a server](#setting-up-a-server)
 
 This fork adds multiplayer to shapez.io. 
 - The game is hosted at `https://thomasbrants.nl/shapez.io-multiplayer/?fullVersion=1`
