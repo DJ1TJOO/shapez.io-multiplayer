@@ -23,6 +23,7 @@ export const KEYMAPPINGS = {
     },
 
     ingame: {
+        menuOpenBlueprintLibrary: { keyCode: key("K") },
         menuOpenShop: { keyCode: key("F") },
         menuOpenStats: { keyCode: key("G") },
         menuClose: { keyCode: key("Q") },

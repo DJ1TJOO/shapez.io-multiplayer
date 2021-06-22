@@ -38,6 +38,7 @@ import { HUDInteractiveTutorial } from "../hud/parts/interactive_tutorial";
 import { HUDSandboxController } from "../hud/parts/sandbox_controller";
 import { queryParamOptions } from "../../core/query_parameters";
 import { MetaBlockBuilding } from "../buildings/block";
+import { HUDBlueprintLibrary } from "../hud/parts/blueprint_library";
 
 /** @typedef {{
  *   shape: string,
@@ -549,6 +550,7 @@ export class RegularGameMode extends GameMode {
             unlockNotification: HUDUnlockNotification,
             massSelector: HUDMassSelector,
             shop: HUDShop,
+            blueprintLibrary: HUDBlueprintLibrary,
             statistics: HUDStatistics,
             waypoints: HUDWaypoints,
             wireInfo: HUDWireInfo,

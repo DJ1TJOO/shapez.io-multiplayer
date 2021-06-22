@@ -463,6 +463,10 @@ ingame:
 
         maximumLevel: MAXIMUM LEVEL (Speed x<currentMult>)
 
+    blueprintLibrary:
+        title: Blueprint Library
+        share: Share
+
     # The "Statistics" window
     statistics:
         title: Statistics
@@ -1276,6 +1280,7 @@ keybindings:
         mapZoomOut: Zoom out
         createMarker: Create Marker
 
+        menuOpenBlueprintLibrary: Blueprint Library
         menuOpenShop: Upgrades
         menuOpenStats: Statistics
         menuClose: Close Menu

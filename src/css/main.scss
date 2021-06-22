@@ -33,6 +33,7 @@
 
 @import "ingame_hud/buildings_toolbar";
 @import "ingame_hud/building_placer";
+@import "ingame_hud/blueprint_library";
 @import "ingame_hud/beta_overlay";
 @import "ingame_hud/keybindings_overlay";
 @import "ingame_hud/unlock_notification";
@@ -108,6 +109,7 @@ ingame_HUD_BetaOverlay,
 
 // Dialogs
 ingame_HUD_Shop,
+ingame_HUD_BlueprintLibrary,
 ingame_HUD_Statistics,
 ingame_HUD_ShapeViewer,
 ingame_HUD_StandaloneAdvantages,
