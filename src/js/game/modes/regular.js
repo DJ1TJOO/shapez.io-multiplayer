@@ -38,6 +38,7 @@ import { HUDSandboxController } from "../hud/parts/sandbox_controller";
 import { queryParamOptions } from "../../core/query_parameters";
 import { MetaBlockBuilding } from "../buildings/block";
 import { MetaItemProducerBuilding } from "../buildings/item_producer";
+import { HUDBeltInfo } from "../hud/parts/belt_info";
 
 /** @typedef {{
  *   shape: string,
@@ -551,6 +552,7 @@ export class RegularGameMode extends GameMode {
             statistics: HUDStatistics,
             waypoints: HUDWaypoints,
             wireInfo: HUDWireInfo,
+            beltInfo: HUDBeltInfo,
             leverToggle: HUDLeverToggle,
             pinnedShapes: HUDPinnedShapes,
             notifications: HUDNotifications,

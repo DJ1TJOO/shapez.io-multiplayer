@@ -264,6 +264,46 @@ export class MapChunkView extends MapChunk {
     }
 
     /**
+     * @param {object} param0
+     * @param {CanvasRenderingContext2D} param0.context
+     * @param {number} param0.x
+     * @param {number} param0.y
+     * @param {Entity} param0.entity
+     * @param {number} param0.tileSizePixels
+     * @param {string=} param0.overrideColor Optionally override the color to be rendered
+     */
+    static drawSingleBeltOverviewTile({ context, x, y, entity, tileSizePixels, overrideColor = null }) {
+        const staticComp = entity.components.StaticMapEntity;
+        const data = getBuildingDataFromCode(staticComp.code);
+        const metaBuilding = data.metaInstance;
+        const overlayMatrix = metaBuilding.getSpecialOverlayRenderMatrix(
+            staticComp.rotation,
+            data.rotationVariant,
+            data.variant,
+            entity
+        );
+        context.fillStyle =
+            overrideColor || metaBuilding.getSilhouetteColor(data.variant, data.rotationVariant);
+        if (overlayMatrix) {
+            for (let dx = 0; dx < 3; ++dx) {
+                for (let dy = 0; dy < 3; ++dy) {
+                    const isFilled = overlayMatrix[dx + dy * 3];
+                    if (isFilled) {
+                        context.fillRect(
+                            x + (dx * tileSizePixels) / CHUNK_OVERLAY_RES,
+                            y + (dy * tileSizePixels) / CHUNK_OVERLAY_RES,
+                            tileSizePixels / CHUNK_OVERLAY_RES,
+                            tileSizePixels / CHUNK_OVERLAY_RES
+                        );
+                    }
+                }
+            }
+        } else {
+            context.fillRect(x, y, tileSizePixels, tileSizePixels);
+        }
+    }
+
+    /**
      * Draws the wires layer
      * @param {DrawParameters} parameters
      */
