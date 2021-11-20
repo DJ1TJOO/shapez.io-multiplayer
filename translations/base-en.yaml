@@ -1388,6 +1388,7 @@ keybindings:
         placeInverse: Invert automatic belt orientation
 
         showShapeTooltip: Show shape output tooltip
+        showBeltLength: Show belt length
 
 about:
     title: About this Game

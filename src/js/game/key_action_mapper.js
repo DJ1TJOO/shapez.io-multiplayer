@@ -34,6 +34,8 @@ export const KEYMAPPINGS = {
         switchLayers: { keyCode: key("E") },
 
         showShapeTooltip: { keyCode: 18 }, // ALT
+
+        showBeltLength: { keyCode: 16 }, // SHIFT
     },
 
     navigation: {

@@ -66,6 +66,7 @@
 @import "ingame_hud/puzzle_play_metadata";
 @import "ingame_hud/puzzle_complete_notification";
 @import "ingame_hud/puzzle_next";
+@import "ingame_hud/belt_info";
 
 // prettier-ignore
 $elements:
@@ -78,6 +79,7 @@ ingame_HUD_PuzzleDLCLogo,
 ingame_HUD_Waypoints,
 ingame_HUD_PlacementHints,
 ingame_HUD_PlacerVariants,
+ingame_HUD_BeltInfo,
 
 // Regular hud
 ingame_HUD_PinnedShapes,

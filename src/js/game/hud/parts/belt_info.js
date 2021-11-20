@@ -1,15 +1,37 @@
 import { globalConfig } from "../../../core/config";
-import { MapChunkView } from "../../map_chunk_view";
+import { Loader } from "../../../core/loader";
+import { makeDiv } from "../../../core/utils";
+import { BeltPath } from "../../belt_path";
+import { KEYMAPPINGS } from "../../key_action_mapper";
 import { THEME } from "../../theme";
 import { BaseHUDPart } from "../base_hud_part";
-import { Loader } from "../../../core/loader";
-import { BeltPath } from "../../belt_path";
-import { getBuildingDataFromCode } from "../../building_codes";
+import { DynamicDomAttach } from "../dynamic_dom_attach";
 
 export class HUDBeltInfo extends BaseHUDPart {
+    createElements(parent) {
+        this.background = makeDiv(parent, "ingame_HUD_BeltInfo");
+
+        this.container = makeDiv(this.background, null, ["container"]);
+
+        this.iconContainer = makeDiv(this.container, null, ["building"]);
+
+        this.icon = makeDiv(this.iconContainer, null, ["icon"]);
+        this.icon.innerHTML = this.beltSprite ? this.beltSprite.getAsHTML(192, 192) : "";
+
+        this.length = makeDiv(this.container, null, ["length"], "0");
+    }
+
     initialize() {
-        this.spriteEmpty = Loader.getSprite("sprites/wires/network_empty.png");
-        this.spriteConflict = Loader.getSprite("sprites/wires/network_conflict.png");
+        this.domAttach = new DynamicDomAttach(this.root, this.background, {
+            attachClass: "visible",
+        });
+
+        this.beltSprite = Loader.getSprite("sprites/buildings/belt_top.png");
+        this.beltSprite.renderToHTMLElement(this.icon, 192, 192);
+    }
+
+    update() {
+        this.domAttach.update(this.visible);
     }
 
     /**
@@ -19,12 +41,20 @@ export class HUDBeltInfo extends BaseHUDPart {
     drawOverlays(parameters) {
         if (this.root.currentLayer !== "regular") {
             // Not in the regular layer
+            this.visible = false;
+            return;
+        }
+
+        if (!this.root.keyMapper.getBinding(KEYMAPPINGS.ingame.showBeltLength).pressed) {
+            // Belt length key not pressed
+            this.visible = false;
             return;
         }
 
         const mousePos = this.root.app.mousePosition;
         if (!mousePos) {
             // No mouse
+            this.visible = false;
             return;
         }
 
@@ -34,32 +64,32 @@ export class HUDBeltInfo extends BaseHUDPart {
 
         if (!entity) {
             // No entity
+            this.visible = false;
             return;
         }
 
         if (!entity.components.Belt) {
             // Not a belt
+            this.visible = false;
             return;
         }
 
         const path = entity.components.Belt.assignedPath;
         if (path === null) {
+            this.visible = false;
             return;
         }
 
         if (path.entityPath.length === 0) {
+            this.visible = false;
             return;
         }
 
+        this.visible = true;
+
         this.drawHighlightedPath(parameters, path);
 
-        // write the path length on mouse position
-        const ctx = parameters.context;
-        ctx.font = "24px Arial";
-        ctx.fillStyle = "black";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(`${path.entityPath.length}`, mousePos.x, mousePos.y - 10);
+        this.length.innerHTML = path.entityPath.length.toString();
     }
 
     /**

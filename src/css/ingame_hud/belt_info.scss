@@ -1,0 +1,54 @@
+#ingame_HUD_BeltInfo {
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        z-index: 9999;
+
+        left: 50%;
+        transform: translateX(-50%);
+        @include S(top, 30px);
+        @include S(width, 90px);
+
+        @include S(border-radius, $globalBorderRadius);
+
+        background: $ingameHudBg;
+        color: #fff;
+
+        .length {
+            @include S(margin-top, -5px);
+            @include S(margin-bottom, 2.5px);
+            @include Text;
+            text-transform: uppercase;
+        }
+
+        .building {
+            display: flex;
+            position: relative;
+
+            @include S(width, 23px);
+            @include S(height, 23px);
+            @include S(margin, 7px);
+
+            .icon {
+                display: flex;
+                flex-direction: column-reverse;
+                position: relative;
+                align-items: center;
+                justify-content: center;
+
+                width: 100%;
+                height: 100%;
+
+                padding: 0;
+                margin: 0;
+                @include S(border-radius, $globalBorderRadius);
+
+                color: $accentColorDark;
+                background: center center / 70% no-repeat;
+            }
+        }
+    }
+}
