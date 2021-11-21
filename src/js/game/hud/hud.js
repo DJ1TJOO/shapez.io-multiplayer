@@ -193,6 +193,7 @@ export class GameHUD {
             "changesDebugger",
             "minerHighlight",
             "shapeTooltip",
+            "beltInfo",
         ];
 
         for (let i = 0; i < partsOrder.length; ++i) {
@@ -207,7 +208,7 @@ export class GameHUD {
      * @param {DrawParameters} parameters
      */
     drawOverlays(parameters) {
-        const partsOrder = ["waypoints", "watermark", "wireInfo", "beltInfo"];
+        const partsOrder = ["waypoints", "watermark", "wireInfo"];
 
         for (let i = 0; i < partsOrder.length; ++i) {
             if (this.parts[partsOrder[i]]) {

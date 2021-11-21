@@ -1,6 +1,6 @@
 import { globalConfig } from "../../../core/config";
 import { Loader } from "../../../core/loader";
-import { makeDiv } from "../../../core/utils";
+import { clamp, makeDiv } from "../../../core/utils";
 import { BeltPath } from "../../belt_path";
 import { KEYMAPPINGS } from "../../key_action_mapper";
 import { THEME } from "../../theme";
@@ -38,7 +38,7 @@ export class HUDBeltInfo extends BaseHUDPart {
      *
      * @param {import("../../../core/draw_utils").DrawParameters} parameters
      */
-    drawOverlays(parameters) {
+    draw(parameters) {
         if (this.root.currentLayer !== "regular") {
             // Not in the regular layer
             this.visible = false;
@@ -99,20 +99,82 @@ export class HUDBeltInfo extends BaseHUDPart {
      * @param {BeltPath} path
      */
     drawHighlightedPath(parameters, path) {
-        parameters.context.globalAlpha = 0.5;
+        const firstBelt = path.entityPath[0];
+        const firstBeltStaticComp = firstBelt.components.StaticMapEntity;
+        const firstBeltScreenTile = firstBeltStaticComp.origin.toWorldSpaceCenterOfTile();
 
+        const lastBelt = path.entityPath[path.entityPath.length - 1];
+        const lastBeltStaticComp = lastBelt.components.StaticMapEntity;
+        const lastBeltScreenTile = lastBeltStaticComp.origin.toWorldSpaceCenterOfTile();
+
+        parameters.context.fillStyle = THEME.map.directionLock[this.root.currentLayer].color;
+        parameters.context.strokeStyle = THEME.map.directionLock[this.root.currentLayer].color;
+        parameters.context.lineWidth = 10;
+
+        parameters.context.beginCircle(firstBeltScreenTile.x, firstBeltScreenTile.y, 8);
+        parameters.context.fill();
+
+        parameters.context.beginPath();
+        parameters.context.moveTo(firstBeltScreenTile.x, firstBeltScreenTile.y);
+
+        let currentScreentTile = firstBeltScreenTile;
         for (let i = 0; i < path.entityPath.length; ++i) {
             const belt = path.entityPath[i];
             const staticComp = belt.components.StaticMapEntity;
-            const screenTile = this.root.camera.worldToScreen(staticComp.origin.toWorldSpace());
+            const screenTile = staticComp.origin.toWorldSpaceCenterOfTile();
 
-            const ctx = parameters.context;
-            const tileSizePixels = globalConfig.tileSize * this.root.camera.zoomLevel;
+            const nextBelt = path.entityPath[i + 1];
+            // End of path
+            if (!nextBelt) {
+                break;
+            }
 
-            ctx.fillStyle = THEME.map.wires.highlightColor;
-            ctx.fillRect(screenTile.x, screenTile.y, tileSizePixels, tileSizePixels);
+            const nextStaticComp = nextBelt.components.StaticMapEntity;
+            const nextScreenTile = nextStaticComp.origin.toWorldSpaceCenterOfTile();
+
+            // Still same line
+            if (nextScreenTile.x === currentScreentTile.x || nextScreenTile.y === currentScreentTile.y) {
+                continue;
+            }
+
+            parameters.context.lineTo(screenTile.x, screenTile.y);
+            currentScreentTile = screenTile;
         }
 
+        parameters.context.lineTo(lastBeltScreenTile.x, lastBeltScreenTile.y);
+
+        parameters.context.globalAlpha = 0.5;
+        parameters.context.stroke();
         parameters.context.globalAlpha = 1;
+
+        parameters.context.beginCircle(lastBeltScreenTile.x, lastBeltScreenTile.y, 5);
+        parameters.context.fill();
+
+        // Draw arrow
+        const arrowSprite = this.root.hud.parts.buildingPlacer.lockIndicatorSprites["regular"];
+        for (let i = 0; i < path.entityPath.length - 1; ++i) {
+            const belt = path.entityPath[i];
+            const staticComp = belt.components.StaticMapEntity;
+            const worldPos = staticComp.origin.toWorldSpaceCenterOfTile();
+
+            const nextBelt = path.entityPath[i + 1];
+            const nextStaticComp = nextBelt.components.StaticMapEntity;
+            const angle = Math.radians(nextStaticComp.rotation);
+
+            parameters.context.translate(worldPos.x, worldPos.y);
+            parameters.context.rotate(angle);
+            parameters.context.drawImage(
+                arrowSprite,
+                -6,
+                -globalConfig.halfTileSize -
+                    clamp((this.root.time.realtimeNow() * 1.5) % 1.0, 0, 1) * 1 * globalConfig.tileSize +
+                    globalConfig.halfTileSize -
+                    6,
+                12,
+                12
+            );
+            parameters.context.rotate(-angle);
+            parameters.context.translate(-worldPos.x, -worldPos.y);
+        }
     }
 }
