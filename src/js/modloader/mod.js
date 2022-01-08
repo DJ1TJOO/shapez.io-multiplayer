@@ -97,4 +97,12 @@ export class Mod {
         // Add cache for building code
         addBuildingCodeCache(variantCode);
     }
+
+    /**
+     * Registers a new state class, should be a GameState derived class
+     * @param {typeof GameState} stateClass
+     */
+    registerState(stateClass) {
+        this.modManager.app.stateMgr.register(stateClass);
+    }
 }

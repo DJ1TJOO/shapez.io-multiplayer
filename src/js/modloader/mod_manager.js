@@ -2,9 +2,8 @@
  * @typedef {import('../application').Application} Application
  */
 
-import { InGameState } from "../states/ingame";
 import { Mod } from "./mod";
-
+import exports from "./exports";
 export class ModManager {
     /**
      * @param {Application} app
@@ -18,6 +17,7 @@ export class ModManager {
         this.mods = [];
 
         window["Mod"] = Mod;
+        window["shapez"] = exports;
     }
 
     /**
