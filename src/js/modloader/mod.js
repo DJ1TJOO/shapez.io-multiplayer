@@ -36,29 +36,32 @@ export class Mod {
         this.modManager = GLOBAL_APP.modManager.registerMod(this);
     }
 
+    registerCss(css) {
+        // Get style element
+        let style = document.getElementById(this.id + "-style");
+        if (!style) {
+            const head = document.head || document.getElementsByTagName("head")[0];
+
+            // Create style element
+            style = document.createElement("style");
+            style.id = this.id + "-style";
+            style.appendChild(document.createTextNode(""));
+
+            head.appendChild(style);
+        }
+
+        // Add css
+        style.appendChild(document.createTextNode(css));
+    }
+
     /**
      * Registers a new icon
      * @param {string} id
      * @param {string} icon
      */
     registerIcon(id, icon) {
-        // Get style element
-        let style = document.getElementById("mod-loader-icons");
-        if (!style) {
-            const head = document.head || document.getElementsByTagName("head")[0];
-
-            // Create style element
-            style = document.createElement("style");
-            style.id = "mod-loader-icons";
-            style.appendChild(document.createTextNode(""));
-
-            head.appendChild(style);
-        }
-
         // Add icon style
-        style.appendChild(
-            document.createTextNode(`[data-icon="${id}.png"] { background-image: url(${icon}) !important; }`)
-        );
+        this.registerCss(`[data-icon="${id}.png"] { background-image: url(${icon}) !important; }`);
     }
 
     /**
