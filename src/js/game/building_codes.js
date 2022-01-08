@@ -27,25 +27,27 @@ export const gBuildingVariants = {
 
 /**
  * Mapping from 'metaBuildingId/variant/rotationVariant' to building code
- * @type {Map<string, number>}
+ * @type {Map<string, string>}
  */
 const variantsCache = new Map();
 
 /**
  * Registers a new variant
+ * @param {string} group
  * @param {number} code
  * @param {typeof MetaBuilding} meta
  * @param {string} variant
  * @param {number} rotationVariant
  */
 export function registerBuildingVariant(
+    group,
     code,
     meta,
     variant = "default" /* @TODO: Circular dependency, actually its defaultBuildingVariant */,
     rotationVariant = 0
 ) {
-    assert(!gBuildingVariants[code], "Duplicate id: " + code);
-    gBuildingVariants[code] = {
+    assert(!gBuildingVariants[`${group}:${code}`], "Duplicate id: " + code);
+    gBuildingVariants[`${group}:${code}`] = {
         metaClass: meta,
         variant,
         rotationVariant,
@@ -56,7 +58,7 @@ export function registerBuildingVariant(
 
 /**
  *
- * @param {number} code
+ * @param {string} code
  * @returns {BuildingVariantIdentifier}
  */
 export function getBuildingDataFromCode(code) {
@@ -71,8 +73,18 @@ export function buildBuildingCodeCache() {
     for (const code in gBuildingVariants) {
         const data = gBuildingVariants[code];
         const hash = data.metaInstance.getId() + "/" + data.variant + "/" + data.rotationVariant;
-        variantsCache.set(hash, +code);
+        variantsCache.set(hash, code);
     }
+}
+
+/**
+ * Add cache for a code
+ * @param {string} code
+ */
+export function addBuildingCodeCache(code) {
+    const data = gBuildingVariants[code];
+    const hash = data.metaInstance.getId() + "/" + data.variant + "/" + data.rotationVariant;
+    variantsCache.set(hash, code);
 }
 
 /**
@@ -80,7 +92,7 @@ export function buildBuildingCodeCache() {
  * @param {MetaBuilding} metaBuilding
  * @param {string} variant
  * @param {number} rotationVariant
- * @returns {number}
+ * @returns {string}
  */
 export function getCodeFromBuildingData(metaBuilding, variant, rotationVariant) {
     const hash = metaBuilding.getId() + "/" + variant + "/" + rotationVariant;

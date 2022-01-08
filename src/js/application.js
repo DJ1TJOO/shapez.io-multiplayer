@@ -35,6 +35,7 @@ import { PuzzleMenuState } from "./states/puzzle_menu";
 import { ClientAPI } from "./platform/api";
 import { LoginState } from "./states/login";
 import { WegameSplashState } from "./states/wegame_splash";
+import { ModManager } from "./modloader/mod_manager";
 
 /**
  * @typedef {import("./platform/achievement_provider").AchievementProviderInterface} AchievementProviderInterface
@@ -77,6 +78,11 @@ export class Application {
         this.inputMgr = new InputDistributor(this);
         this.backgroundResourceLoader = new BackgroundResourcesLoader(this);
         this.clientApi = new ClientAPI(this);
+        this.modManager = new ModManager(this);
+
+        // TODO: add mod loading
+        // temp mod for testing
+        this.modManager.loadMod("http://localhost:9000/tempmod.js");
 
         // Restrictions (Like demo etc)
         this.restrictionMgr = new RestrictionManager(this);
