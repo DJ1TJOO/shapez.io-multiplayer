@@ -118,7 +118,12 @@ function matchDataRecursive(dest, src) {
     }
 }
 
-export function updateApplicationLanguage(id) {
+/**
+ * Updates application language
+ * @param {import('./application').Application} app
+ * @param {string} id
+ */
+export function updateApplicationLanguage(app, id) {
     logger.log("Setting application language:", id);
 
     const data = LANGUAGES[id];
@@ -131,5 +136,15 @@ export function updateApplicationLanguage(id) {
     if (data.data) {
         logger.log("Applying translations ...");
         matchDataRecursive(T, data.data);
+
+        logger.log("Applying mod translations ...");
+        for (const translation of app.modManager.translations.filter(x => x.language === id)) {
+            matchDataRecursive(T, translation.data);
+        }
+    } else {
+        logger.log("Applying mod translations ...");
+        for (const translation of app.modManager.translations.filter(x => x.language === id)) {
+            matchDataRecursive(T, translation.data);
+        }
     }
 }

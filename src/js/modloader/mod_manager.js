@@ -16,6 +16,14 @@ export class ModManager {
          */
         this.mods = [];
 
+        /**
+         * @type {Array<{
+         *  language: string,
+         *  data: object
+         * }>}
+         */
+        this.translations = [];
+
         window["Mod"] = Mod;
         window["shapez"] = exports;
     }

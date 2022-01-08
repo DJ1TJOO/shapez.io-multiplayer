@@ -36,6 +36,18 @@ export class Mod {
         this.modManager = GLOBAL_APP.modManager.registerMod(this);
     }
 
+    /**
+     * Register new translations for language
+     * @param {string} language
+     * @param {object} translations
+     */
+    registerTranslation(language, translations) {
+        this.modManager.translations.push({
+            language,
+            data: translations,
+        });
+    }
+
     registerCss(css) {
         // Get style element
         let style = document.getElementById(this.id + "-style");
