@@ -1,6 +1,6 @@
-// @ts-nocheck
-
+const fs = require("fs");
 const path = require("path");
+const webpack = require("webpack");
 
 const TerserPlugin = require("terser-webpack-plugin");
 const StringReplacePlugin = require("string-replace-webpack-plugin");
@@ -111,6 +111,26 @@ module.exports = () => {
             maxAssetSize: 5120000,
         },
         plugins: [
+            new webpack.DefinePlugin({
+                CSS_MAIN: webpack.DefinePlugin.runtimeValue(function () {
+                    let css = "";
+                    try {
+                        css = fs.readFileSync(path.resolve(__dirname, "../build/main.css"), {
+                            encoding: "utf-8",
+                        });
+                    } catch (error) {}
+                    return "`" + css + "`";
+                }),
+                CSS_RESOURCES: webpack.DefinePlugin.runtimeValue(function () {
+                    let css = "";
+                    try {
+                        css = fs.readFileSync(path.resolve(__dirname, "../build/async-resources.css"), {
+                            encoding: "utf-8",
+                        });
+                    } catch (error) {}
+                    return "`" + css + "`";
+                }),
+            }),
             new UnusedFilesPlugin({
                 failOnUnused: false,
                 cwd: path.join(__dirname, "..", "src", "js"),
@@ -177,6 +197,20 @@ module.exports = () => {
                             ],
                         }),
                     ],
+                },
+                {
+                    test: /\.js$/,
+                    exclude: /node_modules/,
+                    loader: "string-replace-loader",
+                    options: {
+                        search:
+                            "(const|var|let)[ \n]*([^]*?)[ \\n]*=[ \\n]*(new )?[ \\n]*([a-zA-Z0-9\\.]*)?Mod\\(([^]*?)\\);",
+                        replace(match, type, variableName) {
+                            const css = `${variableName}.registerCss(CSS_MAIN);\n${variableName}.registerCss(CSS_RESOURCES);`;
+                            return `${match}\n${css}`;
+                        },
+                        flags: "gms",
+                    },
                 },
                 {
                     test: /\.worker\.js$/,

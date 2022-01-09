@@ -1,6 +1,7 @@
-// @ts-nocheck
-
+const fs = require("fs");
 const path = require("path");
+const webpack = require("webpack");
+
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 
 module.exports = ({ watch = false }) => {
@@ -11,13 +12,29 @@ module.exports = ({ watch = false }) => {
             "mod.js": [path.resolve(__dirname, "../src/js/main.js")],
         },
         watch,
-        resolve: {
-            alias: {
-                "global-compression": path.resolve(__dirname, "..", "src", "js", "core", "lzstring.js"),
-            },
-        },
         context: path.resolve(__dirname, ".."),
         plugins: [
+            new webpack.DefinePlugin({
+                CSS_MAIN: webpack.DefinePlugin.runtimeValue(function () {
+                    let css = "";
+                    try {
+                        css = fs.readFileSync(path.resolve(__dirname, "../build/main.css"), {
+                            encoding: "utf-8",
+                        });
+                    } catch (error) {}
+                    return "`" + css + "`";
+                }),
+                CSS_RESOURCES: webpack.DefinePlugin.runtimeValue(function () {
+                    let css = "";
+                    try {
+                        css = fs.readFileSync(path.resolve(__dirname, "../build/async-resources.css"), {
+                            encoding: "utf-8",
+                        });
+                    } catch (error) {}
+                    return "`" + css + "`";
+                }),
+            }),
+
             new CircularDependencyPlugin({
                 // exclude detection of files based on a RegExp
                 exclude: /node_modules/,
@@ -64,6 +81,20 @@ module.exports = ({ watch = false }) => {
                             },
                         },
                     ],
+                },
+                {
+                    test: /\.js$/,
+                    exclude: /node_modules/,
+                    loader: "string-replace-loader",
+                    options: {
+                        search:
+                            "(const|var|let)[ \n]*([^]*?)[ \\n]*=[ \\n]*(new )?[ \\n]*([a-zA-Z0-9\\.]*)?Mod\\(([^]*?)\\);",
+                        replace(match, type, variableName) {
+                            const css = `${variableName}.registerCss(CSS_MAIN);\n${variableName}.registerCss(CSS_RESOURCES);`;
+                            return `${match}\n${css}`;
+                        },
+                        flags: "gms",
+                    },
                 },
                 {
                     test: /\.worker\.js$/,
