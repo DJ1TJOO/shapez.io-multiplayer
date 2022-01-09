@@ -1,3 +1,11 @@
+/** @type {import('../src/js/modloader/exports')} */
+let e = {
+    exports: shapez,
+};
+
+/**
+ * @type {import('../src/js/modloader/mod').Mod}
+ */
 const mod = new Mod("test", {
     name: "TestMod",
     description: "A test mod for modloader",
@@ -42,6 +50,25 @@ mod.registerTranslation("nl", {
         continue: "Nee",
     },
 });
+
+// Listen when state changed
+mod.modManager.app.stateMgr.stateChanged.add(
+    /**
+     * @param {string} state
+     * @param {import('../src/js/states/main_menu').MainMenuState} gameState
+     */
+    (state, gameState) => {
+        if (state !== "MainMenuState") return;
+
+        // Add buttons
+        const buttonsElement = gameState.htmlElement.querySelector(".topButtons");
+
+        const aboutButton = shapez.makeDiv(buttonsElement, null, ["aboutButton", "settingsButton"]);
+        aboutButton.addEventListener("click", () => {
+            mod.modManager.app.stateMgr.moveToState("AboutModsState");
+        });
+    }
+);
 
 mod.registerState(AboutModsState);
 

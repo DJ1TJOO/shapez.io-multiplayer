@@ -6,6 +6,7 @@ import { GameState } from "./game_state";
 import { createLogger } from "./logging";
 import { APPLICATION_ERROR_OCCURED } from "./error_handler";
 import { waitNextFrame, removeAllChildren } from "./utils";
+import { Signal } from "./signal";
 
 const logger = createLogger("state_manager");
 
@@ -24,6 +25,9 @@ export class StateManager {
 
         /** @type {Object.<string, new() => GameState>} */
         this.stateClasses = {};
+
+        /** @type {TypedSignal<[string, GameState]>} */
+        this.stateChanged = new Signal();
     }
 
     /**
@@ -112,6 +116,9 @@ export class StateManager {
         waitNextFrame().then(() => {
             document.body.classList.add("arrived");
         });
+
+        // Dispatch signal
+        this.stateChanged.dispatch(key, this.currentState);
 
         return true;
     }

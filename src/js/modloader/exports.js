@@ -396,7 +396,7 @@ import {
     enumColorToShortcode,
 } from "../game/colors";
 
-export default {
+export const exports = {
     //Core
     AtlasDefinition,
     BackgroundResourcesLoader,

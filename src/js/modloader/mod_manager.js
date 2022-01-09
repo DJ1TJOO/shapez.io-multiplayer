@@ -3,7 +3,8 @@
  */
 
 import { Mod } from "./mod";
-import exports from "./exports";
+import { exports } from "./exports";
+
 export class ModManager {
     /**
      * @param {Application} app
