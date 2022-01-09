@@ -40,6 +40,7 @@ module.exports = ({ watch = false, standalone = false, chineseVersion = false, w
                 G_IS_RELEASE: "false",
                 G_IS_MOBILE_APP: "false",
                 G_IS_BROWSER: "true",
+                G_IS_MOD: "false",
                 G_IS_STANDALONE: standalone ? "true" : "false",
                 G_BUILD_TIME: "" + new Date().getTime(),
                 G_BUILD_COMMIT_HASH: JSON.stringify(getRevision()),

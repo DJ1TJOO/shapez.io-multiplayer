@@ -123,6 +123,42 @@ function gulptasksJS($, gulp, buildFolder, browserSync) {
     });
     gulp.task("js.staging", gulp.parallel("js.staging.transpiled", "js.staging.latest"));
 
+    //// MOD
+
+    gulp.task("js.mod.transpiled", () => {
+        return gulp
+            .src("../src/js/main.js")
+            .pipe(
+                $.webpackStream(
+                    requireUncached("./webpack.production.config.js")({
+                        enableAssert: true,
+                        environment: "staging",
+                        es6: false,
+                        isMod: true,
+                    })
+                )
+            )
+            .pipe($.rename("bundle-transpiled.js"))
+            .pipe(gulp.dest(buildFolder));
+    });
+
+    gulp.task("js.mod.latest", () => {
+        return gulp
+            .src("../src/js/main.js")
+            .pipe(
+                $.webpackStream(
+                    requireUncached("./webpack.production.config.js")({
+                        enableAssert: true,
+                        environment: "staging",
+                        es6: true,
+                        isMod: true,
+                    })
+                )
+            )
+            .pipe(gulp.dest(buildFolder));
+    });
+    gulp.task("js.mod", gulp.parallel("js.mod.transpiled", "js.mod.latest"));
+
     //// PROD
 
     gulp.task("js.prod.transpiled", () => {

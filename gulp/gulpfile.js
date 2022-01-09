@@ -57,7 +57,7 @@ const js = require("./js");
 js.gulptasksJS($, gulp, buildFolder, browserSync);
 
 const html = require("./html");
-html.gulptasksHTML($, gulp, buildFolder, browserSync);
+html.gulptasksHTML($, gulp, buildFolder);
 
 const ftp = require("./ftp");
 ftp.gulptasksFTP($, gulp, buildFolder);
@@ -66,13 +66,13 @@ const docs = require("./docs");
 docs.gulptasksDocs($, gulp, buildFolder);
 
 const standalone = require("./standalone");
-standalone.gulptasksStandalone($, gulp, buildFolder);
+standalone.gulptasksStandalone($, gulp);
 
 const releaseUploader = require("./release-uploader");
 releaseUploader.gulptasksReleaseUploader($, gulp, buildFolder);
 
 const translations = require("./translations");
-translations.gulptasksTranslations($, gulp, buildFolder);
+translations.gulptasksTranslations($, gulp);
 
 /////////////////////  BUILD TASKS  /////////////////////
 
@@ -274,6 +274,15 @@ gulp.task(
         "html.standalone-dev"
     )
 );
+
+// Builds everything (mod)
+gulp.task("step.mod.code", gulp.series("sounds.fullbuild", "translations.fullBuild", "js.mod"));
+gulp.task(
+    "step.mod.mainbuild",
+    gulp.parallel("utils.copyAdditionalBuildFiles", "step.baseResources", "step.mod.code")
+);
+gulp.task("step.mod.all", gulp.series("step.mod.mainbuild", "css.prod-standalone", "html.dev"));
+gulp.task("build.mod", gulp.series("utils.cleanup", "step.mod.all", "step.postbuild"));
 
 // Builds everything (staging)
 gulp.task("step.staging.code", gulp.series("sounds.fullbuild", "translations.fullBuild", "js.staging"));

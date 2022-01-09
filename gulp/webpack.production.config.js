@@ -15,6 +15,7 @@ module.exports = ({
     es6 = false,
     standalone = false,
     isBrowser = true,
+    isMod = false,
     mobileApp = false,
     chineseVersion = false,
     wegameVersion = false,
@@ -31,6 +32,7 @@ module.exports = ({
         G_IS_STANDALONE: standalone ? "true" : "false",
         G_IS_BROWSER: isBrowser ? "true" : "false",
         G_IS_MOBILE_APP: mobileApp ? "true" : "false",
+        G_IS_MOD: isMod ? "true" : "false",
         G_TRACKING_ENDPOINT: JSON.stringify(
             lzString.compressToEncodedURIComponent("https://tracking.shapez.io/v1")
         ),
