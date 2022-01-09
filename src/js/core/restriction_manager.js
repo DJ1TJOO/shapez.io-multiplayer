@@ -94,7 +94,7 @@ export class RestrictionManager extends ReadWriteProxy {
             return false;
         }
 
-        if (G_IS_DEV) {
+        if (G_IS_DEV || G_IS_MOD) {
             return typeof window !== "undefined" && window.location.search.indexOf("demo") >= 0;
         }
 
