@@ -1,7 +1,56 @@
-import "../core/polyfills";
+import types from "flatted";
 import "../core/assert";
+import { AtlasDefinition, atlasFiles } from "../core/atlas_definitions";
+import { BackgroundResourcesLoader } from "../core/background_resources_loader";
+import {
+    clearBufferBacklog,
+    disableImageSmoothing,
+    enableImageSmoothing,
+    freeCanvas,
+    getBufferStats,
+    getBufferVramUsageBytes,
+    makeOffscreenBuffer,
+    registerCanvas,
+} from "../core/buffer_utils";
+import { cachebust } from "../core/cachebust";
+import { ClickDetector, clickDetectorGlobals, MAX_MOVE_DISTANCE_PX } from "../core/click_detector";
+import {
+    A_B_TESTING_LINK_TYPE,
+    globalConfig,
+    IS_DEBUG,
+    IS_MAC,
+    IS_MOBILE,
+    SUPPORT_TOUCH,
+    THIRDPARTY_URLS,
+} from "../core/config";
+import {
+    getDeviceDPI,
+    prepareHighDPIContext,
+    resizeCanvas,
+    resizeCanvasAndClear,
+    resizeHighDPICanvas,
+    smoothenDpi,
+} from "../core/dpi_manager";
+import { DrawParameters } from "../core/draw_parameters";
+import { drawRotatedSprite, drawSpriteClipped, initDrawUtils } from "../core/draw_utils";
 import "../core/error_handler";
-
+import { APPLICATION_ERROR_OCCURED } from "../core/error_handler";
+import { ExplainedResult } from "../core/explained_result";
+import { Factory } from "../core/factory";
+import { GameState } from "../core/game_state";
+import { GLOBAL_APP, setGlobalApp } from "../core/globals";
+import {
+    gBuildingsByCategory,
+    gComponentRegistry,
+    gGameModeRegistry,
+    gGameSpeedRegistry,
+    gItemRegistry,
+    gMetaBuildingRegistry,
+    initBuildingsByCategory,
+} from "../core/global_registries";
+import { InputDistributor } from "../core/input_distributor";
+import { InputReceiver } from "../core/input_receiver";
+import { Loader } from "../core/loader";
 import {
     createLogger,
     globalDebug,
@@ -13,161 +62,121 @@ import {
     stringifyObjectContainingErrors,
 } from "../core/logging";
 import {
-    A_B_TESTING_LINK_TYPE,
-    globalConfig,
-    IS_DEBUG,
-    IS_MAC,
-    IS_MOBILE,
-    SUPPORT_TOUCH,
-    THIRDPARTY_URLS,
-} from "../core/config";
-import { drawRotatedSprite, drawSpriteClipped, initDrawUtils } from "../core/draw_utils";
-import types from "flatted";
-import { AtlasDefinition, atlasFiles } from "../core/atlas_definitions";
-import { BackgroundResourcesLoader } from "../core/background_resources_loader";
-import {
-    enableImageSmoothing,
-    disableImageSmoothing,
-    getBufferVramUsageBytes,
-    getBufferStats,
-    clearBufferBacklog,
-    makeOffscreenBuffer,
-    registerCanvas,
-    freeCanvas,
-} from "../core/buffer_utils";
-import { cachebust } from "../core/cachebust";
-import { ClickDetector, MAX_MOVE_DISTANCE_PX, clickDetectorGlobals } from "../core/click_detector";
-import {
-    getDeviceDPI,
-    smoothenDpi,
-    prepareHighDPIContext,
-    resizeHighDPICanvas,
-    resizeCanvas,
-    resizeCanvasAndClear,
-} from "../core/dpi_manager";
-import { APPLICATION_ERROR_OCCURED } from "../core/error_handler";
-import { ExplainedResult } from "../core/explained_result";
-import { Factory } from "../core/factory";
-import { GameState } from "../core/game_state";
-import { setGlobalApp, GLOBAL_APP } from "../core/globals";
-import {
-    initBuildingsByCategory,
-    gMetaBuildingRegistry,
-    gBuildingsByCategory,
-    gComponentRegistry,
-    gGameModeRegistry,
-    gGameSpeedRegistry,
-    gItemRegistry,
-} from "../core/global_registries";
-import { InputDistributor } from "../core/input_distributor";
-import { InputReceiver } from "../core/input_receiver";
-import { Loader } from "../core/loader";
-import {
     compressU8,
     compressU8WHeader,
-    decompressU8WHeader,
     compressX64,
+    decompressU8WHeader,
     decompressX64,
 } from "../core/lzstring";
-import { Dialog, DialogOptionChooser, DialogLoading, DialogWithForm } from "../core/modal_dialog_elements";
+import { Dialog, DialogLoading, DialogOptionChooser, DialogWithForm } from "../core/modal_dialog_elements";
 import {
     FormElement,
-    FormElementInput,
     FormElementCheckbox,
+    FormElementInput,
     FormElementItemChooser,
 } from "../core/modal_dialog_forms";
+import "../core/polyfills";
 import { queryParamOptions } from "../core/query_parameters";
 import { ReadWriteProxy } from "../core/read_write_proxy";
-import { RequestChannel, PROMISE_ABORTED } from "../core/request_channel";
+import { Rectangle } from "../core/rectangle";
+import { PROMISE_ABORTED, RequestChannel } from "../core/request_channel";
 import { RestrictionManager } from "../core/restriction_manager";
 import { RandomNumberGenerator } from "../core/rng";
-import { sha1, getNameOfProvider, computeCrc, CRC_PREFIX } from "../core/sensitive_utils.encrypt";
+import { computeCrc, CRC_PREFIX, getNameOfProvider, sha1 } from "../core/sensitive_utils.encrypt";
 import { Signal, STOP_PROPAGATION } from "../core/signal";
 import { SingletonFactory } from "../core/singleton_factory";
 import {
-    BaseSprite,
-    SpriteAtlasLink,
-    RegularSprite,
-    ORIGINAL_SPRITE_SCALE,
-    FULL_CLIP_RECT,
     AtlasSprite,
+    BaseSprite,
+    FULL_CLIP_RECT,
+    ORIGINAL_SPRITE_SCALE,
+    RegularSprite,
+    SpriteAtlasLink,
 } from "../core/sprites";
 import { StaleAreaDetector } from "../core/stale_area_detector";
 import { StateManager } from "../core/state_manager";
 import { TextualGameState } from "../core/textual_game_state";
 import { TrackedState } from "../core/tracked_state";
 import {
-    isAndroid,
-    isIos,
-    getPlatformName,
-    getIPCRenderer,
-    make2DUndefinedArray,
-    newEmptyMap,
-    randomInt,
     accessNestedPropertyReverse,
-    randomChoice,
+    arrayDelete,
+    arrayDeleteValue,
+    clamp,
+    epsilonCompare,
     fastArrayDelete,
     fastArrayDeleteValue,
     fastArrayDeleteValueIfContained,
-    arrayDelete,
-    arrayDeleteValue,
-    epsilonCompare,
-    lerp,
-    findNiceValue,
+    fillInLinkIntoTranslation,
     findNiceIntegerValue,
+    findNiceValue,
     formatBigNumber,
     formatBigNumberFull,
-    waitNextFrame,
+    formatItemsPerSecond,
+    formatSeconds,
+    formatSecondsToTimeAgo,
+    generateFileDownload,
+    generateMatrixRotations,
+    getIPCRenderer,
+    getPlatformName,
+    getRomanNumber,
+    isAndroid,
+    isIos,
+    isSupportedBrowser,
+    lerp,
+    make2DUndefinedArray,
+    makeButton,
+    makeButtonElement,
+    makeDiv,
+    newEmptyMap,
+    randomChoice,
+    randomInt,
+    removeAllChildren,
+    rotateDirectionalObject,
+    rotateFlatMatrix3x3,
     round1Digit,
+    round1DigitLocalized,
     round2Digits,
     round3Digits,
     round4Digits,
-    clamp,
-    makeDiv,
-    makeButtonElement,
-    makeButton,
-    removeAllChildren,
-    isSupportedBrowser,
-    formatSecondsToTimeAgo,
-    formatSeconds,
-    round1DigitLocalized,
-    formatItemsPerSecond,
-    rotateFlatMatrix3x3,
-    generateMatrixRotations,
-    rotateDirectionalObject,
     safeModulo,
     smoothPulse,
-    fillInLinkIntoTranslation,
-    generateFileDownload,
     startFileChoose,
-    getRomanNumber,
+    waitNextFrame,
 } from "../core/utils";
 import {
-    Vector,
-    mixVector,
-    enumDirection,
-    enumInvertedDirections,
-    enumDirectionToAngle,
-    enumAngleToDirection,
     arrayAllDirections,
+    enumAngleToDirection,
+    enumDirection,
+    enumDirectionToAngle,
     enumDirectionToVector,
+    enumInvertedDirections,
+    mixVector,
+    Vector,
 } from "../core/vector";
 import { AutomaticSave, enumSavePriority } from "../game/automatic_save";
+import { BaseItem } from "../game/base_item";
 import { BeltPath } from "../game/belt_path";
 import { Blueprint } from "../game/blueprint";
 import {
-    registerBuildingVariant,
+    gBuildingVariants,
     getBuildingDataFromCode,
     getCodeFromBuildingData,
-    gBuildingVariants,
+    registerBuildingVariant,
 } from "../game/building_codes";
 import {
     Camera,
-    USER_INTERACT_MOVE,
-    USER_INTERACT_ZOOM,
-    USER_INTERACT_TOUCHEND,
     enumMouseButton,
+    USER_INTERACT_MOVE,
+    USER_INTERACT_TOUCHEND,
+    USER_INTERACT_ZOOM,
 } from "../game/camera";
+import {
+    enumColorMixingResults,
+    enumColors,
+    enumColorsToHexCode,
+    enumColorToShortcode,
+} from "../game/colors";
+import { Component } from "../game/component";
 import { BeltComponent } from "../game/components/belt";
 import { BeltReaderComponent } from "../game/components/belt_reader";
 import { BeltUnderlaysComponent, enumClippedBeltUnderlayType } from "../game/components/belt_underlays";
@@ -178,9 +187,9 @@ import { HubComponent } from "../game/components/hub";
 import { ItemAcceptorComponent } from "../game/components/item_acceptor";
 import { ItemEjectorComponent } from "../game/components/item_ejector";
 import {
-    ItemProcessorComponent,
     enumItemProcessorRequirements,
     enumItemProcessorTypes,
+    ItemProcessorComponent,
 } from "../game/components/item_processor";
 import { ItemProducerComponent } from "../game/components/item_producer";
 import { LeverComponent } from "../game/components/lever";
@@ -194,8 +203,10 @@ import { WiredPinsComponent } from "../game/components/wired_pins";
 import { WireTunnelComponent } from "../game/components/wire_tunnel";
 import { GameCore } from "../game/core";
 import { DynamicTickrate } from "../game/dynamic_tickrate";
+import { Entity } from "../game/entity";
 import { EntityManager } from "../game/entity_manager";
 import { GameLoadingOverlay } from "../game/game_loading_overlay";
+import { GameMode } from "../game/game_mode";
 import { GameSystem } from "../game/game_system";
 import { GameSystemManager } from "../game/game_system_manager";
 import { GameSystemWithFilter } from "../game/game_system_with_filter";
@@ -222,7 +233,7 @@ import { HUDLeverToggle } from "../game/hud/parts/lever_toggle";
 import { HUDMassSelector } from "../game/hud/parts/mass_selector";
 import { HUDMinerHighlight } from "../game/hud/parts/miner_highlight";
 import { HUDModalDialogs } from "../game/hud/parts/modal_dialogs";
-import { HUDNotifications, enumNotificationType } from "../game/hud/parts/notifications";
+import { enumNotificationType, HUDNotifications } from "../game/hud/parts/notifications";
 import { HUDPinnedShapes } from "../game/hud/parts/pinned_shapes";
 import { HUDSandboxController } from "../game/hud/parts/sandbox_controller";
 import { HUDScreenshotExporter } from "../game/hud/parts/screenshot_exporter";
@@ -231,7 +242,7 @@ import { HUDShapeViewer } from "../game/hud/parts/shape_viewer";
 import { HUDShop } from "../game/hud/parts/shop";
 import { HUDStandaloneAdvantages } from "../game/hud/parts/standalone_advantages";
 import { HUDStatistics } from "../game/hud/parts/statistics";
-import { HUDShapeStatisticsHandle, enumDisplayMode } from "../game/hud/parts/statistics_handle";
+import { enumDisplayMode, HUDShapeStatisticsHandle } from "../game/hud/parts/statistics_handle";
 import { HUDPartTutorialHints } from "../game/hud/parts/tutorial_hints";
 import { HUDTutorialVideoOffer } from "../game/hud/parts/tutorial_video_offer";
 import { HUDUnlockNotification } from "../game/hud/parts/unlock_notification";
@@ -240,24 +251,25 @@ import { HUDWatermark } from "../game/hud/parts/watermark";
 import { HUDWaypoints } from "../game/hud/parts/waypoints";
 import { HUDWiresOverlay } from "../game/hud/parts/wires_overlay";
 import { HUDWireInfo } from "../game/hud/parts/wire_info";
-import { BOOL_TRUE_SINGLETON, BOOL_FALSE_SINGLETON, BooleanItem } from "../game/items/boolean_item";
+import { BooleanItem, BOOL_FALSE_SINGLETON, BOOL_TRUE_SINGLETON } from "../game/items/boolean_item";
 import { ColorItem } from "../game/items/color_item";
 import { ShapeItem } from "../game/items/shape_item";
 import { itemResolverSingleton, typeItemSingleton } from "../game/item_resolver";
-import { Keybinding, KeyActionMapper } from "../game/key_action_mapper";
+import { KeyActionMapper, Keybinding } from "../game/key_action_mapper";
 import { GameLogic } from "../game/logic";
 import { BaseMap } from "../game/map";
 import { MapChunkView } from "../game/map_chunk_view";
 import { MapView } from "../game/map_view";
 import { defaultBuildingVariant, MetaBuilding } from "../game/meta_building";
 import { RegularGameMode } from "../game/modes/regular";
-import { ProductionAnalytics, enumAnalyticsDataSource } from "../game/production_analytics";
+import { enumAnalyticsDataSource, ProductionAnalytics } from "../game/production_analytics";
+import { GameRoot } from "../game/root";
 import {
-    ShapeDefinition,
     createSimpleShape,
     enumShortcodeToSubShape,
-    enumSubShapeToShortcode,
     enumSubShape,
+    enumSubShapeToShortcode,
+    ShapeDefinition,
 } from "../game/shape_definition";
 import { ShapeDefinitionManager } from "../game/shape_definition_manager";
 import { SoundProxy } from "../game/sound_proxy";
@@ -282,6 +294,7 @@ import { UndergroundBeltSystem } from "../game/systems/underground_belt";
 import { WireSystem } from "../game/systems/wire";
 import { WiredPinsSystem } from "../game/systems/wired_pins";
 import { applyGameTheme, THEME } from "../game/theme";
+import { BaseGameSpeed } from "../game/time/base_game_speed";
 import { FastForwardGameSpeed } from "../game/time/fast_forward_game_speed";
 import { PausedGameSpeed } from "../game/time/paused_game_speed";
 import { RegularGameSpeed } from "../game/time/regular_game_speed";
@@ -301,30 +314,32 @@ import { StorageImplBrowserIndexedDB } from "../platform/browser/storage_indexed
 import { PlatformWrapperImplBrowser } from "../platform/browser/wrapper";
 import { StorageImplElectron } from "../platform/electron/storage";
 import { PlatformWrapperImplElectron } from "../platform/electron/wrapper";
+import { GameAnalyticsInterface } from "../platform/game_analytics";
 import {
-    SoundInstanceInterface,
-    MusicInstanceInterface,
     MUSIC,
-    SOUNDS,
+    MusicInstanceInterface,
+    SoundInstanceInterface,
     SoundInterface,
+    SOUNDS,
 } from "../platform/sound";
+import { StorageInterface } from "../platform/storage";
 import { PlatformWrapperInterface } from "../platform/wrapper";
 import {
-    ApplicationSettings,
     allApplicationSettings,
-    getApplicationSettingById,
-    uiScales,
-    scrollWheelSensitivities,
-    movementSpeeds,
+    ApplicationSettings,
     autosaveIntervals,
     enumCategories,
+    getApplicationSettingById,
+    movementSpeeds,
+    scrollWheelSensitivities,
+    uiScales,
 } from "../profile/application_settings";
-import { BoolSetting, RangeSetting, BaseSetting, EnumSetting } from "../profile/setting_types";
+import { BaseSetting, BoolSetting, EnumSetting, RangeSetting } from "../profile/setting_types";
 import { Savegame } from "../savegame/savegame";
 import { compressObject, decompressObject } from "../savegame/savegame_compressor";
 import { BaseSavegameInterface } from "../savegame/savegame_interface";
 import { getSavegameInterface, savegameInterfaces } from "../savegame/savegame_interface_registry";
-import { SavegameManager, enumLocalSavegameStatus } from "../savegame/savegame_manager";
+import { enumLocalSavegameStatus, SavegameManager } from "../savegame/savegame_manager";
 import { SavegameSerializer } from "../savegame/savegame_serializer";
 import { SavegameInterface_V1000 } from "../savegame/schemas/1000";
 import { SavegameInterface_V1001 } from "../savegame/schemas/1001";
@@ -334,38 +349,41 @@ import { SavegameInterface_V1004 } from "../savegame/schemas/1004";
 import { SavegameInterface_V1005 } from "../savegame/schemas/1005";
 import { SavegameInterface_V1006 } from "../savegame/schemas/1006";
 import { SavegameInterface_V1007 } from "../savegame/schemas/1007";
+import { SavegameInterface_V1008 } from "../savegame/schemas/1008";
+import { SavegameInterface_V1009 } from "../savegame/schemas/1009";
+import { SavegameInterface_V1010 } from "../savegame/schemas/1010";
 import {
     BasicSerializableObject,
-    serializeSchema,
     deserializeSchema,
-    verifySchema,
     extendSchema,
+    serializeSchema,
+    verifySchema,
 } from "../savegame/serialization";
 import {
     BaseDataType,
-    TypeInteger,
+    schemaToJsonSchema,
+    TypeArray,
     TypeBoolean,
-    TypePositiveInteger,
-    TypeString,
-    TypeVector,
-    TypeTileVector,
-    TypeNumber,
-    TypePositiveNumber,
-    TypeEnum,
-    TypeEntity,
-    TypeEntityWeakref,
     TypeClass,
     TypeClassData,
     TypeClassFromMetaclass,
-    TypeMetaClass,
-    TypeArray,
-    TypeFixedClass,
-    TypeKeyValueMap,
     TypeClassId,
-    TypePair,
+    TypeEntity,
+    TypeEntityWeakref,
+    TypeEnum,
+    TypeFixedClass,
+    TypeInteger,
+    TypeKeyValueMap,
+    TypeMetaClass,
     TypeNullable,
+    TypeNumber,
+    TypePair,
+    TypePositiveInteger,
+    TypePositiveNumber,
+    TypeString,
     TypeStructuredObject,
-    schemaToJsonSchema,
+    TypeTileVector,
+    TypeVector,
 } from "../savegame/serialization_data_types";
 import { SerializerInternal } from "../savegame/serializer_internal";
 import { AboutState } from "../states/about";
@@ -376,25 +394,7 @@ import { MainMenuState } from "../states/main_menu";
 import { MobileWarningState } from "../states/mobile_warning";
 import { PreloadState } from "../states/preload";
 import { SettingsState } from "../states/settings";
-import { GameRoot } from "../game/root";
-import { Entity } from "../game/entity";
-import { BaseItem } from "../game/base_item";
-import { Component } from "../game/component";
-import { GameMode } from "../game/game_mode";
-import { BaseGameSpeed } from "../game/time/base_game_speed";
-import { SavegameInterface_V1008 } from "../savegame/schemas/1008";
-import { SavegameInterface_V1009 } from "../savegame/schemas/1009";
-import { SavegameInterface_V1010 } from "../savegame/schemas/1010";
-import { DrawParameters } from "../core/draw_parameters";
-import { Rectangle } from "../core/rectangle";
-import { GameAnalyticsInterface } from "../platform/game_analytics";
-import { StorageInterface } from "../platform/storage";
-import {
-    enumColorMixingResults,
-    enumColors,
-    enumColorsToHexCode,
-    enumColorToShortcode,
-} from "../game/colors";
+import { Mod } from "./mod";
 
 export const exports = {
     //Core
@@ -829,4 +829,7 @@ export const exports = {
     enumMouseButton,
     enumNotificationType,
     enumSavePriority,
+
+    // Modloader
+    Mod,
 };

@@ -25,7 +25,6 @@ export class ModManager {
          */
         this.translations = [];
 
-        window["Mod"] = Mod;
         window["shapez"] = exports;
     }
 
