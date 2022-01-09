@@ -1,12 +1,7 @@
-/** @type {import('../src/js/modloader/exports')} */
-let e = {
-    exports: shapez,
-};
-
 /**
- * @type {import('../src/js/modloader/mod').Mod}
+ * @type {import('../../../src/js/modloader/mod').Mod}
  */
-const mod = new Mod("test", {
+const mod = new shapez.Mod("test", {
     name: "TestMod",
     description: "A test mod for modloader",
     authors: ["DJ1TJOO"],
@@ -55,7 +50,7 @@ mod.registerTranslation("nl", {
 mod.modManager.app.stateMgr.stateChanged.add(
     /**
      * @param {string} state
-     * @param {import('../src/js/states/main_menu').MainMenuState} gameState
+     * @param {import('../../../src/js/states/main_menu').MainMenuState} gameState
      */
     (state, gameState) => {
         if (state !== "MainMenuState") return;
