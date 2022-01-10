@@ -90,10 +90,9 @@ module.exports = ({ watch = false }) => {
                             loader: "string-replace-loader",
                             options: {
                                 search:
-                                    "import[ \\n]*{([a-zA-Z0-9_$, \\n]*)*}[ \\n]*from[ \\n]*(`|\"|')(shapez\\/[^]*?)(`|\"|');",
-                                replace(match, variables) {
-                                    console.log(`const {${variables}} = shapez;`);
-                                    return `const {${variables}} = shapez;`;
+                                    "import[ \\n]*{([a-zA-Z0-9_$, \\n]*)*}[ \\n]*from[ \\n]*[`|\"|'](shapez\\/[^]*?)[`|\"|'];",
+                                replace(match, variables, path) {
+                                    return `const {${variables}} = shapez["${path.replace("shapez/", "")}"];`;
                                 },
                                 flags: "gms",
                             },
