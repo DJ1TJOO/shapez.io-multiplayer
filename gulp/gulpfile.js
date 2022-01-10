@@ -74,6 +74,9 @@ releaseUploader.gulptasksReleaseUploader($, gulp, buildFolder);
 const translations = require("./translations");
 translations.gulptasksTranslations($, gulp);
 
+const mod = require("./mod");
+mod.gulptasksMod($, gulp, buildFolder, browserSync);
+
 /////////////////////  BUILD TASKS  /////////////////////
 
 // Cleans up everything
@@ -243,6 +246,7 @@ gulp.task(
     "build.dev",
     gulp.series(
         "utils.cleanup",
+        "mod.exports",
         "utils.copyAdditionalBuildFiles",
         "localConfig.findOrCreate",
         "imgres.buildAtlas",
@@ -262,6 +266,7 @@ gulp.task(
     "build.standalone.dev",
     gulp.series(
         "utils.cleanup",
+        "mod.exports",
         "localConfig.findOrCreate",
         "imgres.buildAtlas",
         "imgres.atlasToJson",
@@ -281,7 +286,10 @@ gulp.task(
     "step.mod.mainbuild",
     gulp.parallel("utils.copyAdditionalBuildFiles", "step.baseResources", "step.mod.code")
 );
-gulp.task("step.mod.all", gulp.series("step.mod.mainbuild", "css.prod-standalone", "html.dev"));
+gulp.task(
+    "step.mod.all",
+    gulp.series("mod.exports", "step.mod.mainbuild", "css.prod-standalone", "html.dev")
+);
 gulp.task("build.mod", gulp.series("utils.cleanup", "step.mod.all", "step.postbuild"));
 
 // Builds everything (staging)
@@ -290,7 +298,10 @@ gulp.task(
     "step.staging.mainbuild",
     gulp.parallel("utils.copyAdditionalBuildFiles", "step.baseResources", "step.staging.code")
 );
-gulp.task("step.staging.all", gulp.series("step.staging.mainbuild", "css.prod", "html.staging"));
+gulp.task(
+    "step.staging.all",
+    gulp.series("mod.exports", "step.staging.mainbuild", "css.prod", "html.staging")
+);
 gulp.task("build.staging", gulp.series("utils.cleanup", "step.staging.all", "step.postbuild"));
 
 // Builds everything (prod)
@@ -299,7 +310,7 @@ gulp.task(
     "step.prod.mainbuild",
     gulp.parallel("utils.copyAdditionalBuildFiles", "step.baseResources", "step.prod.code")
 );
-gulp.task("step.prod.all", gulp.series("step.prod.mainbuild", "css.prod", "html.prod"));
+gulp.task("step.prod.all", gulp.series("mod.exports", "step.prod.mainbuild", "css.prod", "html.prod"));
 gulp.task("build.prod", gulp.series("utils.cleanup", "step.prod.all", "step.postbuild"));
 
 // Builds everything (standalone-beta)
@@ -310,7 +321,12 @@ gulp.task(
 gulp.task("step.standalone-beta.mainbuild", gulp.parallel("step.baseResources", "step.standalone-beta.code"));
 gulp.task(
     "step.standalone-beta.all",
-    gulp.series("step.standalone-beta.mainbuild", "css.prod-standalone", "html.standalone-beta")
+    gulp.series(
+        "mod.exports",
+        "step.standalone-beta.mainbuild",
+        "css.prod-standalone",
+        "html.standalone-beta"
+    )
 );
 gulp.task(
     "build.standalone-beta",
@@ -332,7 +348,12 @@ for (const prefix of ["", "china.", "wegame."]) {
 
     gulp.task(
         prefix + "step.standalone-prod.all",
-        gulp.series(prefix + "step.standalone-prod.mainbuild", "css.prod-standalone", "html.standalone-prod")
+        gulp.series(
+            "mod.exports",
+            prefix + "step.standalone-prod.mainbuild",
+            "css.prod-standalone",
+            "html.standalone-prod"
+        )
     );
 
     gulp.task(
