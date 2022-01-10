@@ -1,7 +1,9 @@
 /**
  * @type {import('../../../src/js/modloader/mod').Mod}
  */
-const mod = new shapez.Mod("test", {
+import { Mod } from "shapez/modloader/mod";
+
+const mod = new Mod("test", {
     name: "TestMod",
     description: "A test mod for modloader",
     authors: ["DJ1TJOO"],

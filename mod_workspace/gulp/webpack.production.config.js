@@ -201,16 +201,32 @@ module.exports = () => {
                 {
                     test: /\.js$/,
                     exclude: /node_modules/,
-                    loader: "string-replace-loader",
-                    options: {
-                        search:
-                            "(const|var|let)[ \n]*([^]*?)[ \\n]*=[ \\n]*(new )?[ \\n]*([a-zA-Z0-9\\.]*)?Mod\\(([^]*?)\\);",
-                        replace(match, type, variableName) {
-                            const css = `${variableName}.registerCss(CSS_MAIN);\n${variableName}.registerCss(CSS_RESOURCES);`;
-                            return `${match}\n${css}`;
+                    use: [
+                        {
+                            loader: "string-replace-loader",
+                            options: {
+                                search:
+                                    "import[ \\n]*{([a-zA-Z0-9_$, \\n]*)*}[ \\n]*from[ \\n]*(`|\"|')(shapez\\/[^]*?)(`|\"|');",
+                                replace(match, variables) {
+                                    console.log(`const {${variables}} = shapez;`);
+                                    return `const {${variables}} = shapez;`;
+                                },
+                                flags: "gms",
+                            },
                         },
-                        flags: "gms",
-                    },
+                        {
+                            loader: "string-replace-loader",
+                            options: {
+                                search:
+                                    "(const|var|let|[a-zA-Z0-9\\.]*?)?[ \\n]*([a-zA-Z0-9]*?)[ \\n]*=[ \\n]*(new )?[ \\n]*([a-zA-Z0-9\\.]*)?Mod\\(([^]*?)\\);",
+                                replace(match, type, variableName) {
+                                    const css = `${variableName}.registerCss(CSS_MAIN);\n${variableName}.registerCss(CSS_RESOURCES);`;
+                                    return `${match}\n${css}`;
+                                },
+                                flags: "gms",
+                            },
+                        },
+                    ],
                 },
                 {
                     test: /\.worker\.js$/,
