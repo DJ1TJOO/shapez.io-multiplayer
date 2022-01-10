@@ -19,7 +19,8 @@
         "publishStandalone": "yarn publishOnItch && yarn publishOnSteam",
         "publishWeb": "cd gulp && yarn main.deploy.prod",
         "publish": "yarn publishStandalone && yarn publishWeb",
-        "syncTranslations": "node sync-translations.js"
+        "syncTranslations": "node sync-translations.js",
+        "generateDefinitions": "tsc src/js/application.js --declaration --allowJs --emitDeclarationOnly --skipLibCheck --out types.js"
     },
     "dependencies": {
         "@babel/core": "^7.5.4",
@@ -91,6 +92,7 @@
         "imagemin-pngquant": "^8.0.0",
         "jimp": "^0.6.1",
         "js-yaml": "^3.13.1",
+        "jsdoc": "^3.6.7",
         "postcss-assets": "^5.0.0",
         "postcss-preset-env": "^6.5.0",
         "postcss-round-subpixels": "^1.2.0",
@@ -99,6 +101,7 @@
         "sass-unused": "^0.3.0",
         "strip-json-comments": "^3.0.1",
         "trim": "^0.0.1",
+        "tsd-jsdoc": "^2.5.0",
         "yarn": "^1.22.4"
     }
 }

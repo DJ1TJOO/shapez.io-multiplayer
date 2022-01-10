@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const glob = require("glob");
+const exec = require("child_process").exec;
 
 function gulptasksMod($, gulp, buildFolder, browserSync) {
     gulp.task("mod.exports", () => {
@@ -63,6 +64,35 @@ function gulptasksMod($, gulp, buildFolder, browserSync) {
                 })
             )
             .pipe(gulp.dest("../src/js/modloader/"));
+    });
+
+    gulp.task("mod.declarations", async cb => {
+        exec(
+            "yarn generateDefinitions",
+            {
+                cwd: "../",
+            },
+            (error, stdout, sterr) => {
+                if (error) {
+                    console.log(stdout);
+                    console.log(sterr);
+                    throw error;
+                }
+
+                const stream = gulp
+                    .src("../types.d.ts")
+                    .pipe($.replace(/declare module "modloader\/exports" {[^]*?}[^]*?}/gms, ""))
+                    .pipe(
+                        $.replace(
+                            /declare module "([^]*?)"/gms,
+                            (matched, moduleName) => `declare module "shapez/${moduleName}"`
+                        )
+                    )
+                    .pipe(gulp.dest("../build/"));
+                stream.on("end", cb);
+                stream.on("error", cb);
+            }
+        );
     });
 }
 

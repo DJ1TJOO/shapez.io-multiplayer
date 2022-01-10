@@ -288,7 +288,7 @@ gulp.task(
 );
 gulp.task(
     "step.mod.all",
-    gulp.series("mod.exports", "step.mod.mainbuild", "css.prod-standalone", "html.dev")
+    gulp.series("mod.exports", "step.mod.mainbuild", "css.prod-standalone", "html.dev", "mod.declarations")
 );
 gulp.task("build.mod", gulp.series("utils.cleanup", "step.mod.all", "step.postbuild"));
 
