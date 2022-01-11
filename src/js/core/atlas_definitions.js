@@ -41,8 +41,8 @@ export class AtlasDefinition {
 }
 
 /** @type {AtlasDefinition[]} **/
+// @ts-ignore
 export const atlasFiles = require
-    // @ts-ignore
     .context("../../../res_built/atlas/", false, /.*\.json/i)
     .keys()
     .map(f => f.replace(/^\.\//gi, ""))
