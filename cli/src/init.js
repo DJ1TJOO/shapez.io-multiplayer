@@ -13,7 +13,7 @@ function parseArgumentsIntoOptions(rawArgs) {
             "-g": "--git",
             "-i": "--install",
             "-s": "--shapez",
-            "-sr": "--shapez-repo",
+            "-r": "--shapez-repo",
             "-y": "--yes",
         },
         {

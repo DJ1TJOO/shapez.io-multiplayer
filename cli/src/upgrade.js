@@ -8,7 +8,7 @@ function parseArgumentsIntoOptions(rawArgs) {
             "--shapez": String,
             "--shapez-repo": String,
             "-s": "--shapez",
-            "-sr": "--shapez-repo",
+            "-r": "--shapez-repo",
             "--yes": Boolean,
             "-y": "--yes",
         },
