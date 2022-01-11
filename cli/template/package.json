@@ -1,11 +1,10 @@
 {
-    "name": "shapez.io-mod-workspace",
-    "version": "1.0.0",
-    "author": "DJ1TJOO",
+    "name": "mod_name",
+    "version": "mod_version",
+    "author": "mod_author",
     "license": "MIT",
     "scripts": {
         "dev": "cd gulp && gulp",
         "build": "cd gulp && gulp main.build"
-    },
-    "private": true
+    }
 }

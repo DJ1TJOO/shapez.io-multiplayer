@@ -1,7 +1,3 @@
-/**
- * @type {import('../../../src/js/modloader/mod').Mod}
- */
-
 import { Mod } from "shapez/modloader/mod";
 
 const mod = new Mod("test", {
@@ -10,7 +6,6 @@ const mod = new Mod("test", {
     authors: ["DJ1TJOO"],
     version: "0.0.1",
 });
-
 class AboutModsState extends shapez.TextualGameState {
     constructor() {
         super("AboutModsState");
