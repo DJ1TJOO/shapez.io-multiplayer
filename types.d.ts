@@ -44,15 +44,15 @@ declare module "core/config" {
     export const SUPPORT_TOUCH: false;
     export const IS_MAC: boolean;
     export namespace THIRDPARTY_URLS {
-        const discord: string;
-        const github: string;
-        const reddit: string;
-        const shapeViewer: string;
-        const privacyPolicy: string;
-        const standaloneStorePage: string;
-        const stanaloneCampaignLink: string;
-        const puzzleDlcStorePage: string;
-        const levelTutorialVideos: {
+        export const discord: string;
+        export const github: string;
+        export const reddit: string;
+        export const shapeViewer: string;
+        export const privacyPolicy: string;
+        export const standaloneStorePage: string;
+        export const stanaloneCampaignLink: string;
+        export const puzzleDlcStorePage: string;
+        export const levelTutorialVideos: {
             21: string;
             25: string;
             26: string;
@@ -60,11 +60,11 @@ declare module "core/config" {
     }
     export const A_B_TESTING_LINK_TYPE: "steam_2_npr";
     export namespace globalConfig {
-        const minerSpeedItemsPerSecond: number;
-        const mapChunkWorldSize: number;
-        const mapChunkOverviewMinZoom: number;
-        const warmupTimeSecondsFast: number;
-        const warmupTimeSecondsRegular: number;
+        export const minerSpeedItemsPerSecond: number;
+        export const mapChunkWorldSize: number;
+        export const mapChunkOverviewMinZoom: number;
+        export const warmupTimeSecondsFast: number;
+        export const warmupTimeSecondsRegular: number;
     }
     export const IS_MOBILE: boolean;
 }
@@ -543,10 +543,10 @@ declare module "core/vector" {
     export function mixVector(v1: Vector, v2: Vector, a: number): Vector;
     export type enumDirection = string;
     export namespace enumDirection {
-        const top: string;
-        const right: string;
-        const bottom: string;
-        const left: string;
+        export const top: string;
+        export const right: string;
+        export const bottom: string;
+        export const left: string;
     }
     export type enumInvertedDirections = string;
     /**
@@ -562,7 +562,7 @@ declare module "core/vector" {
     export const enumDirectionToAngle: {
         [x: string]: number;
     };
-    export type enumAngleToDirection = enumDirection;
+    export type enumAngleToDirection = string;
     /**
      * @enum {enumDirection}
      */
@@ -606,8 +606,8 @@ declare module "core/vector" {
          * @param {number=} y
          */
         constructor(x?: number | undefined, y?: number | undefined);
-        x: number;
-        y: number;
+        x: any;
+        y: any;
         /**
          * return a copy of the vector
          * @returns {Vector}
@@ -882,8 +882,8 @@ declare module "core/vector" {
          * Creates a simple representation of the vector
          */
         serializeSimple(): {
-            x: number;
-            y: number;
+            x: any;
+            y: any;
         };
         /**
          * @returns {number}
@@ -1005,8 +1005,8 @@ declare module "savegame/serialization_data_types" {
          * @param {FactoryTemplate<*>} registry
          * @param {(GameRoot, object) => object} customResolver
          */
-        constructor(registry: FactoryTemplate<any>, customResolver?: (GameRoot: any, object: any) => object);
-        registry: FactoryTemplate<any>;
+        constructor(registry: any, customResolver?: (GameRoot: any, object: any) => object);
+        registry: any;
         customResolver: (GameRoot: any, object: any) => object;
     }
     export class TypeClassData extends BaseDataType {
@@ -1014,8 +1014,8 @@ declare module "savegame/serialization_data_types" {
          *
          * @param {FactoryTemplate<*>} registry
          */
-        constructor(registry: FactoryTemplate<any>);
-        registry: FactoryTemplate<any>;
+        constructor(registry: any);
+        registry: any;
     }
     export class TypeClassFromMetaclass extends BaseDataType {
         /**
@@ -1023,8 +1023,8 @@ declare module "savegame/serialization_data_types" {
          * @param {typeof BasicSerializableObject} classHandle
          * @param {SingletonFactoryTemplate<*>} registry
          */
-        constructor(classHandle: typeof BasicSerializableObject, registry: SingletonFactoryTemplate<any>);
-        registry: SingletonFactoryTemplate<any>;
+        constructor(classHandle: typeof BasicSerializableObject, registry: any);
+        registry: any;
         classHandle: typeof BasicSerializableObject;
     }
     export class TypeMetaClass extends BaseDataType {
@@ -1032,8 +1032,8 @@ declare module "savegame/serialization_data_types" {
          *
          * @param {SingletonFactoryTemplate<*>} registry
          */
-        constructor(registry: SingletonFactoryTemplate<any>);
-        registry: SingletonFactoryTemplate<any>;
+        constructor(registry: any);
+        registry: any;
     }
     export class TypeArray extends BaseDataType {
         /**
@@ -1064,7 +1064,7 @@ declare module "savegame/serialization_data_types" {
         /**
          * @param {FactoryTemplate<*>|SingletonFactoryTemplate<*>} registry
          */
-        constructor(registry: FactoryTemplate<any> | SingletonFactoryTemplate<any>);
+        constructor(registry: any | any);
         registry: any;
     }
     export class TypePair extends BaseDataType {
@@ -1230,6 +1230,11 @@ declare module "game/component" {
          */
         static getSchema(): {};
         /**
+         * Fixes typeof DerivedComponent is not assignable to typeof Component, compiled out
+         * in non-dev builds
+         */
+        constructor(...args: any[]);
+        /**
          * Copy the current state to another component
          * @param {Component} otherComponent
          */
@@ -1253,7 +1258,7 @@ declare module "game/component" {
 }
 declare module "game/base_item" {
     /** @type {ItemType[]} **/
-    export const itemTypes: ItemType[];
+    export const itemTypes: any[];
     /**
      * Class for items on belts etc. Not an entity for performance reasons
      */
@@ -1261,10 +1266,9 @@ declare module "game/base_item" {
         static getId(): string;
         /** @returns {object} */
         static getSchema(): object;
-        constructor();
-        _type: ItemType;
+        _type: any;
         /** @returns {ItemType} **/
-        getItemType(): ItemType;
+        getItemType(): any;
         /**
          * Returns a string id of the item
          * @returns {string}
@@ -1509,22 +1513,22 @@ declare module "core/rectangle" {
 }
 declare module "platform/sound" {
     export namespace SOUNDS {
-        const uiClick: string;
-        const uiError: string;
-        const dialogError: string;
-        const dialogOk: string;
-        const swishHide: string;
-        const swishShow: string;
-        const badgeNotification: string;
-        const levelComplete: string;
-        const destroyBuilding: string;
-        const placeBuilding: string;
-        const placeBelt: string;
-        const copy: string;
+        export const uiClick: string;
+        export const uiError: string;
+        export const dialogError: string;
+        export const dialogOk: string;
+        export const swishHide: string;
+        export const swishShow: string;
+        export const badgeNotification: string;
+        export const levelComplete: string;
+        export const destroyBuilding: string;
+        export const placeBuilding: string;
+        export const placeBelt: string;
+        export const copy: string;
     }
     export namespace MUSIC {
-        const theme: string;
-        const menu: string;
+        export const theme: string;
+        export const menu: string;
     }
     export class SoundInstanceInterface {
         constructor(key: any, url: any);
@@ -1885,21 +1889,21 @@ declare module "core/dpi_manager" {
 declare module "game/colors" {
     export type enumColors = string;
     export namespace enumColors {
-        const red: string;
-        const green: string;
-        const blue: string;
-        const yellow: string;
-        const purple: string;
-        const cyan: string;
-        const white: string;
-        const uncolored: string;
+        export const red: string;
+        export const green: string;
+        export const blue: string;
+        export const yellow: string;
+        export const purple: string;
+        export const cyan: string;
+        export const white: string;
+        export const uncolored: string;
     }
     export type enumColorToShortcode = string;
     /** @enum {string} */
     export const enumColorToShortcode: {
         [x: string]: string;
     };
-    export type enumShortcodeToColor = enumColors;
+    export type enumShortcodeToColor = string;
     /** @enum {enumColors} */
     export const enumShortcodeToColor: {};
     export type enumColorsToHexCode = string;
@@ -1920,8 +1924,8 @@ declare module "game/colors" {
 declare module "game/theme" {
     export function applyGameTheme(id: any): void;
     export namespace THEMES {
-        const dark: any;
-        const light: any;
+        export const dark: any;
+        export const light: any;
     }
     export let THEME: any;
 }
@@ -1934,17 +1938,17 @@ declare module "game/shape_definition" {
     export function createSimpleShape(layers: any): Array<import("game/shape_definition").ShapeLayer>;
     export type enumSubShape = string;
     export namespace enumSubShape {
-        const rect: string;
-        const circle: string;
-        const star: string;
-        const windmill: string;
+        export const rect: string;
+        export const circle: string;
+        export const star: string;
+        export const windmill: string;
     }
     export type enumSubShapeToShortcode = string;
     /** @enum {string} */
     export const enumSubShapeToShortcode: {
         [x: string]: string;
     };
-    export type enumShortcodeToSubShape = enumSubShape;
+    export type enumShortcodeToSubShape = string;
     /** @enum {enumSubShape} */
     export const enumShortcodeToSubShape: {};
     export class ShapeDefinition extends BasicSerializableObject {
@@ -2068,7 +2072,19 @@ declare module "game/shape_definition" {
     /**
      * Order is Q1 (tr), Q2(br), Q3(bl), Q4(tl)
      */
-    export type ShapeLayer = [ShapeLayerItem?, ShapeLayerItem?, ShapeLayerItem?, ShapeLayerItem?];
+    export type ShapeLayer = [{
+        subShape: enumSubShape;
+        color: enumColors;
+    }, {
+        subShape: enumSubShape;
+        color: enumColors;
+    }, {
+        subShape: enumSubShape;
+        color: enumColors;
+    }, {
+        subShape: enumSubShape;
+        color: enumColors;
+    }];
     import { BasicSerializableObject } from "savegame/serialization";
     import { DrawParameters } from "core/draw_parameters";
     import { enumColors } from "game/colors";
@@ -2375,7 +2391,7 @@ declare module "game/components/item_acceptor" {
     export type ItemAcceptorSlot = {
         pos: Vector;
         directions: enumDirection[];
-        filter?: ItemType;
+        filter?: any;
     };
     /**
      * Contains information about a slot plus its location
@@ -2388,7 +2404,7 @@ declare module "game/components/item_acceptor" {
     export type ItemAcceptorSlotConfig = {
         pos: Vector;
         directions: enumDirection[];
-        filter?: ItemType;
+        filter?: any;
     };
     import { Component } from "game/component";
     import { BaseItem } from "game/base_item";
@@ -2477,7 +2493,7 @@ declare module "game/components/item_ejector" {
         item: BaseItem;
         lastItem: BaseItem;
         progress: number | null;
-        cachedDestSlot?: import("game/components/item_acceptor").ItemAcceptorLocatedSlot;
+        cachedDestSlot?: import("./item_acceptor").ItemAcceptorLocatedSlot;
         cachedBeltPath?: BeltPath;
         cachedTargetEntity?: Entity;
     };
@@ -2548,10 +2564,10 @@ declare module "game/components/belt_underlays" {
      */
     export type enumClippedBeltUnderlayType = string;
     export namespace enumClippedBeltUnderlayType {
-        const full: string;
-        const bottomOnly: string;
-        const topOnly: string;
-        const none: string;
+        export const full: string;
+        export const bottomOnly: string;
+        export const topOnly: string;
+        export const none: string;
     }
     /**
      * @typedef {{
@@ -2568,7 +2584,11 @@ declare module "game/components/belt_underlays" {
         constructor({ underlays }: {
             underlays?: Array<BeltUnderlayTile> | undefined;
         });
-        underlays: BeltUnderlayTile[];
+        underlays: {
+            pos: Vector;
+            direction: enumDirection;
+            cachedType?: enumClippedBeltUnderlayType;
+        }[];
     }
     export type BeltUnderlayTile = {
         pos: Vector;
@@ -2581,28 +2601,29 @@ declare module "game/components/belt_underlays" {
 }
 declare module "game/components/hub" {
     export class HubComponent extends Component {
+        constructor(...args: any[]);
     }
     import { Component } from "game/component";
 }
 declare module "game/components/item_processor" {
     export type enumItemProcessorTypes = string;
     export namespace enumItemProcessorTypes {
-        const balancer: string;
-        const cutter: string;
-        const cutterQuad: string;
-        const rotater: string;
-        const rotaterCCW: string;
-        const rotater180: string;
-        const stacker: string;
-        const trash: string;
-        const mixer: string;
-        const painter: string;
-        const painterDouble: string;
-        const painterQuad: string;
-        const hub: string;
-        const filter: string;
-        const reader: string;
-        const goal: string;
+        export const balancer: string;
+        export const cutter: string;
+        export const cutterQuad: string;
+        export const rotater: string;
+        export const rotaterCCW: string;
+        export const rotater180: string;
+        export const stacker: string;
+        export const trash: string;
+        export const mixer: string;
+        export const painter: string;
+        export const painterDouble: string;
+        export const painterQuad: string;
+        export const hub: string;
+        export const filter: string;
+        export const reader: string;
+        export const goal: string;
     }
     export type enumItemProcessorRequirements = string;
     export namespace enumItemProcessorRequirements {
@@ -2642,7 +2663,7 @@ declare module "game/components/item_processor" {
          * Our current inputs
          * @type {Map<number, BaseItem>}
          */
-        inputSlots: Map<number, BaseItem>;
+        inputSlots: any;
         nextOutputSlot: number;
         /**
          * Current input count
@@ -2765,8 +2786,8 @@ declare module "game/components/storage" {
 declare module "game/components/underground_belt" {
     export type enumUndergroundBeltMode = string;
     export namespace enumUndergroundBeltMode {
-        const sender: string;
-        const receiver: string;
+        export const sender: string;
+        export const receiver: string;
     }
     /**
      * @typedef {{
@@ -2873,9 +2894,9 @@ declare module "core/stale_area_detector" {
 declare module "game/production_analytics" {
     export type enumAnalyticsDataSource = string;
     export namespace enumAnalyticsDataSource {
-        const produced: string;
-        const stored: string;
-        const delivered: string;
+        export const produced: string;
+        export const stored: string;
+        export const delivered: string;
     }
     export class ProductionAnalytics extends BasicSerializableObject {
         static getId(): string;
@@ -2927,56 +2948,56 @@ declare module "game/production_analytics" {
 }
 declare module "platform/achievement_provider" {
     export namespace ACHIEVEMENTS {
-        const belt500Tiles: string;
-        const blueprint100k: string;
-        const blueprint1m: string;
-        const completeLvl26: string;
-        const cutShape: string;
-        const darkMode: string;
-        const destroy1000: string;
-        const irrelevantShape: string;
-        const level100: string;
-        const level50: string;
-        const logoBefore18: string;
-        const mam: string;
-        const mapMarkers15: string;
-        const noBeltUpgradesUntilBp: string;
-        const noInverseRotater: string;
-        const oldLevel17: string;
-        const openWires: string;
-        const paintShape: string;
-        const place5000Wires: string;
-        const placeBlueprint: string;
-        const placeBp1000: string;
-        const play1h: string;
-        const play10h: string;
-        const play20h: string;
-        const produceLogo: string;
-        const produceMsLogo: string;
-        const produceRocket: string;
-        const rotateShape: string;
-        const speedrunBp30: string;
-        const speedrunBp60: string;
-        const speedrunBp120: string;
-        const stack4Layers: string;
-        const stackShape: string;
-        const store100Unique: string;
-        const storeShape: string;
-        const throughputBp25: string;
-        const throughputBp50: string;
-        const throughputLogo25: string;
-        const throughputLogo50: string;
-        const throughputRocket10: string;
-        const throughputRocket20: string;
-        const trash1000: string;
-        const unlockWires: string;
-        const upgradesTier5: string;
-        const upgradesTier8: string;
+        export const belt500Tiles: string;
+        export const blueprint100k: string;
+        export const blueprint1m: string;
+        export const completeLvl26: string;
+        export const cutShape: string;
+        export const darkMode: string;
+        export const destroy1000: string;
+        export const irrelevantShape: string;
+        export const level100: string;
+        export const level50: string;
+        export const logoBefore18: string;
+        export const mam: string;
+        export const mapMarkers15: string;
+        export const noBeltUpgradesUntilBp: string;
+        export const noInverseRotater: string;
+        export const oldLevel17: string;
+        export const openWires: string;
+        export const paintShape: string;
+        export const place5000Wires: string;
+        export const placeBlueprint: string;
+        export const placeBp1000: string;
+        export const play1h: string;
+        export const play10h: string;
+        export const play20h: string;
+        export const produceLogo: string;
+        export const produceMsLogo: string;
+        export const produceRocket: string;
+        export const rotateShape: string;
+        export const speedrunBp30: string;
+        export const speedrunBp60: string;
+        export const speedrunBp120: string;
+        export const stack4Layers: string;
+        export const stackShape: string;
+        export const store100Unique: string;
+        export const storeShape: string;
+        export const throughputBp25: string;
+        export const throughputBp50: string;
+        export const throughputLogo25: string;
+        export const throughputLogo50: string;
+        export const throughputRocket10: string;
+        export const throughputRocket20: string;
+        export const trash1000: string;
+        export const unlockWires: string;
+        export const upgradesTier5: string;
+        export const upgradesTier8: string;
     }
     export class AchievementProviderInterface {
         /** @param {Application} app */
         constructor(app: Application);
-        collection: AchievementCollection;
+        collection: AchievementCollection | undefined;
         app: Application;
         /**
          * Initializes the achievement provider.
@@ -3033,9 +3054,9 @@ declare module "platform/achievement_provider" {
          * @param {string} [options.signal]
          */
         add(key: string, options?: {
-            init?: Function;
-            isValid?: Function;
-            signal?: string;
+            init: Function;
+            isValid: Function;
+            signal: string;
         }): void;
         bulkUnlock(...args: any[]): void;
         /**
@@ -3153,15 +3174,15 @@ declare module "platform/achievement_provider" {
 declare module "game/components/wire" {
     export type enumWireType = string;
     export namespace enumWireType {
-        const forward: string;
-        const turn: string;
-        const split: string;
-        const cross: string;
+        export const forward: string;
+        export const turn: string;
+        export const split: string;
+        export const cross: string;
     }
     export type enumWireVariant = string;
     export namespace enumWireVariant {
-        const first: string;
-        const second: string;
+        export const first: string;
+        export const second: string;
     }
     export class WireComponent extends Component {
         /**
@@ -3192,34 +3213,34 @@ declare module "game/tutorial_goals" {
      */
     export type enumHubGoalRewards = string;
     export namespace enumHubGoalRewards {
-        const reward_cutter_and_trash: string;
-        const reward_rotater: string;
-        const reward_painter: string;
-        const reward_mixer: string;
-        const reward_stacker: string;
-        const reward_balancer: string;
-        const reward_tunnel: string;
-        const reward_rotater_ccw: string;
-        const reward_rotater_180: string;
-        const reward_miner_chainable: string;
-        const reward_underground_belt_tier_2: string;
-        const reward_belt_reader: string;
-        const reward_splitter: string;
-        const reward_cutter_quad: string;
-        const reward_painter_double: string;
-        const reward_storage: string;
-        const reward_merger: string;
-        const reward_wires_painter_and_levers: string;
-        const reward_display: string;
-        const reward_constant_signal: string;
-        const reward_logic_gates: string;
-        const reward_virtual_processing: string;
-        const reward_filter: string;
-        const reward_demo_end: string;
-        const reward_blueprints: string;
-        const reward_freeplay: string;
-        const no_reward: string;
-        const no_reward_freeplay: string;
+        export const reward_cutter_and_trash: string;
+        export const reward_rotater: string;
+        export const reward_painter: string;
+        export const reward_mixer: string;
+        export const reward_stacker: string;
+        export const reward_balancer: string;
+        export const reward_tunnel: string;
+        export const reward_rotater_ccw: string;
+        export const reward_rotater_180: string;
+        export const reward_miner_chainable: string;
+        export const reward_underground_belt_tier_2: string;
+        export const reward_belt_reader: string;
+        export const reward_splitter: string;
+        export const reward_cutter_quad: string;
+        export const reward_painter_double: string;
+        export const reward_storage: string;
+        export const reward_merger: string;
+        export const reward_wires_painter_and_levers: string;
+        export const reward_display: string;
+        export const reward_constant_signal: string;
+        export const reward_logic_gates: string;
+        export const reward_virtual_processing: string;
+        export const reward_filter: string;
+        export const reward_demo_end: string;
+        export const reward_blueprints: string;
+        export const reward_freeplay: string;
+        export const no_reward: string;
+        export const no_reward_freeplay: string;
     }
 }
 declare module "core/draw_utils" {
@@ -3280,16 +3301,14 @@ declare module "game/buildings/wire" {
     };
     export type wireVariants = string;
     export namespace wireVariants {
-        const second: string;
+        export const second: string;
     }
     export class MetaWireBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/components/wire_tunnel" {
     export class WireTunnelComponent extends Component {
-        constructor();
         /**
          * Linked network, only if its not multiple directions
          * @type {Array<import("../systems/wire").WireNetwork>}
@@ -3424,7 +3443,7 @@ declare module "game/map_chunk" {
          * Which entities this chunk contains, sorted by layer
          * @type {Record<Layer, Array<Entity>>}
          */
-        containedEntitiesByLayer: Record<Layer, Array<Entity>>;
+        containedEntitiesByLayer: Record<any, Array<Entity>>;
         /**
          * Store which patches we have so we can render them in the overview
          * @type {Array<{pos: Vector, item: BaseItem, size: number }>}
@@ -3496,7 +3515,7 @@ declare module "game/map_chunk" {
          * @param {Layer} layer
          * @returns {Entity=}
          */
-        getLayerContentFromWorldCoords(worldX: number, worldY: number, layer: Layer): Entity | undefined;
+        getLayerContentFromWorldCoords(worldX: number, worldY: number, layer: any): Entity | undefined;
         /**
          * Returns the contents of this chunk from the given world space coordinates
          * @param {number} worldX
@@ -3518,7 +3537,7 @@ declare module "game/map_chunk" {
          * @param {Entity=} contents
          * @param {Layer} layer
          */
-        setLayerContentFromWorldCords(tileX: number, tileY: number, contents?: Entity | undefined, layer: Layer): void;
+        setLayerContentFromWorldCords(tileX: number, tileY: number, contents?: Entity | undefined, layer: any): void;
     }
     import { GameRoot } from "game/root";
     import { BaseItem } from "game/base_item";
@@ -3548,6 +3567,13 @@ declare module "game/map_chunk_view" {
             tileSizePixels: number;
             overrideColor?: string | undefined;
         }): void;
+        /**
+         *
+         * @param {GameRoot} root
+         * @param {number} x
+         * @param {number} y
+         */
+        constructor(root: GameRoot, x: number, y: number);
         /**
          * Whenever something changes, we increase this number - so we know we need to redraw
          */
@@ -3597,6 +3623,7 @@ declare module "game/map_chunk_view" {
     import { MapChunk } from "game/map_chunk";
     import { DrawParameters } from "core/draw_parameters";
     import { Entity } from "game/entity";
+    import { GameRoot } from "game/root";
 }
 declare module "game/systems/wire" {
     export class WireNetwork {
@@ -3738,8 +3765,8 @@ declare module "game/systems/wire" {
 declare module "game/components/wired_pins" {
     export type enumPinSlotType = string;
     export namespace enumPinSlotType {
-        const logicalEjector: string;
-        const logicalAcceptor: string;
+        export const logicalEjector: string;
+        export const logicalAcceptor: string;
     }
     /** @typedef {{
      *   pos: Vector,
@@ -3783,7 +3810,7 @@ declare module "game/components/wired_pins" {
         type: enumPinSlotType;
         direction: enumDirection;
         value: BaseItem;
-        linkedNetwork: import("game/systems/wire").WireNetwork;
+        linkedNetwork: import("../systems/wire").WireNetwork;
     };
     import { Component } from "game/component";
     import { Vector } from "core/vector";
@@ -3811,18 +3838,18 @@ declare module "game/components/constant_signal" {
 declare module "game/components/logic_gate" {
     export type enumLogicGateType = string;
     export namespace enumLogicGateType {
-        const and: string;
-        const not: string;
-        const xor: string;
-        const or: string;
-        const transistor: string;
-        const analyzer: string;
-        const rotater: string;
-        const unstacker: string;
-        const cutter: string;
-        const compare: string;
-        const stacker: string;
-        const painter: string;
+        export const and: string;
+        export const not: string;
+        export const xor: string;
+        export const or: string;
+        export const transistor: string;
+        export const analyzer: string;
+        export const rotater: string;
+        export const unstacker: string;
+        export const cutter: string;
+        export const compare: string;
+        export const stacker: string;
+        export const painter: string;
     }
     export class LogicGateComponent extends Component {
         /**
@@ -3855,20 +3882,20 @@ declare module "game/components/lever" {
 }
 declare module "game/components/display" {
     export class DisplayComponent extends Component {
+        constructor(...args: any[]);
     }
     import { Component } from "game/component";
 }
 declare module "game/components/belt_reader" {
     export type enumBeltReaderType = string;
     export namespace enumBeltReaderType {
-        const wired: string;
-        const wireless: string;
+        export const wired: string;
+        export const wireless: string;
     }
     export class BeltReaderComponent extends Component {
         static getSchema(): {
             lastItem: import("savegame/serialization_data_types").TypeNullable;
         };
-        constructor();
         /**
          * Which items went through the reader, we only store the time
          * @type {Array<number>}
@@ -3905,7 +3932,6 @@ declare module "game/components/filter" {
             pendingItemsToLeaveThrough: import("savegame/serialization_data_types").TypeArray;
             pendingItemsToReject: import("savegame/serialization_data_types").TypeArray;
         };
-        constructor();
         duplicateWithoutContents(): FilterComponent;
         /**
          * Items in queue to leave through
@@ -3927,6 +3953,7 @@ declare module "game/components/filter" {
 }
 declare module "game/components/item_producer" {
     export class ItemProducerComponent extends Component {
+        constructor(...args: any[]);
     }
     import { Component } from "game/component";
 }
@@ -4058,7 +4085,7 @@ declare module "game/entity" {
          * On which layer this entity is
          * @type {Layer}
          */
-        layer: Layer;
+        layer: any;
         /**
          * Internal entity unique id, set by the @see EntityManager
          */
@@ -4128,7 +4155,7 @@ declare module "game/meta_building" {
          * Returns the edit layer of the building
          * @returns {Layer}
          */
-        getLayer(): Layer;
+        getLayer(): any;
         /**
          * Should return the dimensions of the building
          */
@@ -4261,7 +4288,7 @@ declare module "game/meta_building" {
             tile: Vector;
             rotation: number;
             variant: string;
-            layer: Layer;
+            layer: any;
         }): {
             rotation: number;
             rotationVariant: number;
@@ -4288,7 +4315,6 @@ declare module "game/meta_building" {
 }
 declare module "game/buildings/item_producer" {
     export class MetaItemProducerBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
@@ -4307,7 +4333,7 @@ declare module "core/globals" {
 declare module "core/click_detector" {
     export const MAX_MOVE_DISTANCE_PX: 20 | 80;
     export namespace clickDetectorGlobals {
-        const lastTouchTime: number;
+        export const lastTouchTime: number;
     }
     /**
      * Click detector creation payload typehints
@@ -4471,287 +4497,287 @@ declare module "game/key_action_mapper" {
      */
     export function getStringForKeyCode(code: number): string;
     export namespace KEYMAPPINGS {
-        namespace general {
-            namespace confirm {
-                const keyCode: number;
+        export namespace general {
+            export namespace confirm {
+                export const keyCode: number;
             }
-            namespace back {
+            export namespace back {
                 const keyCode_1: number;
                 export { keyCode_1 as keyCode };
                 export const builtin: boolean;
             }
         }
-        namespace ingame {
-            namespace menuOpenShop {
+        export namespace ingame {
+            export namespace menuOpenShop {
                 const keyCode_2: any;
                 export { keyCode_2 as keyCode };
             }
-            namespace menuOpenStats {
+            export namespace menuOpenStats {
                 const keyCode_3: any;
                 export { keyCode_3 as keyCode };
             }
-            namespace menuClose {
+            export namespace menuClose {
                 const keyCode_4: any;
                 export { keyCode_4 as keyCode };
             }
-            namespace toggleHud {
+            export namespace toggleHud {
                 const keyCode_5: number;
                 export { keyCode_5 as keyCode };
             }
-            namespace exportScreenshot {
+            export namespace exportScreenshot {
                 const keyCode_6: number;
                 export { keyCode_6 as keyCode };
             }
-            namespace toggleFPSInfo {
+            export namespace toggleFPSInfo {
                 const keyCode_7: number;
                 export { keyCode_7 as keyCode };
             }
-            namespace switchLayers {
+            export namespace switchLayers {
                 const keyCode_8: any;
                 export { keyCode_8 as keyCode };
             }
-            namespace showShapeTooltip {
+            export namespace showShapeTooltip {
                 const keyCode_9: number;
                 export { keyCode_9 as keyCode };
             }
         }
-        namespace navigation {
-            namespace mapMoveUp {
+        export namespace navigation {
+            export namespace mapMoveUp {
                 const keyCode_10: any;
                 export { keyCode_10 as keyCode };
             }
-            namespace mapMoveRight {
+            export namespace mapMoveRight {
                 const keyCode_11: any;
                 export { keyCode_11 as keyCode };
             }
-            namespace mapMoveDown {
+            export namespace mapMoveDown {
                 const keyCode_12: any;
                 export { keyCode_12 as keyCode };
             }
-            namespace mapMoveLeft {
+            export namespace mapMoveLeft {
                 const keyCode_13: any;
                 export { keyCode_13 as keyCode };
             }
-            namespace mapMoveFaster {
+            export namespace mapMoveFaster {
                 const keyCode_14: number;
                 export { keyCode_14 as keyCode };
             }
-            namespace centerMap {
+            export namespace centerMap {
                 const keyCode_15: number;
                 export { keyCode_15 as keyCode };
             }
-            namespace mapZoomIn {
+            export namespace mapZoomIn {
                 const keyCode_16: number;
                 export { keyCode_16 as keyCode };
                 export const repeated: boolean;
             }
-            namespace mapZoomOut {
+            export namespace mapZoomOut {
                 const keyCode_17: number;
                 export { keyCode_17 as keyCode };
                 const repeated_1: boolean;
                 export { repeated_1 as repeated };
             }
-            namespace createMarker {
+            export namespace createMarker {
                 const keyCode_18: any;
                 export { keyCode_18 as keyCode };
             }
         }
-        namespace buildings {
-            namespace constant_producer {
+        export namespace buildings {
+            export namespace constant_producer {
                 const keyCode_19: any;
                 export { keyCode_19 as keyCode };
             }
-            namespace goal_acceptor {
+            export namespace goal_acceptor {
                 const keyCode_20: any;
                 export { keyCode_20 as keyCode };
             }
-            namespace block {
+            export namespace block {
                 const keyCode_21: any;
                 export { keyCode_21 as keyCode };
             }
-            namespace belt {
+            export namespace belt {
                 const keyCode_22: any;
                 export { keyCode_22 as keyCode };
             }
-            namespace balancer {
+            export namespace balancer {
                 const keyCode_23: any;
                 export { keyCode_23 as keyCode };
             }
-            namespace underground_belt {
+            export namespace underground_belt {
                 const keyCode_24: any;
                 export { keyCode_24 as keyCode };
             }
-            namespace miner {
+            export namespace miner {
                 const keyCode_25: any;
                 export { keyCode_25 as keyCode };
             }
-            namespace cutter {
+            export namespace cutter {
                 const keyCode_26: any;
                 export { keyCode_26 as keyCode };
             }
-            namespace rotater {
+            export namespace rotater {
                 const keyCode_27: any;
                 export { keyCode_27 as keyCode };
             }
-            namespace stacker {
+            export namespace stacker {
                 const keyCode_28: any;
                 export { keyCode_28 as keyCode };
             }
-            namespace mixer {
+            export namespace mixer {
                 const keyCode_29: any;
                 export { keyCode_29 as keyCode };
             }
-            namespace painter {
+            export namespace painter {
                 const keyCode_30: any;
                 export { keyCode_30 as keyCode };
             }
-            namespace trash {
+            export namespace trash {
                 const keyCode_31: any;
                 export { keyCode_31 as keyCode };
             }
-            namespace item_producer {
+            export namespace item_producer {
                 const keyCode_32: any;
                 export { keyCode_32 as keyCode };
             }
-            namespace storage {
+            export namespace storage {
                 const keyCode_33: any;
                 export { keyCode_33 as keyCode };
             }
-            namespace reader {
+            export namespace reader {
                 const keyCode_34: any;
                 export { keyCode_34 as keyCode };
             }
-            namespace lever {
+            export namespace lever {
                 const keyCode_35: any;
                 export { keyCode_35 as keyCode };
             }
-            namespace filter {
+            export namespace filter {
                 const keyCode_36: any;
                 export { keyCode_36 as keyCode };
             }
-            namespace display {
+            export namespace display {
                 const keyCode_37: any;
                 export { keyCode_37 as keyCode };
             }
-            namespace wire {
+            export namespace wire {
                 const keyCode_38: any;
                 export { keyCode_38 as keyCode };
             }
-            namespace wire_tunnel {
+            export namespace wire_tunnel {
                 const keyCode_39: any;
                 export { keyCode_39 as keyCode };
             }
-            namespace constant_signal {
+            export namespace constant_signal {
                 const keyCode_40: any;
                 export { keyCode_40 as keyCode };
             }
-            namespace logic_gate {
+            export namespace logic_gate {
                 const keyCode_41: any;
                 export { keyCode_41 as keyCode };
             }
-            namespace virtual_processor {
+            export namespace virtual_processor {
                 const keyCode_42: any;
                 export { keyCode_42 as keyCode };
             }
-            namespace analyzer {
+            export namespace analyzer {
                 const keyCode_43: any;
                 export { keyCode_43 as keyCode };
             }
-            namespace comparator {
+            export namespace comparator {
                 const keyCode_44: any;
                 export { keyCode_44 as keyCode };
             }
-            namespace transistor {
+            export namespace transistor {
                 const keyCode_45: any;
                 export { keyCode_45 as keyCode };
             }
         }
-        namespace placement {
-            namespace pipette {
+        export namespace placement {
+            export namespace pipette {
                 const keyCode_46: any;
                 export { keyCode_46 as keyCode };
             }
-            namespace rotateWhilePlacing {
+            export namespace rotateWhilePlacing {
                 const keyCode_47: any;
                 export { keyCode_47 as keyCode };
             }
-            namespace rotateInverseModifier {
+            export namespace rotateInverseModifier {
                 const keyCode_48: number;
                 export { keyCode_48 as keyCode };
             }
-            namespace rotateToUp {
+            export namespace rotateToUp {
                 export { KEYCODE_UP_ARROW as keyCode };
             }
-            namespace rotateToDown {
+            export namespace rotateToDown {
                 export { KEYCODE_DOWN_ARROW as keyCode };
             }
-            namespace rotateToRight {
+            export namespace rotateToRight {
                 export { KEYCODE_RIGHT_ARROW as keyCode };
             }
-            namespace rotateToLeft {
+            export namespace rotateToLeft {
                 export { KEYCODE_LEFT_ARROW as keyCode };
             }
-            namespace cycleBuildingVariants {
+            export namespace cycleBuildingVariants {
                 const keyCode_49: any;
                 export { keyCode_49 as keyCode };
             }
-            namespace cycleBuildings {
+            export namespace cycleBuildings {
                 const keyCode_50: number;
                 export { keyCode_50 as keyCode };
             }
-            namespace switchDirectionLockSide {
+            export namespace switchDirectionLockSide {
                 const keyCode_51: any;
                 export { keyCode_51 as keyCode };
             }
-            namespace copyWireValue {
+            export namespace copyWireValue {
                 const keyCode_52: any;
                 export { keyCode_52 as keyCode };
             }
         }
-        namespace massSelect {
-            namespace massSelectStart {
+        export namespace massSelect {
+            export namespace massSelectStart {
                 const keyCode_53: number;
                 export { keyCode_53 as keyCode };
             }
-            namespace massSelectSelectMultiple {
+            export namespace massSelectSelectMultiple {
                 const keyCode_54: number;
                 export { keyCode_54 as keyCode };
             }
-            namespace massSelectCopy {
+            export namespace massSelectCopy {
                 const keyCode_55: any;
                 export { keyCode_55 as keyCode };
             }
-            namespace massSelectCut {
+            export namespace massSelectCut {
                 const keyCode_56: any;
                 export { keyCode_56 as keyCode };
             }
-            namespace massSelectClear {
+            export namespace massSelectClear {
                 const keyCode_57: any;
                 export { keyCode_57 as keyCode };
             }
-            namespace confirmMassDelete {
+            export namespace confirmMassDelete {
                 const keyCode_58: number;
                 export { keyCode_58 as keyCode };
             }
-            namespace pasteLastBlueprint {
+            export namespace pasteLastBlueprint {
                 const keyCode_59: any;
                 export { keyCode_59 as keyCode };
             }
         }
-        namespace placementModifiers {
-            namespace lockBeltDirection {
+        export namespace placementModifiers {
+            export namespace lockBeltDirection {
                 const keyCode_60: number;
                 export { keyCode_60 as keyCode };
             }
-            namespace placementDisableAutoOrientation {
+            export namespace placementDisableAutoOrientation {
                 const keyCode_61: number;
                 export { keyCode_61 as keyCode };
             }
-            namespace placeMultiple {
+            export namespace placeMultiple {
                 const keyCode_62: number;
                 export { keyCode_62 as keyCode };
             }
-            namespace placeInverse {
+            export namespace placeInverse {
                 const keyCode_63: number;
                 export { keyCode_63 as keyCode };
             }
@@ -4984,16 +5010,16 @@ declare module "game/hud/base_hud_part" {
 declare module "game/game_mode" {
     export type enumGameModeIds = string;
     export namespace enumGameModeIds {
-        const puzzleEdit: string;
-        const puzzlePlay: string;
-        const regular: string;
+        export const puzzleEdit: string;
+        export const puzzlePlay: string;
+        export const regular: string;
     }
     export type enumGameModeTypes = string;
-    export namespace enumGameModeTypes {
-        const _default: string;
-        export { _default as default };
-        export const puzzle: string;
-    }
+    /** @enum {string} */
+    export const enumGameModeTypes: {
+        default: string;
+        puzzle: string;
+    };
     export class GameMode extends BasicSerializableObject {
         /** @returns {string} */
         static getId(): string;
@@ -5041,7 +5067,7 @@ declare module "game/game_mode" {
         getMaximumZoom(): number;
         /** @returns {Object<string, Array>} */
         getUpgrades(): {
-            [x: string]: any[];
+            [x: string]: Array;
         };
         throughputDoesNotMatter(): boolean;
         /**
@@ -5079,7 +5105,7 @@ declare module "core/global_registries" {
      * @param {Object.<string, Array<Class<MetaBuilding>>>} buildings
      */
     export function initBuildingsByCategory(buildings: {
-        [x: string]: Array<Class<import("game/meta_building").MetaBuilding>>;
+        [x: string]: Array<any>;
     }): void;
     /**
      * @typedef {import("../game/time/base_game_speed").BaseGameSpeed} BaseGameSpeed
@@ -5092,27 +5118,26 @@ declare module "core/global_registries" {
     // These factories are here to remove circular dependencies
     
     /** @type {SingletonFactoryTemplate<MetaBuilding>} */
-    export let gMetaBuildingRegistry: SingletonFactoryTemplate<import("game/meta_building").MetaBuilding>;
+    export let gMetaBuildingRegistry: any;
     /** @type {Object.<string, Array<Class<MetaBuilding>>>} */
     export let gBuildingsByCategory: {
-        [x: string]: Array<Class<import("game/meta_building").MetaBuilding>>;
+        [x: string]: Array<any>;
     };
     /** @type {FactoryTemplate<Component>} */
-    export let gComponentRegistry: FactoryTemplate<import("game/component").Component>;
+    export let gComponentRegistry: any;
     /** @type {FactoryTemplate<GameMode>} */
-    export let gGameModeRegistry: FactoryTemplate<import("game/game_mode").GameMode>;
+    export let gGameModeRegistry: any;
     /** @type {FactoryTemplate<BaseGameSpeed>} */
-    export let gGameSpeedRegistry: FactoryTemplate<import("game/time/base_game_speed").BaseGameSpeed>;
+    export let gGameSpeedRegistry: any;
     /** @type {FactoryTemplate<BaseItem>} */
-    export let gItemRegistry: FactoryTemplate<import("game/base_item").BaseItem>;
+    export let gItemRegistry: any;
     export type BaseGameSpeed = import("game/time/base_game_speed").BaseGameSpeed;
     export type Component = import("game/component").Component;
     export type BaseItem = import("game/base_item").BaseItem;
     export type GameMode = import("game/game_mode").GameMode;
     /**
      * // These factories are here to remove circular dependencies
-     *
-     * /**
+    /**
      */
     export type MetaBuilding = import("game/meta_building").MetaBuilding;
 }
@@ -5438,7 +5463,6 @@ declare module "core/modal_dialog_elements" {
 }
 declare module "game/buildings/hub" {
     export class MetaHubBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
@@ -5448,9 +5472,9 @@ declare module "game/camera" {
     export const USER_INTERACT_TOUCHEND: "touchend";
     export type enumMouseButton = string;
     export namespace enumMouseButton {
-        const left: string;
-        const middle: string;
-        const right: string;
+        export const left: string;
+        export const middle: string;
+        export const right: string;
     }
     export class Camera extends BasicSerializableObject {
         static getId(): string;
@@ -5486,9 +5510,9 @@ declare module "game/camera" {
         desiredZoom: number;
         /** @type {Vector} */
         touchPostMoveVelocity: Vector;
-        downPreHandler: TypedSignal<[Vector, string]>;
-        movePreHandler: TypedSignal<[Vector]>;
-        upPostHandler: TypedSignal<[Vector]>;
+        downPreHandler: any;
+        movePreHandler: any;
+        upPostHandler: any;
         addScreenShake(amount: any): void;
         /**
          * Sets a point in world space to focus on
@@ -5546,7 +5570,7 @@ declare module "game/camera" {
         /**
          * Returns effective world space viewport right
          */
-        getViewportRight(): number;
+        getViewportRight(): any;
         /**
          * Returns effective world space viewport top
          */
@@ -5554,7 +5578,7 @@ declare module "game/camera" {
         /**
          * Returns effective world space viewport bottom
          */
-        getViewportBottom(): number;
+        getViewportBottom(): any;
         /**
          * Returns the visible world space rect
          * @returns {Rectangle}
@@ -5766,7 +5790,7 @@ declare module "game/hud/dynamic_dom_attach" {
         timeToKeepSeconds: number;
         lastVisibleTime: number;
         attached: boolean;
-        internalIsClassAttached: boolean;
+        internalIsClassAttached: any;
         classAttachTimeout: number;
         /** @type {DOMRect} */
         lastComputedBounds: DOMRect;
@@ -5802,11 +5826,12 @@ declare module "game/hud/dynamic_dom_attach" {
 declare module "game/hud/parts/notifications" {
     export type enumNotificationType = string;
     export namespace enumNotificationType {
-        const saved: string;
-        const upgrade: string;
-        const success: string;
+        export const saved: string;
+        export const upgrade: string;
+        export const success: string;
     }
     export class HUDNotifications extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         /** @type {Array<{ element: HTMLElement, expireAt: number}>} */
         notificationElements: {
@@ -5823,13 +5848,22 @@ declare module "game/hud/parts/notifications" {
 }
 declare module "game/hud/parts/waypoints" {
     export class HUDWaypoints extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         hintElement: HTMLDivElement;
         waypointsListElement: HTMLDivElement;
         /**
          * Serializes the waypoints
          */
         serialize(): {
-            waypoints: Waypoint[];
+            waypoints: {
+                label: string | null;
+                center: {
+                    x: number;
+                    y: number;
+                };
+                zoomLevel: number;
+                layer: any;
+            }[];
         };
         /**
          * Deserializes the waypoints
@@ -5980,7 +6014,7 @@ declare module "game/hud/parts/waypoints" {
             y: number;
         };
         zoomLevel: number;
-        layer: Layer;
+        layer: any;
     };
     import { BaseHUDPart } from "game/hud/base_hud_part";
     import { DynamicDomAttach } from "game/hud/dynamic_dom_attach";
@@ -6107,10 +6141,21 @@ declare module "savegame/savegame_serializer" {
         deserialize(savegame: SerializedGame, root: GameRoot): ExplainedResult;
     }
     export type Component = import("game/component").Component;
-    export type StaticComponent = import("game/component").StaticComponent;
+    export type StaticComponent = typeof import("game/component").Component;
     export type Entity = import("game/entity").Entity;
     export type GameRoot = import("game/root").GameRoot;
-    export type SerializedGame = import("savegame/savegame_typedefs").SerializedGame;
+    export type SerializedGame = {
+        camera: any;
+        time: any;
+        entityMgr: any;
+        map: any;
+        gameMode: any;
+        hubGoals: any;
+        pinnedShapes: any;
+        waypoints: any;
+        entities: import("game/entity").Entity[];
+        beltPaths: any[];
+    };
     import { SerializerInternal } from "savegame/serializer_internal";
     import { ExplainedResult } from "core/explained_result";
 }
@@ -6147,139 +6192,78 @@ declare module "savegame/serialization" {
      * @returns {Schema}
      */
     export function extendSchema(base: Schema, newOne: Schema): Schema;
-    export namespace types {
-        export const int: TypeInteger;
-        export const uint: TypePositiveInteger;
-        export const float: TypeNumber;
-        export const ufloat: TypePositiveNumber;
-        export const string: TypeString;
-        export const entity: TypeEntity;
-        export const weakEntityRef: TypeEntityWeakref;
-        export const vector: TypeVector;
-        export const tileVector: TypeVector;
-        export const bool: TypeBoolean;
+    export const types: {
+        int: TypeInteger;
+        uint: TypePositiveInteger;
+        float: TypeNumber;
+        ufloat: TypePositiveNumber;
+        string: TypeString;
+        entity: TypeEntity;
+        weakEntityRef: TypeEntityWeakref;
+        vector: TypeVector;
+        tileVector: TypeVector;
+        bool: TypeBoolean;
         /**
          * @param {BaseDataType} wrapped
          */
-        export function nullable(wrapped: BaseDataType): TypeNullable;
-        /**
-         * @param {BaseDataType} wrapped
-         */
-        export function nullable(wrapped: BaseDataType): TypeNullable;
+        nullable(wrapped: BaseDataType): TypeNullable;
         /**
          * @param {FactoryTemplate<*>|SingletonFactoryTemplate<*>} registry
          */
-        export function classId(registry: any): TypeClassId;
-        /**
-         * @param {FactoryTemplate<*>|SingletonFactoryTemplate<*>} registry
-         */
-        export function classId(registry: any): TypeClassId;
+        classId(registry: any | any): TypeClassId;
         /**
          * @param {BaseDataType} valueType
          * @param {boolean=} includeEmptyValues
          */
-        export function keyValueMap(valueType: BaseDataType, includeEmptyValues?: boolean): TypeKeyValueMap;
-        /**
-         * @param {BaseDataType} valueType
-         * @param {boolean=} includeEmptyValues
-         */
-        export function keyValueMap(valueType: BaseDataType, includeEmptyValues?: boolean): TypeKeyValueMap;
+        keyValueMap(valueType: BaseDataType, includeEmptyValues?: boolean | undefined): TypeKeyValueMap;
         /**
          * @param {Object<string, any>} values
          */
-        function _enum(values: {
+        enum(values: {
             [x: string]: any;
         }): TypeEnum;
-        /**
-         * @param {Object<string, any>} values
-         */
-        export function _enum(values: {
-            [x: string]: any;
-        }): TypeEnum;
-        export { _enum as enum };
         /**
          * @param {FactoryTemplate<*>} registry
          * @param {(GameRoot, any) => object=} resolver
          */
-        export function obj(registry: FactoryTemplate<any>, resolver?: (GameRoot: any, any: any) => any): TypeClass;
-        /**
-         * @param {FactoryTemplate<*>} registry
-         * @param {(GameRoot, any) => object=} resolver
-         */
-        export function obj(registry: FactoryTemplate<any>, resolver?: (GameRoot: any, any: any) => any): TypeClass;
+        obj(registry: any, resolver?: (GameRoot: any, any: any) => object): TypeClass;
         /**
          * @param {FactoryTemplate<*>} registry
          */
-        export function objData(registry: FactoryTemplate<any>): TypeClassData;
-        /**
-         * @param {FactoryTemplate<*>} registry
-         */
-        export function objData(registry: FactoryTemplate<any>): TypeClassData;
+        objData(registry: any): TypeClassData;
         /**
          * @param {typeof BasicSerializableObject} cls
          */
-        export function knownType(cls: typeof BasicSerializableObject): TypeFixedClass;
-        /**
-         * @param {typeof BasicSerializableObject} cls
-         */
-        export function knownType(cls: typeof BasicSerializableObject): TypeFixedClass;
+        knownType(cls: typeof BasicSerializableObject): TypeFixedClass;
         /**
          * @param {BaseDataType} innerType
          */
-        export function array(innerType: BaseDataType): TypeArray;
+        array(innerType: BaseDataType): TypeArray;
         /**
          * @param {BaseDataType} innerType
          */
-        export function array(innerType: BaseDataType): TypeArray;
-        /**
-         * @param {BaseDataType} innerType
-         */
-        export function fixedSizeArray(innerType: BaseDataType): TypeArray;
-        /**
-         * @param {BaseDataType} innerType
-         */
-        export function fixedSizeArray(innerType: BaseDataType): TypeArray;
+        fixedSizeArray(innerType: BaseDataType): TypeArray;
         /**
          * @param {SingletonFactoryTemplate<*>} innerType
          */
-        export function classRef(registry: any): TypeMetaClass;
-        /**
-         * @param {SingletonFactoryTemplate<*>} innerType
-         */
-        export function classRef(registry: any): TypeMetaClass;
+        classRef(registry: any): TypeMetaClass;
         /**
          * @param {Object.<string, BaseDataType>} descriptor
          */
-        export function structured(descriptor: {
-            [x: string]: BaseDataType;
-        }): TypeStructuredObject;
-        /**
-         * @param {Object.<string, BaseDataType>} descriptor
-         */
-        export function structured(descriptor: {
+        structured(descriptor: {
             [x: string]: BaseDataType;
         }): TypeStructuredObject;
         /**
          * @param {BaseDataType} a
          * @param {BaseDataType} b
          */
-        export function pair(a: BaseDataType, b: BaseDataType): TypePair;
-        /**
-         * @param {BaseDataType} a
-         * @param {BaseDataType} b
-         */
-        export function pair(a: BaseDataType, b: BaseDataType): TypePair;
+        pair(a: BaseDataType, b: BaseDataType): TypePair;
         /**
          * @param {typeof BasicSerializableObject} classHandle
          * @param {SingletonFactoryTemplate<*>} registry
          */
-        export function classWithMetaclass(classHandle: typeof BasicSerializableObject, registry: SingletonFactoryTemplate<any>): TypeClassFromMetaclass;
-        /**
-         * @param {typeof BasicSerializableObject} classHandle
-         * @param {SingletonFactoryTemplate<*>} registry
-         */
-        export function classWithMetaclass(classHandle: typeof BasicSerializableObject, registry: SingletonFactoryTemplate<any>): TypeClassFromMetaclass;
-    }
+        classWithMetaclass(classHandle: typeof BasicSerializableObject, registry: any): TypeClassFromMetaclass;
+    };
     export class BasicSerializableObject {
         static getId(): void;
         /**
@@ -6336,11 +6320,13 @@ declare module "savegame/serialization" {
 }
 declare module "game/time/regular_game_speed" {
     export class RegularGameSpeed extends BaseGameSpeed {
+        constructor(root: import("game/root").GameRoot);
     }
     import { BaseGameSpeed } from "game/time/base_game_speed";
 }
 declare module "game/time/paused_game_speed" {
     export class PausedGameSpeed extends BaseGameSpeed {
+        constructor(root: import("game/root").GameRoot);
     }
     import { BaseGameSpeed } from "game/time/base_game_speed";
 }
@@ -6358,8 +6344,8 @@ declare module "game/time/game_time" {
         constructor(root: GameRoot);
         root: GameRoot;
         timeSeconds: number;
-        realtimeSeconds: number;
-        realtimeAdjust: number;
+        realtimeSeconds: any;
+        realtimeAdjust: any;
         /** @type {BaseGameSpeed} */
         speed: BaseGameSpeed;
         logicTimeBudget: number;
@@ -6471,7 +6457,7 @@ declare module "game/entity_manager" {
          *
          * @returns {Map<number, Entity>}
          */
-        getFrozenUidSearchMap(): Map<number, Entity>;
+        getFrozenUidSearchMap(): any;
         /**
          * Returns all entities having the given component
          * @param {typeof Component} componentHandle
@@ -6503,7 +6489,6 @@ declare module "game/buildings/belt" {
         };
     };
     export class MetaBeltBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
@@ -6643,6 +6628,7 @@ declare module "game/systems/item_ejector" {
 }
 declare module "game/systems/map_resources" {
     export class MapResourcesSystem extends GameSystem {
+        constructor(root: import("game/root").GameRoot);
         /**
          * Draws the map resources
          * @param {DrawParameters} parameters
@@ -6819,7 +6805,7 @@ declare module "game/systems/item_processor" {
      */
     export type ProcessorImplementationPayload = {
         entity: Entity;
-        items: Map<number, BaseItem>;
+        items: any;
         inputCount: number;
         outItems: Array<ProducedItem>;
     };
@@ -6894,7 +6880,7 @@ declare module "game/systems/static_map_entity" {
     export class StaticMapEntitySystem extends GameSystem {
         constructor(root: any);
         /** @type {Set<number>} */
-        drawnUids: Set<number>;
+        drawnUids: any;
         /**
          * Clears the uid list when a new frame started
          */
@@ -6938,7 +6924,7 @@ declare module "game/systems/storage" {
          * Stores which uids were already drawn to avoid drawing entities twice
          * @type {Set<number>}
          */
-        drawnUids: Set<number>;
+        drawnUids: any;
         clearDrawnUids(): void;
         /**
          * @param {DrawParameters} parameters
@@ -6990,7 +6976,7 @@ declare module "game/systems/wired_pins" {
 declare module "game/systems/belt_underlays" {
     export class BeltUnderlaysSystem extends GameSystemWithFilter {
         constructor(root: any);
-        underlayBeltSprites: import("core/sprites").AtlasSprite[];
+        underlayBeltSprites: any[];
         staleArea: StaleAreaDetector;
         /**
          * Called when an area changed - Resets all caches in the given area
@@ -7270,6 +7256,8 @@ declare module "game/systems/goal_acceptor" {
 }
 declare module "game/systems/zone" {
     export class ZoneSystem extends GameSystem {
+        /** @param {GameRoot} root */
+        constructor(root: GameRoot);
         drawn: boolean;
         /**
          *
@@ -7290,6 +7278,7 @@ declare module "game/systems/zone" {
     import { Vector } from "core/vector";
     import { DrawParameters } from "core/draw_parameters";
     import { MapChunkView } from "game/map_chunk_view";
+    import { GameRoot } from "game/root";
 }
 declare module "game/game_system_manager" {
     export class GameSystemManager {
@@ -7414,6 +7403,7 @@ declare module "game/achievement_proxy" {
 }
 declare module "game/hud/parts/beta_overlay" {
     export class HUDBetaOverlay extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
     }
     import { BaseHUDPart } from "game/hud/base_hud_part";
@@ -7435,7 +7425,7 @@ declare module "game/blueprint" {
          * Returns the layer of this blueprint
          * @returns {Layer}
          */
-        get layer(): Layer;
+        get layer(): any;
         /**
          * Returns the cost of this blueprint in shapes
          */
@@ -7477,10 +7467,11 @@ declare module "game/blueprint" {
 }
 declare module "game/hud/parts/blueprint_placer" {
     export class HUDBlueprintPlacer extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         costDisplayParent: HTMLDivElement;
         costDisplayText: HTMLDivElement;
         /** @type {TypedTrackedState<Blueprint?>} */
-        currentBlueprint: TypedTrackedState<Blueprint>;
+        currentBlueprint: any;
         /** @type {Blueprint?} */
         lastBlueprintUsed: Blueprint | null;
         domAttach: DynamicDomAttach;
@@ -7491,7 +7482,7 @@ declare module "game/hud/parts/blueprint_placer" {
          * Called when the layer was changed
          * @param {Layer} layer
          */
-        onEditModeChanged(layer: Layer): void;
+        onEditModeChanged(layer: any): void;
         /**
          * Called when the blueprint is now affordable or not
          * @param {boolean} canAfford
@@ -7536,98 +7527,86 @@ declare module "game/hud/parts/blueprint_placer" {
 declare module "game/buildings/cutter" {
     export type enumCutterVariants = string;
     export namespace enumCutterVariants {
-        const quad: string;
+        export const quad: string;
     }
     export class MetaCutterBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/display" {
     export class MetaDisplayBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/filter" {
     export class MetaFilterBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/lever" {
     export class MetaLeverBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/miner" {
     export type enumMinerVariants = string;
     export namespace enumMinerVariants {
-        const chainable: string;
+        export const chainable: string;
     }
     export class MetaMinerBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/mixer" {
     export class MetaMixerBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/painter" {
     export type enumPainterVariants = string;
     export namespace enumPainterVariants {
-        const mirrored: string;
-        const double: string;
-        const quad: string;
+        export const mirrored: string;
+        export const double: string;
+        export const quad: string;
     }
     export class MetaPainterBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/reader" {
     export class MetaReaderBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/rotater" {
     export type enumRotaterVariants = string;
     export namespace enumRotaterVariants {
-        const ccw: string;
-        const rotate180: string;
+        export const ccw: string;
+        export const rotate180: string;
     }
     export class MetaRotaterBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/balancer" {
     export type enumBalancerVariants = string;
     export namespace enumBalancerVariants {
-        const merger: string;
-        const mergerInverse: string;
-        const splitter: string;
-        const splitterInverse: string;
+        export const merger: string;
+        export const mergerInverse: string;
+        export const splitter: string;
+        export const splitterInverse: string;
     }
     export class MetaBalancerBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/stacker" {
     export class MetaStackerBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/trash" {
     export class MetaTrashBuilding extends MetaBuilding {
-        constructor();
         addAchievementReceiver(entity: any): void;
     }
     import { MetaBuilding } from "game/meta_building";
@@ -7638,32 +7617,29 @@ declare module "game/buildings/underground_belt" {
     export const arrayUndergroundRotationVariantToMode: string[];
     export type enumUndergroundBeltVariants = string;
     export namespace enumUndergroundBeltVariants {
-        const tier2: string;
+        export const tier2: string;
     }
     export const enumUndergroundBeltVariantToTier: {
         [x: string]: number;
         default: number;
     };
     export class MetaUndergroundBeltBuilding extends MetaBuilding {
-        constructor();
     }
+    import { defaultBuildingVariant } from "game/meta_building";
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/block" {
     export class MetaBlockBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/constant_producer" {
     export class MetaConstantProducerBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/goal_acceptor" {
     export class MetaGoalAcceptorBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
@@ -7683,13 +7659,13 @@ declare module "game/hud/parts/base_toolbar" {
             secondaryBuildings?: Array<typeof MetaBuilding> | undefined;
             visibilityCondition: Function;
             htmlElementId: string;
-            layer?: Layer | undefined;
+            layer?: any | undefined;
         });
         primaryBuildings: (typeof MetaBuilding)[];
         secondaryBuildings: (typeof MetaBuilding)[];
         visibilityCondition: Function;
         htmlElementId: string;
-        layer: Layer;
+        layer: any;
         /** @type {Object.<string, {
          * metaBuilding: MetaBuilding,
          * unlocked: boolean,
@@ -7751,7 +7727,6 @@ declare module "game/hud/parts/base_toolbar" {
 }
 declare module "game/buildings/storage" {
     export class MetaStorageBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
@@ -7767,6 +7742,7 @@ declare module "game/hud/parts/building_placer_logic" {
      * of info boxes or drawing.
      */
     export class HUDBuildingPlacerLogic extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         /**
          * We use a fake entity to get information about how a building will look
          * once placed
@@ -7781,7 +7757,7 @@ declare module "game/hud/parts/building_placer_logic" {
          * The current building
          * @type {TypedTrackedState<MetaBuilding?>}
          */
-        currentMetaBuilding: TypedTrackedState<MetaBuilding>;
+        currentMetaBuilding: any;
         /**
          * The current rotation
          * @type {number}
@@ -7803,7 +7779,7 @@ declare module "game/hud/parts/building_placer_logic" {
          * Current building variant
          * @type {TypedTrackedState<string>}
          */
-        currentVariant: TypedTrackedState<string>;
+        currentVariant: any;
         /**
          * Whether we are currently drag-deleting
          * @type {boolean}
@@ -7840,7 +7816,7 @@ declare module "game/hud/parts/building_placer_logic" {
          * Called when the edit mode got changed
          * @param {Layer} layer
          */
-        onEditModeChanged(layer: Layer): void;
+        onEditModeChanged(layer: any): void;
         /**
          * Sets the base rotation for the current meta-building.
          * @param {number} rotation The new rotation/angle.
@@ -7952,12 +7928,13 @@ declare module "game/hud/parts/building_placer_logic" {
     import { BaseHUDPart } from "game/hud/base_hud_part";
     import { Entity } from "game/entity";
     import { Signal } from "core/signal";
-    import { MetaBuilding } from "game/meta_building";
     import { Vector } from "core/vector";
+    import { MetaBuilding } from "game/meta_building";
     import { enumMouseButton } from "game/camera";
 }
 declare module "game/hud/parts/building_placer" {
     export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         buildingInfoElements: {};
         variantsElement: HTMLDivElement;
@@ -7974,7 +7951,7 @@ declare module "game/hud/parts/building_placer" {
          * Makes the lock indicator sprite for the given layer
          * @param {Layer} layer
          */
-        makeLockIndicatorSprite(layer: Layer): HTMLCanvasElement;
+        makeLockIndicatorSprite(layer: any): HTMLCanvasElement;
         /**
          * Rerenders the building info dialog
          */
@@ -8013,6 +7990,7 @@ declare module "game/hud/parts/building_placer" {
 }
 declare module "game/hud/parts/color_blind_helper" {
     export class HUDColorBlindHelper extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         belowTileIndicator: HTMLDivElement;
         trackedColorBelowTile: TrackedState;
         /**
@@ -8040,6 +8018,7 @@ declare module "game/hud/parts/debug_changes" {
      * }} DebugChange
      */
     export class HUDChangesDebugger extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot); /** @type {Array<DebugChange>} */
         /** @type {Array<DebugChange>} */
         changes: Array<DebugChange>;
         /**
@@ -8062,6 +8041,7 @@ declare module "game/hud/parts/debug_changes" {
 }
 declare module "game/hud/parts/debug_info" {
     export class HUDDebugInfo extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         trackedTickRate: TrackedState;
         trackedTickDuration: TrackedState;
@@ -8090,14 +8070,18 @@ declare module "game/hud/parts/debug_info" {
          */
         cycleModes(): void;
     }
+    export type enumDebugOverlayMode = string;
+    /**
+     * Specifies which mode follows after which mode
+     */
+    export type enumDebugOverlayModeNext = string;
     import { BaseHUDPart } from "game/hud/base_hud_part";
     import { TrackedState } from "core/tracked_state";
     import { DynamicDomAttach } from "game/hud/dynamic_dom_attach";
-    type enumDebugOverlayMode = string;
     namespace enumDebugOverlayMode {
-        const disabled: string;
-        const regular: string;
-        const detailed: string;
+        export const disabled: string;
+        export const regular: string;
+        export const detailed: string;
     }
     export {};
 }
@@ -8106,6 +8090,7 @@ declare module "game/hud/parts/entity_debugger" {
      * Allows to inspect entities by pressing F8 while hovering them
      */
     export class HUDEntityDebugger extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         componentsElem: Element;
         /**
@@ -8171,6 +8156,7 @@ declare module "game/hud/parts/modal_dialogs" {
 }
 declare module "game/hud/parts/settings_menu" {
     export class HUDSettingsMenu extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         background: HTMLDivElement;
         menuElement: HTMLDivElement;
         statsElement: HTMLDivElement;
@@ -8190,6 +8176,7 @@ declare module "game/hud/parts/settings_menu" {
 }
 declare module "game/hud/parts/shape_tooltip" {
     export class HUDShapeTooltip extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         /** @type {Vector} */
         currentTile: Vector;
         /** @type {Entity} */
@@ -8203,6 +8190,7 @@ declare module "game/hud/parts/shape_tooltip" {
 }
 declare module "game/hud/parts/vignette_overlay" {
     export class HUDVignetteOverlay extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
     }
     import { BaseHUDPart } from "game/hud/base_hud_part";
@@ -8230,7 +8218,7 @@ declare module "game/hud/trailer_maker" {
         markers: any[];
         playbackMarkers: any[];
         currentPlaybackOrigin: Vector;
-        currentPlaybackZoom: number;
+        currentPlaybackZoom: any;
         update(): void;
     }
     import { GameRoot } from "game/root";
@@ -8248,15 +8236,15 @@ declare module "game/hud/hud" {
          */
         initialize(): void;
         signals: {
-            buildingSelectedForPlacement: TypedSignal<[MetaBuilding]>;
-            selectedPlacementBuildingChanged: TypedSignal<[MetaBuilding]>;
-            shapePinRequested: TypedSignal<[ShapeDefinition]>;
-            shapeUnpinRequested: TypedSignal<[string]>;
-            notification: TypedSignal<[string, string]>;
-            buildingsSelectedForCopy: TypedSignal<[number[]]>;
-            pasteBlueprintRequested: TypedSignal<[]>;
-            viewShapeDetailsRequested: TypedSignal<[ShapeDefinition]>;
-            unlockNotificationFinished: TypedSignal<[]>;
+            buildingSelectedForPlacement: any;
+            selectedPlacementBuildingChanged: any;
+            shapePinRequested: any;
+            shapeUnpinRequested: any;
+            notification: any;
+            buildingsSelectedForCopy: any;
+            pasteBlueprintRequested: any;
+            viewShapeDetailsRequested: any;
+            unlockNotificationFinished: any;
         };
         parts: {
             buildingsToolbar: HUDBuildingsToolbar;
@@ -8310,8 +8298,6 @@ declare module "game/hud/hud" {
         cleanup(): void;
     }
     import { GameRoot } from "game/root";
-    import { MetaBuilding } from "game/meta_building";
-    import { ShapeDefinition } from "game/shape_definition";
     import { HUDBuildingsToolbar } from "game/hud/parts/buildings_toolbar";
     import { HUDBlueprintPlacer } from "game/hud/parts/blueprint_placer";
     import { HUDBuildingPlacer } from "game/hud/parts/building_placer";
@@ -8384,11 +8370,11 @@ declare module "game/map" {
         /**
          * Mapping of 'X|Y' to chunk
          * @type {Map<string, MapChunkView>} */
-        chunksById: Map<string, MapChunkView>;
+        chunksById: any;
         /**
          * Mapping of 'X|Y' to chunk aggregate
          * @type {Map<string, MapChunkAggregate>} */
-        aggregatesById: Map<string, MapChunkAggregate>;
+        aggregatesById: any;
         /**
          * Returns the given chunk by index
          * @param {number} chunkX
@@ -8433,7 +8419,7 @@ declare module "game/map" {
          * @param {Layer} layer
          * @returns {Entity} Entity or null
          */
-        getTileContent(tile: Vector, layer: Layer): Entity;
+        getTileContent(tile: Vector, layer: any): Entity;
         /**
          * Returns the lower layers content of the given tile
          * @param {number} x
@@ -8448,7 +8434,7 @@ declare module "game/map" {
          * @param {Layer} layer
          * @returns {Entity} Entity or null
          */
-        getLayerContentXY(x: number, y: number, layer: Layer): Entity;
+        getLayerContentXY(x: number, y: number, layer: any): Entity;
         /**
          * Returns the tile contents of a given tile
          * @param {number} x
@@ -8462,7 +8448,7 @@ declare module "game/map" {
          * @param {Layer} layer
          * @returns {boolean}
          */
-        isTileUsed(tile: Vector, layer: Layer): boolean;
+        isTileUsed(tile: Vector, layer: any): boolean;
         /**
          * Checks if the tile is used
          * @param {number} x
@@ -8470,7 +8456,7 @@ declare module "game/map" {
          * @param {Layer} layer
          * @returns {boolean}
          */
-        isTileUsedXY(x: number, y: number, layer: Layer): boolean;
+        isTileUsedXY(x: number, y: number, layer: any): boolean;
         /**
          * Sets the tiles content
          * @param {Vector} tile
@@ -8496,7 +8482,6 @@ declare module "game/map" {
     import { BasicSerializableObject } from "savegame/serialization";
     import { GameRoot } from "game/root";
     import { MapChunkView } from "game/map_chunk_view";
-    import { MapChunkAggregate } from "game/map_chunk_aggregate";
     import { Vector } from "core/vector";
     import { Entity } from "game/entity";
     import { BaseItem } from "game/base_item";
@@ -8590,7 +8575,7 @@ declare module "core/state_manager" {
             [x: string]: new () => GameState;
         };
         /** @type {TypedSignal<[string, GameState]>} */
-        stateChanged: TypedSignal<[string, GameState]>;
+        stateChanged: any;
         /**
          * Registers a new state class, should be a GameState derived class
          * @param {object} stateClass
@@ -8619,7 +8604,7 @@ declare module "core/request_channel" {
     export const PROMISE_ABORTED: "promise-aborted";
     export class RequestChannel {
         /** @type {Array<Promise>} */
-        pendingPromises: Array<Promise<any>>;
+        pendingPromises: Array<Promise>;
         /**
          *
          * @param {Promise<any>} promise
@@ -9045,8 +9030,9 @@ declare module "savegame/savegame_interface" {
 }
 declare module "savegame/schemas/1000" {
     export class SavegameInterface_V1000 extends BaseSavegameInterface {
+        constructor(data: any);
     }
-    import { BaseSavegameInterface } from "savegame/savegame_interface";
+    import { BaseSavegameInterface } from "savegame/savegame_interface.js";
 }
 declare module "savegame/schemas/1001" {
     export class SavegameInterface_V1001 extends SavegameInterface_V1000 {
@@ -9054,8 +9040,9 @@ declare module "savegame/schemas/1001" {
          * @param {import("../savegame_typedefs.js").SavegameData} data
          */
         static migrate1000to1001(data: import("../savegame_typedefs.js").SavegameData): boolean;
+        constructor(data: any);
     }
-    import { SavegameInterface_V1000 } from "savegame/schemas/1000";
+    import { SavegameInterface_V1000 } from "savegame/schemas/1000.js";
 }
 declare module "savegame/schemas/1002" {
     export class SavegameInterface_V1002 extends SavegameInterface_V1001 {
@@ -9063,8 +9050,9 @@ declare module "savegame/schemas/1002" {
          * @param {import("../savegame_typedefs.js").SavegameData} data
          */
         static migrate1001to1002(data: import("../savegame_typedefs.js").SavegameData): boolean;
+        constructor(data: any);
     }
-    import { SavegameInterface_V1001 } from "savegame/schemas/1001";
+    import { SavegameInterface_V1001 } from "savegame/schemas/1001.js";
 }
 declare module "savegame/schemas/1003" {
     export class SavegameInterface_V1003 extends SavegameInterface_V1002 {
@@ -9072,8 +9060,9 @@ declare module "savegame/schemas/1003" {
          * @param {import("../savegame_typedefs.js").SavegameData} data
          */
         static migrate1002to1003(data: import("../savegame_typedefs.js").SavegameData): boolean;
+        constructor(data: any);
     }
-    import { SavegameInterface_V1002 } from "savegame/schemas/1002";
+    import { SavegameInterface_V1002 } from "savegame/schemas/1002.js";
 }
 declare module "savegame/schemas/1004" {
     export class SavegameInterface_V1004 extends SavegameInterface_V1003 {
@@ -9081,8 +9070,9 @@ declare module "savegame/schemas/1004" {
          * @param {import("../savegame_typedefs.js").SavegameData} data
          */
         static migrate1003to1004(data: import("../savegame_typedefs.js").SavegameData): boolean;
+        constructor(data: any);
     }
-    import { SavegameInterface_V1003 } from "savegame/schemas/1003";
+    import { SavegameInterface_V1003 } from "savegame/schemas/1003.js";
 }
 declare module "savegame/schemas/1005" {
     export class SavegameInterface_V1005 extends SavegameInterface_V1004 {
@@ -9090,8 +9080,9 @@ declare module "savegame/schemas/1005" {
          * @param {import("../savegame_typedefs.js").SavegameData} data
          */
         static migrate1004to1005(data: import("../savegame_typedefs.js").SavegameData): boolean;
+        constructor(data: any);
     }
-    import { SavegameInterface_V1004 } from "savegame/schemas/1004";
+    import { SavegameInterface_V1004 } from "savegame/schemas/1004.js";
 }
 declare module "savegame/schemas/1006" {
     export class SavegameInterface_V1006 extends SavegameInterface_V1005 {
@@ -9130,9 +9121,10 @@ declare module "savegame/schemas/1006" {
          * @param {Entity} entity
          */
         static migrateStaticComp1005to1006(entity: Entity): void;
+        constructor(data: any);
     }
-    import { SavegameInterface_V1005 } from "savegame/schemas/1005";
-    import { Entity } from "game/entity";
+    import { SavegameInterface_V1005 } from "savegame/schemas/1005.js";
+    import { Entity } from "game/entity.js";
 }
 declare module "savegame/schemas/1007" {
     export class SavegameInterface_V1007 extends SavegameInterface_V1006 {
@@ -9140,8 +9132,9 @@ declare module "savegame/schemas/1007" {
          * @param {import("../savegame_typedefs.js").SavegameData} data
          */
         static migrate1006to1007(data: import("../savegame_typedefs.js").SavegameData): boolean;
+        constructor(data: any);
     }
-    import { SavegameInterface_V1006 } from "savegame/schemas/1006";
+    import { SavegameInterface_V1006 } from "savegame/schemas/1006.js";
 }
 declare module "savegame/schemas/1008" {
     export class SavegameInterface_V1008 extends SavegameInterface_V1007 {
@@ -9149,21 +9142,21 @@ declare module "savegame/schemas/1008" {
          * @param {import("../savegame_typedefs.js").SavegameData} data
          */
         static migrate1007to1008(data: import("../savegame_typedefs.js").SavegameData): boolean;
+        constructor(data: any);
     }
-    import { SavegameInterface_V1007 } from "savegame/schemas/1007";
+    import { SavegameInterface_V1007 } from "savegame/schemas/1007.js";
 }
 declare module "game/buildings/constant_signal" {
     export class MetaConstantSignalBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/logic_gate" {
     export type enumLogicGateVariants = string;
     export namespace enumLogicGateVariants {
-        const not: string;
-        const xor: string;
-        const or: string;
+        export const not: string;
+        export const xor: string;
+        export const or: string;
     }
     export type enumVariantToGate = string;
     /** @enum {string} */
@@ -9172,23 +9165,22 @@ declare module "game/buildings/logic_gate" {
         default: string;
     };
     export class MetaLogicGateBuilding extends MetaBuilding {
-        constructor();
     }
+    import { defaultBuildingVariant } from "game/meta_building";
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/wire_tunnel" {
     export class MetaWireTunnelBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/virtual_processor" {
     export type enumVirtualProcessorVariants = string;
     export namespace enumVirtualProcessorVariants {
-        const rotater: string;
-        const unstacker: string;
-        const stacker: string;
-        const painter: string;
+        export const rotater: string;
+        export const unstacker: string;
+        export const stacker: string;
+        export const painter: string;
     }
     export type enumVariantToGate = string;
     /** @enum {string} */
@@ -9197,29 +9189,26 @@ declare module "game/buildings/virtual_processor" {
         default: string;
     };
     export class MetaVirtualProcessorBuilding extends MetaBuilding {
-        constructor();
     }
+    import { defaultBuildingVariant } from "game/meta_building";
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/transistor" {
     export type enumTransistorVariants = string;
     export namespace enumTransistorVariants {
-        const mirrored: string;
+        export const mirrored: string;
     }
     export class MetaTransistorBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/analyzer" {
     export class MetaAnalyzerBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/buildings/comparator" {
     export class MetaComparatorBuilding extends MetaBuilding {
-        constructor();
     }
     import { MetaBuilding } from "game/meta_building";
 }
@@ -9233,19 +9222,20 @@ declare module "game/tutorial_goals_mappings" {
     /**
      * Stores which reward unlocks what
      */
-    export type enumHubGoalRewardsToContentUnlocked = [typeof MetaBuilding, string][] | null;
+    export type enumHubGoalRewardsToContentUnlocked = [typeof MetaBuilding, string][];
     /**
      * Stores which reward unlocks what
      * @enum {TutorialGoalReward?}
      */
     export const enumHubGoalRewardsToContentUnlocked: {
-        [x: string]: TutorialGoalReward;
+        [x: string]: [typeof MetaBuilding, string][];
     };
-    export type TutorialGoalReward = Array<[typeof MetaBuilding, string]>;
+    export type TutorialGoalReward = [typeof MetaBuilding, string][];
     import { MetaBuilding } from "game/meta_building";
 }
 declare module "game/hud/parts/unlock_notification" {
     export class HUDUnlockNotification extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         visible: boolean;
         domAttach: DynamicDomAttach;
         buttonShowTimeout: number;
@@ -9269,6 +9259,7 @@ declare module "game/hud/parts/unlock_notification" {
 }
 declare module "game/hud/parts/mass_selector" {
     export class HUDMassSelector extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         currentSelectionStartWorld: Vector;
         currentSelectionEnd: Vector;
         selectedUids: any;
@@ -9311,6 +9302,7 @@ declare module "game/hud/parts/mass_selector" {
 }
 declare module "game/hud/parts/shop" {
     export class HUDShop extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         background: HTMLDivElement;
         dialogInner: HTMLDivElement;
         title: HTMLDivElement;
@@ -9334,8 +9326,8 @@ declare module "game/hud/parts/shop" {
 declare module "game/hud/parts/statistics_handle" {
     export type enumDisplayMode = string;
     export namespace enumDisplayMode {
-        const icons: string;
-        const detailed: string;
+        export const icons: string;
+        export const detailed: string;
     }
     /**
      * Stores how many seconds one unit is
@@ -9357,7 +9349,7 @@ declare module "game/hud/parts/statistics_handle" {
         definition: ShapeDefinition;
         root: GameRoot;
         intersectionObserver: IntersectionObserver;
-        visible: boolean;
+        visible: any;
         initElement(): void;
         element: HTMLDivElement;
         counter: HTMLSpanElement;
@@ -9401,6 +9393,7 @@ declare module "game/hud/parts/statistics_handle" {
 }
 declare module "game/hud/parts/statistics" {
     export class HUDStatistics extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         background: HTMLDivElement;
         dialogInner: HTMLDivElement;
         title: HTMLDivElement;
@@ -9463,6 +9456,7 @@ declare module "game/hud/parts/statistics" {
 }
 declare module "game/hud/parts/wire_info" {
     export class HUDWireInfo extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         spriteEmpty: import("core/sprites").AtlasSprite;
         spriteConflict: import("core/sprites").AtlasSprite;
         /**
@@ -9478,6 +9472,7 @@ declare module "game/hud/parts/wire_info" {
 }
 declare module "game/hud/parts/lever_toggle" {
     export class HUDLeverToggle extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         /**
          * @param {Vector} pos
          * @param {enumMouseButton} button
@@ -9490,6 +9485,7 @@ declare module "game/hud/parts/lever_toggle" {
 }
 declare module "game/hud/parts/screenshot_exporter" {
     export class HUDScreenshotExporter extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         startExport(): void;
         doExport(): void;
     }
@@ -9497,6 +9493,7 @@ declare module "game/hud/parts/screenshot_exporter" {
 }
 declare module "game/hud/parts/wires_overlay" {
     export class HUDWiresOverlay extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         currentAlpha: any;
         /**
          * Switches between layers
@@ -9517,6 +9514,7 @@ declare module "game/hud/parts/wires_overlay" {
 }
 declare module "game/hud/parts/shape_viewer" {
     export class HUDShapeViewer extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         background: HTMLDivElement;
         dialogInner: HTMLDivElement;
         title: HTMLDivElement;
@@ -9551,6 +9549,7 @@ declare module "game/hud/parts/layer_preview" {
      * Helper class which allows peaking through to the wires layer
      */
     export class HUDLayerPreview extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         previewOverlay: import("core/sprites").AtlasSprite;
         /**
          * (re) initializes the canvas
@@ -9582,24 +9581,27 @@ declare module "game/hud/parts/tutorial_video_offer" {
      * Offers to open the tutorial video after completing a level
      */
     export class HUDTutorialVideoOffer extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
     }
     import { BaseHUDPart } from "game/hud/base_hud_part";
 }
 declare module "game/hud/parts/miner_highlight" {
     export class HUDMinerHighlight extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         /**
          * Finds all connected miners to the given entity
          * @param {Entity} entity
          * @param {Set<number>} seenUids Which entities have already been processed
          * @returns {Array<Entity>} The connected miners
          */
-        findConnectedMiners(entity: Entity, seenUids?: Set<number>): Array<Entity>;
+        findConnectedMiners(entity: Entity, seenUids?: any): Array<Entity>;
     }
     import { BaseHUDPart } from "game/hud/base_hud_part";
     import { Entity } from "game/entity";
 }
 declare module "game/hud/parts/game_menu" {
     export class HUDGameMenu extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         /** @type {Array<{
          * badge: function,
@@ -9642,6 +9644,7 @@ declare module "game/hud/parts/game_menu" {
 }
 declare module "game/hud/parts/constant_signal_edit" {
     export class HUDConstantSignalEdit extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         /**
          * @param {Vector} pos
          * @param {enumMouseButton} button
@@ -9666,6 +9669,7 @@ declare module "game/hud/parts/keybinding_overlay" {
      * }} KeyBinding
      */
     export class HUDKeybindingOverlay extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         /**
          * HELPER / Returns if there is a building selected for placement
          * @returns {boolean}
@@ -9733,6 +9737,7 @@ declare module "game/hud/parts/keybinding_overlay" {
 }
 declare module "game/hud/parts/watermark" {
     export class HUDWatermark extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         linkElement: HTMLDivElement;
         domAttach: DynamicDomAttach;
@@ -9743,6 +9748,7 @@ declare module "game/hud/parts/watermark" {
 }
 declare module "game/hud/parts/standalone_advantages" {
     export class HUDStandaloneAdvantages extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         background: HTMLDivElement;
         dialogInner: HTMLDivElement;
         title: HTMLDivElement;
@@ -9759,6 +9765,7 @@ declare module "game/hud/parts/standalone_advantages" {
 }
 declare module "game/hud/parts/cat_memes" {
     export class HUDCatMemes extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         domAttach: DynamicDomAttach;
     }
@@ -9767,6 +9774,7 @@ declare module "game/hud/parts/cat_memes" {
 }
 declare module "game/hud/parts/tutorial_hints" {
     export class HUDPartTutorialHints extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         videoElement: HTMLVideoElement;
         videoAttach: DynamicDomAttach;
@@ -9794,6 +9802,7 @@ declare module "core/cachebust" {
 }
 declare module "game/hud/parts/interactive_tutorial" {
     export class HUDInteractiveTutorial extends BaseHUDPart {
+        constructor(root: GameRoot);
         element: HTMLDivElement;
         elementDescription: HTMLDivElement;
         elementGif: HTMLDivElement;
@@ -9804,16 +9813,18 @@ declare module "game/hud/parts/interactive_tutorial" {
     import { BaseHUDPart } from "game/hud/base_hud_part";
     import { DynamicDomAttach } from "game/hud/dynamic_dom_attach";
     import { TrackedState } from "core/tracked_state";
+    import { GameRoot } from "game/root";
 }
 declare module "core/query_parameters" {
     export namespace queryParamOptions {
-        const embedProvider: any;
-        const fullVersion: boolean;
-        const sandboxMode: boolean;
+        export const embedProvider: any;
+        export const fullVersion: boolean;
+        export const sandboxMode: boolean;
     }
 }
 declare module "game/hud/parts/sandbox_controller" {
     export class HUDSandboxController extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         giveBlueprints(): void;
         maxOutAll(): void;
@@ -9861,6 +9872,8 @@ declare module "game/modes/regular" {
     export const rocketShape: "CbCuCbCu:Sr------:--CrSrCr:CwCwCwCw";
     export const finalGameShape: "RuCw--Cw:----Ru--";
     export class RegularGameMode extends GameMode {
+        /** @param {GameRoot} root */
+        constructor(root: GameRoot);
     }
     export type UpgradeRequirement = {
         shape: string;
@@ -9871,7 +9884,11 @@ declare module "game/modes/regular" {
         improvement?: number;
         excludePrevious?: boolean;
     };
-    export type UpgradeTiers = Array<TierRequirement>;
+    export type UpgradeTiers = {
+        required: Array<UpgradeRequirement>;
+        improvement?: number;
+        excludePrevious?: boolean;
+    }[];
     export type LevelDefinition = {
         shape: string;
         required: number;
@@ -9879,6 +9896,7 @@ declare module "game/modes/regular" {
         throughputOnly?: boolean;
     };
     import { GameMode } from "game/game_mode";
+    import { GameRoot } from "game/root";
     import { enumHubGoalRewards } from "game/tutorial_goals";
 }
 declare module "savegame/schemas/1009" {
@@ -9887,8 +9905,9 @@ declare module "savegame/schemas/1009" {
          * @param {import("../savegame_typedefs.js").SavegameData} data
          */
         static migrate1008to1009(data: import("../savegame_typedefs.js").SavegameData): boolean;
+        constructor(data: any);
     }
-    import { SavegameInterface_V1008 } from "savegame/schemas/1008";
+    import { SavegameInterface_V1008 } from "savegame/schemas/1008.js";
 }
 declare module "savegame/schemas/1010" {
     export class SavegameInterface_V1010 extends SavegameInterface_V1009 {
@@ -9896,8 +9915,9 @@ declare module "savegame/schemas/1010" {
          * @param {import("../savegame_typedefs.js").SavegameData} data
          */
         static migrate1009to1010(data: import("../savegame_typedefs.js").SavegameData): boolean;
+        constructor(data: any);
     }
-    import { SavegameInterface_V1009 } from "savegame/schemas/1009";
+    import { SavegameInterface_V1009 } from "savegame/schemas/1009.js";
 }
 declare module "savegame/savegame_interface_registry" {
     /**
@@ -9948,7 +9968,13 @@ declare module "savegame/savegame" {
             metaDataRef: SavegameMetadata;
         });
         internalId: string;
-        metaDataRef: import("savegame/savegame_typedefs").SavegameMetadata;
+        metaDataRef: {
+            lastUpdate: number;
+            version: number;
+            internalId: string;
+            level: number;
+            name: string;
+        };
         /**
          * Returns if this game can be saved on disc
          * @returns {boolean}
@@ -10004,10 +10030,51 @@ declare module "savegame/savegame" {
     }
     export type Application = import("application").Application;
     export type GameRoot = import("game/root").GameRoot;
-    export type SavegameData = import("savegame/savegame_typedefs").SavegameData;
-    export type SavegameMetadata = import("savegame/savegame_typedefs").SavegameMetadata;
-    export type SavegameStats = import("savegame/savegame_typedefs").SavegameStats;
-    export type SerializedGame = import("savegame/savegame_typedefs").SerializedGame;
+    export type SavegameData = {
+        version: number;
+        dump: {
+            camera: any;
+            time: any;
+            entityMgr: any;
+            map: any;
+            gameMode: any;
+            hubGoals: any;
+            pinnedShapes: any;
+            waypoints: any;
+            entities: import("game/entity").Entity[];
+            beltPaths: any[];
+        };
+        stats: {
+            failedMam: boolean;
+            trashedCount: number;
+            usedInverseRotater: boolean;
+        };
+        lastUpdate: number;
+    };
+    export type SavegameMetadata = {
+        lastUpdate: number;
+        version: number;
+        internalId: string;
+        level: number;
+        name: string;
+    };
+    export type SavegameStats = {
+        failedMam: boolean;
+        trashedCount: number;
+        usedInverseRotater: boolean;
+    };
+    export type SerializedGame = {
+        camera: any;
+        time: any;
+        entityMgr: any;
+        map: any;
+        gameMode: any;
+        hubGoals: any;
+        pinnedShapes: any;
+        waypoints: any;
+        entities: import("game/entity").Entity[];
+        beltPaths: any[];
+    };
     import { ReadWriteProxy } from "core/read_write_proxy";
     import { BaseSavegameInterface } from "savegame/savegame_interface";
 }
@@ -10019,7 +10086,7 @@ declare module "core/buffer_maintainer" {
         constructor(root: GameRoot);
         root: GameRoot;
         /** @type {Map<string, Map<string, CacheEntry>>} */
-        cache: Map<string, Map<string, CacheEntry>>;
+        cache: any;
         iterationIndex: number;
         lastIteration: number;
         /**
@@ -10079,8 +10146,8 @@ declare module "core/buffer_maintainer" {
 declare module "game/automatic_save" {
     export type enumSavePriority = number;
     export namespace enumSavePriority {
-        const regular: number;
-        const asap: number;
+        export const regular: number;
+        export const asap: number;
     }
     export class AutomaticSave {
         constructor(root: any);
@@ -10419,29 +10486,34 @@ declare module "game/logic" {
     /**
      * Typing helper
      */
-    export type EjectorsAffectingTile = Array<{
+    export type EjectorsAffectingTile = {
         entity: Entity;
-        slot: import("game/components/item_ejector").ItemEjectorSlot;
+        slot: import("./components/item_ejector").ItemEjectorSlot;
         fromTile: Vector;
         toDirection: enumDirection;
-    }>;
+    }[];
     /**
      * Typing helper
      */
-    export type AcceptorsAffectingTile = Array<{
+    export type AcceptorsAffectingTile = {
         entity: Entity;
-        slot: import("game/components/item_acceptor").ItemAcceptorSlot;
+        slot: import("./components/item_acceptor").ItemAcceptorSlot;
         toTile: Vector;
         fromDirection: enumDirection;
-    }>;
+    }[];
     export type AcceptorsAndEjectorsAffectingTile = {
         acceptors: {
             entity: Entity;
-            slot: import("game/components/item_acceptor").ItemAcceptorSlot;
+            slot: import("./components/item_acceptor").ItemAcceptorSlot;
             toTile: Vector;
-            fromDirection: string;
+            fromDirection: enumDirection;
         }[];
-        ejectors: EjectorsAffectingTile;
+        ejectors: {
+            entity: Entity;
+            slot: import("./components/item_ejector").ItemEjectorSlot;
+            fromTile: Vector;
+            toDirection: enumDirection;
+        }[];
     };
     import { GameRoot } from "game/root";
     import { Entity } from "game/entity";
@@ -10665,11 +10737,10 @@ declare module "game/core" {
     import { Savegame } from "savegame/savegame";
 }
 declare module "states/ingame" {
-    export namespace gameCreationAction {
-        const _new: string;
-        export { _new as new };
-        export const resume: string;
-    }
+    export const gameCreationAction: {
+        new: string;
+        resume: string;
+    };
     export class GameCreationPayload {
         /** @type {boolean|undefined} */
         fastEnter: boolean | undefined;
@@ -10681,10 +10752,9 @@ declare module "states/ingame" {
         gameModeParameters: object | undefined;
     }
     export class InGameState extends GameState {
-        constructor();
         /** @type {GameCreationPayload} */
         creationPayload: GameCreationPayload;
-        stage: string;
+        stage: any;
         /** @type {GameCore} */
         core: GameCore;
         /** @type {KeyActionMapper} */
@@ -10787,7 +10857,7 @@ declare module "states/ingame" {
 }
 declare module "game/root" {
     /** @type {Array<Layer>} */
-    export const layers: Array<Layer>;
+    export const layers: Array<any>;
     /**
      * The game root is basically the whole game state at a given point,
      * combining all important classes. We don't have globals, but this
@@ -10857,36 +10927,36 @@ declare module "game/root" {
         /** @type {DynamicTickrate} */
         dynamicTickrate: DynamicTickrate;
         /** @type {Layer} */
-        currentLayer: Layer;
+        currentLayer: any;
         /** @type {GameMode} */
         gameMode: GameMode;
         signals: {
-            entityManuallyPlaced: TypedSignal<[Entity]>;
-            entityAdded: TypedSignal<[Entity]>;
-            entityChanged: TypedSignal<[Entity]>;
-            entityGotNewComponent: TypedSignal<[Entity]>;
-            entityComponentRemoved: TypedSignal<[Entity]>;
-            entityQueuedForDestroy: TypedSignal<[Entity]>;
-            entityDestroyed: TypedSignal<[Entity]>;
-            resized: TypedSignal<[number, number]>;
-            readyToRender: TypedSignal<[]>;
+            entityManuallyPlaced: any;
+            entityAdded: any;
+            entityChanged: any;
+            entityGotNewComponent: any;
+            entityComponentRemoved: any;
+            entityQueuedForDestroy: any;
+            entityDestroyed: any;
+            resized: any;
+            readyToRender: any;
             aboutToDestruct: Signal;
-            gameSaved: TypedSignal<[]>;
-            gameRestored: TypedSignal<[]>;
-            gameFrameStarted: TypedSignal<[]>;
-            storyGoalCompleted: TypedSignal<[number, string]>;
-            upgradePurchased: TypedSignal<[string]>;
-            postLoadHook: TypedSignal<[]>;
-            shapeDelivered: TypedSignal<[ShapeDefinition]>;
-            itemProduced: TypedSignal<[BaseItem]>;
-            bulkOperationFinished: TypedSignal<[]>;
-            immutableOperationFinished: TypedSignal<[]>;
-            editModeChanged: TypedSignal<[Layer]>;
-            prePlacementCheck: TypedSignal<[Entity, Vector]>;
-            freeEntityAreaBeforeBuild: TypedSignal<[Entity]>;
-            achievementCheck: TypedSignal<[string, any]>;
-            bulkAchievementCheck: TypedSignal<any[]>;
-            puzzleComplete: TypedSignal<[]>;
+            gameSaved: any;
+            gameRestored: any;
+            gameFrameStarted: any;
+            storyGoalCompleted: any;
+            upgradePurchased: any;
+            postLoadHook: any;
+            shapeDelivered: any;
+            itemProduced: any;
+            bulkOperationFinished: any;
+            immutableOperationFinished: any;
+            editModeChanged: any;
+            prePlacementCheck: any;
+            freeEntityAreaBeforeBuild: any;
+            achievementCheck: any;
+            bulkAchievementCheck: any;
+            puzzleComplete: any;
         };
         /** @type {Object.<string, Object.<string, RandomNumberGenerator>>} */
         rngs: {
@@ -10926,11 +10996,7 @@ declare module "game/root" {
     import { ProductionAnalytics } from "game/production_analytics";
     import { DynamicTickrate } from "game/dynamic_tickrate";
     import { GameMode } from "game/game_mode";
-    import { Entity } from "game/entity";
     import { Signal } from "core/signal";
-    import { ShapeDefinition } from "game/shape_definition";
-    import { BaseItem } from "game/base_item";
-    import { Vector } from "core/vector";
     import { RandomNumberGenerator } from "core/rng";
 }
 declare module "core/draw_parameters" {
@@ -11130,9 +11196,23 @@ declare module "core/atlas_definitions" {
          * @param {SourceData} sourceData
          */
         constructor({ frames, meta }: SourceData);
-        meta: AtlasMeta;
+        meta: {
+            app: string;
+            version: string;
+            image: string;
+            format: string;
+            size: Size;
+            scale: string;
+            smartupdate: string;
+        };
         sourceData: {
-            [x: string]: SpriteDefinition;
+            [x: string]: {
+                frame: Position & Size;
+                rotated: boolean;
+                spriteSourceSize: Position & Size;
+                sourceSize: Size;
+                trimmed: boolean;
+            };
         };
         sourceFileName: string;
         getFullSourcePath(): string;
@@ -11180,7 +11260,7 @@ declare module "core/loader" {
     class LoaderImpl {
         app: import("application").Application;
         /** @type {Map<string, BaseSprite>} */
-        sprites: Map<string, BaseSprite>;
+        sprites: any;
         rawImages: any[];
         /**
          * @param {Application} app
@@ -11396,11 +11476,13 @@ declare module "platform/ad_provider" {
 }
 declare module "platform/ad_providers/no_ad_provider" {
     export class NoAdProvider extends AdProviderInterface {
+        constructor(app: import("application").Application);
     }
     import { AdProviderInterface } from "platform/ad_provider";
 }
 declare module "platform/browser/no_achievement_provider" {
     export class NoAchievementProvider extends AchievementProviderInterface {
+        constructor(app: import("application").Application);
     }
     import { AchievementProviderInterface } from "platform/achievement_provider";
 }
@@ -11439,6 +11521,7 @@ declare module "platform/analytics" {
 }
 declare module "platform/browser/google_analytics" {
     export class GoogleAnalyticsImpl extends AnalyticsInterface {
+        constructor(app: any);
         lastUiClickTracked: number;
         /**
          * Tracks an event so GA keeps track of the user
@@ -11465,6 +11548,11 @@ declare module "platform/browser/sound" {
 declare module "platform/ad_providers/gamedistribution" {
     export class GamedistributionAdProvider extends AdProviderInterface {
         /**
+         *
+         * @param {Application} app
+         */
+        constructor(app: Application);
+        /**
          * The resolve function to finish the current video ad. Null if none is currently running
          * @type {Function}
          */
@@ -11479,15 +11567,19 @@ declare module "platform/ad_providers/gamedistribution" {
         lastVideoAdShowTime: number;
     }
     import { AdProviderInterface } from "platform/ad_provider";
+    import { Application } from "application";
 }
 declare module "platform/electron/steam_achievement_provider" {
     export class SteamAchievementProvider extends AchievementProviderInterface {
+        /** @param {Application} app */
+        constructor(app: Application);
         initialized: boolean;
         root: GameRoot;
         ipc: any;
     }
     import { AchievementProviderInterface } from "platform/achievement_provider";
     import { GameRoot } from "game/root";
+    import { Application } from "application";
 }
 declare module "platform/wrapper" {
     export class PlatformWrapperInterface {
@@ -11564,12 +11656,14 @@ declare module "platform/wrapper" {
 }
 declare module "platform/browser/storage" {
     export class StorageImplBrowser extends StorageInterface {
+        constructor(app: any);
         currentBusyFilename: boolean;
     }
     import { StorageInterface } from "platform/storage";
 }
 declare module "platform/browser/storage_indexed_db" {
     export class StorageImplBrowserIndexedDB extends StorageInterface {
+        constructor(app: any);
         currentBusyFilename: boolean;
         /** @type {IDBDatabase} */
         database: IDBDatabase;
@@ -11578,6 +11672,7 @@ declare module "platform/browser/storage_indexed_db" {
 }
 declare module "platform/browser/wrapper" {
     export class PlatformWrapperImplBrowser extends PlatformWrapperInterface {
+        constructor(app: any);
         recaptchaTokenCallback: any;
         embedProvider: {
             id: string;
@@ -11599,6 +11694,7 @@ declare module "platform/browser/wrapper" {
 }
 declare module "platform/electron/storage" {
     export class StorageImplElectron extends StorageInterface {
+        constructor(app: any);
         /** @type {Object.<number, {resolve:Function, reject: Function}>} */
         jobs: {
             [x: number]: {
@@ -11612,6 +11708,7 @@ declare module "platform/electron/storage" {
 }
 declare module "platform/electron/wrapper" {
     export class PlatformWrapperImplElectron extends PlatformWrapperImplBrowser {
+        constructor(app: any);
         dlcs: {
             puzzle: boolean;
         };
@@ -11725,10 +11822,10 @@ declare module "profile/application_settings" {
     export function getApplicationSettingById(id: any): any;
     export type enumCategories = string;
     export namespace enumCategories {
-        const general: string;
-        const userInterface: string;
-        const performance: string;
-        const advanced: string;
+        export const general: string;
+        export const userInterface: string;
+        export const performance: string;
+        export const advanced: string;
     }
     export const uiScales: {
         id: string;
@@ -11837,8 +11934,8 @@ declare module "profile/application_settings" {
 declare module "savegame/savegame_manager" {
     export type enumLocalSavegameStatus = string;
     export namespace enumLocalSavegameStatus {
-        const offline: string;
-        const synced: string;
+        export const offline: string;
+        export const synced: string;
     }
     export class SavegameManager extends ReadWriteProxy {
         constructor(app: any);
@@ -11893,8 +11990,26 @@ declare module "savegame/savegame_manager" {
         generateInternalId(): any;
         initialize(): Promise<any>;
     }
-    export type SavegamesData = import("savegame/savegame_typedefs").SavegamesData;
-    export type SavegameMetadata = import("savegame/savegame_typedefs").SavegameMetadata;
+    export type SavegamesData = {
+        version: number;
+        /**
+         * @returns {SavegamesData}
+         */
+        savegames: {
+            lastUpdate: number;
+            version: number;
+            internalId: string;
+            level: number;
+            name: string;
+        }[];
+    };
+    export type SavegameMetadata = {
+        lastUpdate: number;
+        version: number;
+        internalId: string;
+        level: number;
+        name: string;
+    };
     import { ReadWriteProxy } from "core/read_write_proxy";
     import { Savegame } from "savegame/savegame";
 }
@@ -11904,6 +12019,7 @@ declare module "core/textual_game_state" {
      * scrollable content.
      */
     export class TextualGameState extends GameState {
+        constructor(key: string);
         /**
          * Should return the states HTML content.
          */
@@ -11939,7 +12055,6 @@ declare module "core/textual_game_state" {
 }
 declare module "states/about" {
     export class AboutState extends TextualGameState {
-        constructor();
     }
     import { TextualGameState } from "core/textual_game_state";
 }
@@ -11958,13 +12073,11 @@ declare module "changelog" {
 }
 declare module "states/changelog" {
     export class ChangelogState extends TextualGameState {
-        constructor();
     }
     import { TextualGameState } from "core/textual_game_state";
 }
 declare module "states/keybindings" {
     export class KeybindingsState extends TextualGameState {
-        constructor();
         editKeybinding(id: any): void;
         updateKeybindings(): void;
         resetKeybinding(id: any): void;
@@ -11978,7 +12091,6 @@ declare module "states/main_menu" {
      * @typedef {import("../profile/setting_types").EnumSetting} EnumSetting
      */
     export class MainMenuState extends GameState {
-        constructor();
         /**
          * Asks the user to import a savegame
          */
@@ -11994,7 +12106,13 @@ declare module "states/main_menu" {
         onChangelogClicked(): void;
         onRedditClicked(): void;
         onLanguageChooseClicked(): void;
-        get savedGames(): import("savegame/savegame_typedefs").SavegameMetadata[];
+        get savedGames(): {
+            lastUpdate: number;
+            version: number;
+            internalId: string;
+            level: number;
+            name: string;
+        }[];
         renderSavegames(): void;
         /**
          * @param {SavegameMetadata} game
@@ -12022,14 +12140,19 @@ declare module "states/main_menu" {
         onWegameRatingClicked(): void;
         onContinueButtonClicked(): void;
     }
-    export type SavegameMetadata = import("savegame/savegame_typedefs").SavegameMetadata;
+    export type SavegameMetadata = {
+        lastUpdate: number;
+        version: number;
+        internalId: string;
+        level: number;
+        name: string;
+    };
     export type EnumSetting = import("profile/setting_types").EnumSetting;
     import { GameState } from "core/game_state";
     import { HUDModalDialogs } from "game/hud/parts/modal_dialogs";
 }
 declare module "states/mobile_warning" {
     export class MobileWarningState extends GameState {
-        constructor();
     }
     import { GameState } from "core/game_state";
 }
@@ -12041,7 +12164,6 @@ declare module "game/hints" {
 }
 declare module "states/preload" {
     export class PreloadState extends GameState {
-        constructor();
         dialogs: HUDModalDialogs;
         /** @type {HTMLElement} */
         statusText: HTMLElement;
@@ -12066,7 +12188,6 @@ declare module "states/preload" {
 }
 declare module "states/settings" {
     export class SettingsState extends TextualGameState {
-        constructor();
         getCategoryButtonsHtml(): string;
         getSettingsHtml(): string;
         renderBuildText(): void;
@@ -12121,6 +12242,7 @@ declare module "platform/game_analytics" {
 }
 declare module "platform/browser/game_analytics" {
     export class ShapezGameAnalytics extends GameAnalyticsInterface {
+        constructor(app: any);
         get environment(): "dev" | "steam-sandbox" | "steam" | "prod" | "alpha-sandbox" | "alpha" | "beta-sandbox" | "beta";
         syncKey: any;
         /**
@@ -12216,7 +12338,6 @@ declare module "core/restriction_manager" {
 }
 declare module "states/puzzle_menu" {
     export class PuzzleMenuState extends TextualGameState {
-        constructor();
         loading: boolean;
         activeCategory: string;
         /**
@@ -12363,7 +12484,6 @@ declare module "platform/api" {
 }
 declare module "states/login" {
     export class LoginState extends GameState {
-        constructor();
         payload: {
             nextStateId: string;
         };
@@ -12382,7 +12502,6 @@ declare module "states/login" {
 }
 declare module "states/wegame_splash" {
     export class WegameSplashState extends GameState {
-        constructor();
     }
     import { GameState } from "core/game_state";
 }
@@ -12408,7 +12527,12 @@ declare module "modloader/mod" {
          */
         constructor(id: string, info: ModInfo, enabled?: boolean);
         id: string;
-        info: ModInfo;
+        info: {
+            name: string;
+            description: string;
+            authors: Array<string>;
+            version: string;
+        };
         enabled: boolean;
         signals: {
             enable: Signal;
@@ -12461,6 +12585,7 @@ declare module "game/component_registry" {
 }
 declare module "game/hud/parts/puzzle_back_to_menu" {
     export class HUDPuzzleBackToMenu extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         button: HTMLButtonElement;
         back(): void;
@@ -12469,6 +12594,7 @@ declare module "game/hud/parts/puzzle_back_to_menu" {
 }
 declare module "game/hud/parts/puzzle_dlc_logo" {
     export class HUDPuzzleDLCLogo extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         next(): void;
     }
@@ -12478,14 +12604,18 @@ declare module "game/modes/puzzle" {
     export class PuzzleGameMode extends GameMode {
         /** @returns {object} */
         static getSchema(): object;
+        /** @param {GameRoot} root */
+        constructor(root: GameRoot);
         zoneWidth: any;
         zoneHeight: any;
         getSaveData(): any;
     }
     import { GameMode } from "game/game_mode";
+    import { GameRoot } from "game/root";
 }
 declare module "game/hud/parts/puzzle_editor_controls" {
     export class HUDPuzzleEditorControls extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         titleElement: HTMLDivElement;
     }
@@ -12529,6 +12659,7 @@ declare module "game/hud/parts/puzzle_editor_review" {
 }
 declare module "game/hud/parts/puzzle_editor_settings" {
     export class HUDPuzzleEditorSettings extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         zone: HTMLDivElement;
         clearItems(): void;
@@ -12544,11 +12675,15 @@ declare module "game/hud/parts/puzzle_editor_settings" {
 declare module "game/modes/puzzle_edit" {
     export class PuzzleEditGameMode extends PuzzleGameMode {
         static getSchema(): {};
+        /** @param {GameRoot} root */
+        constructor(root: GameRoot);
     }
     import { PuzzleGameMode } from "game/modes/puzzle";
+    import { GameRoot } from "game/root";
 }
 declare module "game/hud/parts/puzzle_play_metadata" {
     export class HUDPuzzlePlayMetadata extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         titleElement: HTMLDivElement;
         puzzleNameElement: HTMLDivElement;
         element: HTMLDivElement;
@@ -12559,6 +12694,7 @@ declare module "game/hud/parts/puzzle_play_metadata" {
 }
 declare module "game/hud/parts/puzzle_complete_notification" {
     export class HUDPuzzleCompleteNotification extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         visible: boolean;
         domAttach: DynamicDomAttach;
         userDidLikePuzzle: any;
@@ -12582,6 +12718,7 @@ declare module "game/hud/parts/puzzle_complete_notification" {
 }
 declare module "game/hud/parts/puzzle_play_settings" {
     export class HUDPuzzlePlaySettings extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         clearItems(): void;
         resetPuzzle(): void;
@@ -12591,6 +12728,7 @@ declare module "game/hud/parts/puzzle_play_settings" {
 }
 declare module "game/hud/parts/HUDPuzzleNextPuzzle" {
     export class HUDPuzzleNextPuzzle extends BaseHUDPart {
+        constructor(root: import("game/root").GameRoot);
         element: HTMLDivElement;
         button: HTMLButtonElement;
         nextPuzzle(): void;
@@ -12609,7 +12747,52 @@ declare module "game/modes/puzzle_play" {
             puzzle: import("../../savegame/savegame_typedefs").PuzzleFullData;
             nextPuzzles: Array<number> | undefined;
         });
-        puzzle: import("savegame/savegame_typedefs").PuzzleFullData;
+        puzzle: {
+            meta: {
+                id: number;
+                shortKey: string;
+                likes: number;
+                downloads: number;
+                completions: number;
+                difficulty: number;
+                averageTime: number;
+                title: string;
+                author: string;
+                completed: boolean;
+            };
+            game: {
+                version: number;
+                bounds: {
+                    w: number;
+                    h: number;
+                };
+                buildings: ({
+                    type: "emitter";
+                    item: string;
+                    pos: {
+                        x: number;
+                        y: number;
+                        r: number;
+                    };
+                } | {
+                    type: "goal";
+                    item: string;
+                    pos: {
+                        x: number;
+                        y: number;
+                        r: number;
+                    };
+                } | {
+                    type: "block";
+                    pos: {
+                        x: number;
+                        y: number;
+                        r: number;
+                    };
+                })[];
+                excludedBuildings: string[];
+            };
+        };
         /**
          * @type {Array<number>}
          */
@@ -12638,11 +12821,17 @@ declare module "game/item_registry" {
 }
 declare module "game/time/fast_forward_game_speed" {
     export class FastForwardGameSpeed extends BaseGameSpeed {
+        constructor(root: import("game/root").GameRoot);
     }
     import { BaseGameSpeed } from "game/time/base_game_speed";
 }
 declare module "platform/ad_providers/adinplay" {
     export class AdinplayAdProvider extends AdProviderInterface {
+        /**
+         *
+         * @param {Application} app
+         */
+        constructor(app: Application);
         /** @type {ClickDetector} */
         getOnSteamClickDetector: ClickDetector;
         /** @type {Element} */
@@ -12663,9 +12852,11 @@ declare module "platform/ad_providers/adinplay" {
     }
     import { AdProviderInterface } from "platform/ad_provider";
     import { ClickDetector } from "core/click_detector";
+    import { Application } from "application";
 }
 declare module "platform/browser/no_game_analytics" {
     export class NoGameAnalytics extends GameAnalyticsInterface {
+        constructor(app: any);
     }
     import { GameAnalyticsInterface } from "platform/game_analytics";
 }
@@ -13344,11 +13535,11 @@ declare module "application" {
         /** @type {GameAnalyticsInterface} */
         gameAnalytics: GameAnalyticsInterface;
         focused: boolean;
-        pageVisible: boolean;
+        pageVisible: any;
         applicationPaused: boolean;
         /** @type {TypedTrackedState<boolean>} */
-        trackedIsRenderable: TypedTrackedState<boolean>;
-        screenWidth: number;
+        trackedIsRenderable: any;
+        screenWidth: any;
         screenHeight: number;
         lastResizeCheck: number;
         /** @type {Vector|null} */
@@ -13391,7 +13582,7 @@ declare module "application" {
         /**
          * Returns if the app is currently visible
          */
-        isRenderable(): boolean;
+        isRenderable(): any;
         onAppRenderableStateChanged(renderable: any): void;
         /**
          * Internal unload handler
