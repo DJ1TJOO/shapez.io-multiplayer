@@ -125,7 +125,7 @@ function gulptasksJS($, gulp, buildFolder, browserSync) {
 
     //// MOD
 
-    gulp.task("js.mod.transpiled", cb => {
+    gulp.task("js.mod.transpiled", async cb => {
         gulp.src("../src/js/main.js")
             .pipe(
                 $.webpackStream(
@@ -142,7 +142,7 @@ function gulptasksJS($, gulp, buildFolder, browserSync) {
             .on("end", cb);
     });
 
-    gulp.task("js.mod.latest", cb => {
+    gulp.task("js.mod.latest", async cb => {
         gulp.src("../src/js/main.js")
             .pipe(
                 $.webpackStream(
