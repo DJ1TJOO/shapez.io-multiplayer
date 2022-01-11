@@ -93,7 +93,7 @@ jobs:
             - name: Building mod development version
               run: |
                   cd gulp
-                  yarn gulp build.staging
+                  yarn gulp build.mod
 
             - name: Getting commit hash
               id: hash
