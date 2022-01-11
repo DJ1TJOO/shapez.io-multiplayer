@@ -28,18 +28,8 @@ jobs:
             - name: Checkout repo
               uses: actions/checkout@v2
 
-            - name: Get yarn cache directory path
-              id: yarn-cache-dir-path
-              run: echo "::set-output name=dir::$(yarn cache dir)"
-
-            - name: Install Yarn Dependencies
-              id: yarn-cache
-              uses: actions/cache@v1
-              with:
-                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-yarn-
+            - name: Check Yarn Cache
+              uses: c-hive/gha-yarn-cache@v2
 
             - name: Install Yarn Dependencies
               if: steps.yarn-cache.outputs.cache-hit != 'true'
@@ -98,21 +88,10 @@ jobs:
             - name: Checkout repo
               uses: actions/checkout@v2
 
-            - name: Get yarn cache directory path
-              id: yarn-cache-dir-path
-              run: echo "::set-output name=dir::$(yarn cache dir)"
+            - name: Check Yarn Cache
+              uses: c-hive/gha-yarn-cache@v2
 
             - name: Install Yarn Dependencies
-              id: yarn-cache
-              uses: actions/cache@v1
-              with:
-                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-yarn-
-
-            - name: Install Yarn Dependencies
-              if: steps.yarn-cache.outputs.cache-hit != 'true'
               run: |
                   yarn
                   cd gulp/
@@ -132,5 +111,5 @@ jobs:
               uses: actions/upload-artifact@v2
               with:
                   name: shapezio-mod-build-${{ steps.hash.outputs.short }}
-                  path: "/build"
+                  path: "/build/"
                   if-no-files-found: error
