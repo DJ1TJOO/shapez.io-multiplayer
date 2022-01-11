@@ -125,9 +125,8 @@ function gulptasksJS($, gulp, buildFolder, browserSync) {
 
     //// MOD
 
-    gulp.task("js.mod.transpiled", () => {
-        return gulp
-            .src("../src/js/main.js")
+    gulp.task("js.mod.transpiled", cb => {
+        gulp.src("../src/js/main.js")
             .pipe(
                 $.webpackStream(
                     requireUncached("./webpack.production.config.js")({
@@ -139,12 +138,12 @@ function gulptasksJS($, gulp, buildFolder, browserSync) {
                 )
             )
             .pipe($.rename("bundle-transpiled.js"))
-            .pipe(gulp.dest(buildFolder));
+            .pipe(gulp.dest(buildFolder))
+            .on("end", cb);
     });
 
-    gulp.task("js.mod.latest", () => {
-        return gulp
-            .src("../src/js/main.js")
+    gulp.task("js.mod.latest", cb => {
+        gulp.src("../src/js/main.js")
             .pipe(
                 $.webpackStream(
                     requireUncached("./webpack.production.config.js")({
@@ -155,7 +154,8 @@ function gulptasksJS($, gulp, buildFolder, browserSync) {
                     })
                 )
             )
-            .pipe(gulp.dest(buildFolder));
+            .pipe(gulp.dest(buildFolder))
+            .on("end", cb);
     });
     gulp.task("js.mod", gulp.series("js.mod.transpiled", "js.mod.latest"));
 
