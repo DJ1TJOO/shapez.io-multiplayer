@@ -11,10 +11,12 @@ function parseArgumentsIntoOptions(rawArgs) {
             "--git": Boolean,
             "--install": Boolean,
             "--shapez": String,
+            "--shapez-repo": String,
             "--yes": Boolean,
             "-g": "--git",
             "-i": "--install",
             "-s": "--shapez",
+            "-sr": "--shapez-repo",
             "-y": "--yes",
         },
         {
@@ -25,6 +27,7 @@ function parseArgumentsIntoOptions(rawArgs) {
         skipPrompts: args["--yes"] || false,
         git: args["--git"] || false,
         shapez: args["--shapez"] || false,
+        shapezRepo: args["--shapez-repo"] || false,
         runInstall: args["--install"] || false,
     };
 }
@@ -37,9 +40,12 @@ async function promptForMissingOptions(options) {
     const defaultVesion = "1.0.0";
     const defaultPackageManager = "yarn";
     const defaultShapez = "latest";
+    const defaultShapezRepo = "https://github.com/DJ1TJOO/shapez.io/tree/modloader-try-again";
+
     if (options.skipPrompts) {
         return {
             ...options,
+            shapezRepo: options.shapezRepo || defaultShapezRepo,
             shapez: options.shapez || defaultShapez,
             name: defaultName,
             modId: defaultModId,
@@ -101,7 +107,7 @@ async function promptForMissingOptions(options) {
     if (!options.install) {
         questions.push({
             type: "confirm",
-            name: "install",
+            name: "runInstall",
             message: "Install all modules?",
             default: true,
         });
@@ -126,8 +132,9 @@ async function promptForMissingOptions(options) {
     const answers = await inquirer.prompt(questions);
     return {
         ...options,
+        shapezRepo: options.shapezRepo || defaultShapezRepo,
         shapez: options.shapez || answers.shapez || defaultShapez,
-        install: options.install || answers.install,
+        runInstall: options.runInstall || answers.runInstall,
         git: options.git || answers.git,
         name: options.name || answers.name,
         modId: options.modId || answers.modId,

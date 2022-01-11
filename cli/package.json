@@ -8,9 +8,6 @@
         "@dj1tjoo/create-shapezio-mod": "bin/create-shapezio-mod",
         "create-shapezio-mod": "bin/create-shapezio-mod"
     },
-    "scripts": {
-        "test": "node src/test.js"
-    },
     "publishConfig": {
         "access": "public"
     },
@@ -24,9 +21,10 @@
     "files": [
         "bin/",
         "src/",
-        "templates/"
+        "template/"
     ],
     "dependencies": {
+        "adm-zip": "^0.5.9",
         "arg": "^5.0.1",
         "chalk": "4.1.2",
         "esm": "^3.2.25",
@@ -36,6 +34,7 @@
         "listr": "^0.14.3",
         "ncp": "^2.0.0",
         "octokit": "^1.7.1",
-        "pkg-install": "^1.0.0"
+        "pkg-install": "^1.0.0",
+        "superagent": "^7.0.1"
     }
 }

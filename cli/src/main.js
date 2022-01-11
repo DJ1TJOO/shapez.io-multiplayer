@@ -6,9 +6,14 @@ import { promisify } from "util";
 import Listr from "listr";
 import { projectInstall } from "pkg-install";
 import { execSync } from "child_process";
-import { Octokit } from "octokit";
+import { Octokit } from "@octokit/rest";
+import admZip from "adm-zip";
+import { gh } from "../config";
+import url from "url";
 
-const octokit = new Octokit();
+const octokit = new Octokit({
+    auth: gh,
+});
 const access = promisify(fs.access);
 const copy = promisify(ncp);
 
@@ -37,10 +42,11 @@ async function updateTemplateFiles(options) {
     packageFile = packageFile.replace(/mod_version/g, options.version);
     packageFile = packageFile.replace(/mod_author/g, options.author);
 
+    mainFile = mainFile.replace(/mod_id/g, options.modId);
     mainFile = mainFile.replace(/mod_name/g, options.name);
     mainFile = mainFile.replace(/mod_description/g, options.description);
     mainFile = mainFile.replace(/mod_version/g, options.version);
-    mainFile = mainFile.replace(/mod_authors/g, `["${options.author}"]`);
+    mainFile = mainFile.replace(/mod_author/g, options.author);
 
     // Write files
     fs.writeFileSync(packagePath, packageFile);
@@ -49,7 +55,12 @@ async function updateTemplateFiles(options) {
     return;
 }
 
-async function downloadShapez(options, owner, repo, branch) {
+async function downloadShapez(options) {
+    let [owner, repo, tree, branch] = options.shapezRepo.replace("https://github.com/", "").split("/");
+    if (tree !== "tree" || !branch) {
+        branch = "master";
+    }
+
     try {
         const lastCommit = await octokit.request(
             "GET https://api.github.com/repos/{owner}/{repo}/commits/{branch}",
@@ -59,16 +70,32 @@ async function downloadShapez(options, owner, repo, branch) {
                 branch,
             }
         );
-        const commit = lastCommit.data.sha.substring(0, 7);
+        const artifactName = "shapezio-mod-build-" + lastCommit.data.sha.substring(0, 7);
 
-        const artifact = await octokit.request(
-            "GET https://api.github.com/repos/{owner}/{repo}/actions/artifacts/{artifact_id}",
+        const artifacts = await octokit.request(
+            "GET https://api.github.com/repos/{owner}/{repo}/actions/artifacts",
             {
                 owner,
                 repo,
-                artifact_id: "shapezio-mod-build-" + commit,
             }
         );
+        const artifactMeta = artifacts.data.artifacts.find(x => x.name === artifactName);
+
+        const artifact = await octokit.actions.downloadArtifact({
+            owner,
+            repo,
+            artifact_id: artifactMeta.id,
+            archive_format: "zip",
+        });
+
+        fs.writeFileSync("./shapez-zip.zip", Buffer.from(artifact.data));
+
+        const zip = new admZip("./shapez-zip.zip");
+        zip.extractEntryTo("types.d.ts", "./src/js/");
+        zip.extractAllTo("./shapez");
+
+        fs.unlinkSync("./shapez-zip.zip");
+
         return;
     } catch (error) {
         return Promise.reject(new Error("Failed to download shapez.io build"));
@@ -92,7 +119,8 @@ export async function createProject(options) {
         targetDirectory: options.targetDirectory || process.cwd(),
     };
 
-    const templateDir = path.resolve(new URL(import.meta.url).pathname, "../template");
+    const pathName = url.fileURLToPath(import.meta.url);
+    const templateDir = path.resolve(pathName, "../../template/");
     options.templateDirectory = templateDir;
 
     try {
