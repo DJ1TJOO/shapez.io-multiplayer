@@ -11,7 +11,7 @@ steamPage:
         Daca asta nu era suficient, vei fi nevoit sa produci exponențial mai multe figuri pentru a satisface cererea - singurul lucru care te poate ajuta este extinderea !
 
         Dacă la început procesezi doar forme, vei fi nevoit sa le colorezi mai târziu - pentru asta vei avea nevoie să extragi și să amesteci culori !
-        
+
         Cumpărarea jocului pe Steam îți va asigura acesul la versiunea finală, dar te poți juca o versiune demonstrativă pe shapez.io mai întâi și să te decizi mai târziu !
     what_others_say: Ce spun alții despre shapez.io
     nothernlion_comment: This game is great - I'm having a wonderful time playing,
@@ -455,7 +455,7 @@ ingame:
             - 5. Odată ce ai apăsat revizurie, puzzle-ul tău va fi validat și îl vei putea
               publica.
             - 6. Odată lansat, <strong>toate constucțiile vor fi distruse</strong>
-              cu excepția producătoarelor constante și a acceptoarelorl de obiective 
+              cu excepția producătoarelor constante și a acceptoarelorl de obiective
             - Asta face parte din ceea ce trebuie să își dea seama jucătorul, până la urmă :)
     puzzleCompletion:
         title: Puzzle Completat!
@@ -609,7 +609,8 @@ buildings:
     logic_gate:
         default:
             name: Poartă AND
-            description: Emite valoarea binară "1" daca ambele input-uri sunt adevărate. (adevarat înseamna formă,
+            description:
+                Emite valoarea binară "1" daca ambele input-uri sunt adevărate. (adevarat înseamna formă,
                 culoare sau valoarea binară "1")
         not:
             name: Poartă NOT
@@ -617,20 +618,24 @@ buildings:
                 culoare sau valoarea binară "1")
         xor:
             name: Poartă XOR
-            description: Emite valoarea binară "1" daca unul din input-uri e adevărat, dar nu ambele. (adevarat înseamna formă,
+            description:
+                Emite valoarea binară "1" daca unul din input-uri e adevărat, dar nu ambele. (adevarat înseamna formă,
                 culoare sau valoarea binară "1")
         or:
             name: Poartă OR
-            description: Emite valoarea binară "1" daca unul sau mai multe input-uri este adevărat. (adevarat înseamna formă,
+            description:
+                Emite valoarea binară "1" daca unul sau mai multe input-uri este adevărat. (adevarat înseamna formă,
                 culoare sau valoarea binară "1")
     transistor:
         default:
             name: Tranzistor
-            description: Transmite valoarea de la input-ul de jos daca input-ul din lateral este adevarat (adevarat înseamna formă,
+            description:
+                Transmite valoarea de la input-ul de jos daca input-ul din lateral este adevarat (adevarat înseamna formă,
                 culoare sau valoarea binară "1").
         mirrored:
             name: Transistor
-            description: Transmite valoarea de la input-ul de jos daca input-ul din lateral este adevarat (adevarat înseamna formă,
+            description:
+                Transmite valoarea de la input-ul de jos daca input-ul din lateral este adevarat (adevarat înseamna formă,
                 culoare sau valoarea binară "1").
     filter:
         default:
@@ -991,7 +996,7 @@ settings:
                 poți șterge direct construcția apasând click dreapta.
         lowQualityTextures:
             title: Texturi la calitate slabă(Urât)
-            description: Folosește texturi la calitate slabă pentru a salva performanța. 
+            description: Folosește texturi la calitate slabă pentru a salva performanța.
                 Va face jocul să arate mai urât.
         displayChunkBorders:
             title: Afișează marginea chuck-urilor
@@ -1019,7 +1024,7 @@ settings:
             description: Controlează dimensiunea formelor pe hartă (la micșorare)
         shapeTooltipAlwaysOn:
             title: Sfaturi Formă - Afișează mereu
-            description: Dacă se va afișa permanent sfalturi despre formă deasupra 
+            description: Dacă se va afișa permanent sfalturi despre formă deasupra
                 construcțiilor, in schimbul afișării doar la apăsarea butonului ALT.
     rangeSliderPercentage: <amount> %
     tickrateHz: <amount> Hz
@@ -1050,7 +1055,7 @@ keybindings:
         menuOpenShop: Upgrade-uri
         menuOpenStats: Statistici
         toggleHud: Comută interfața
-        toggleFPSInfo: Comută FPS și informații depănare 
+        toggleFPSInfo: Comută FPS și informații depănare
         belt: Benzi Rulante
         underground_belt: Tunel
         miner: Extractor
@@ -1225,7 +1230,7 @@ puzzleMenu:
         goalAcceptorRateNotMet: Unul sau mai multe acceptoare de obiective nu primesc suficiente
             iteme. Asigură-te că indicatoarele sunt verzi pentru toate acceptoarele.
         buildingOutOfBounds: Una sau mai multe construcții sunt în afara ariei de construcție.
-           Mărește zona sau șterge-le.
+            Mărește zona sau șterge-le.
         autoComplete: Puzzle-ul tău se completeaza automat! Asigură-te că producătoarele
             constante nu livrează direct către acceptoarele de obiective.
     difficulties:
@@ -1233,7 +1238,7 @@ puzzleMenu:
         medium: Medium
         hard: Greu
         unknown: Neevaluat
-    dlcHint: Ai cumpărat deja DLC-ul? Asigură-te ca e activat pe 
+    dlcHint: Ai cumpărat deja DLC-ul? Asigură-te ca e activat pe
         shapez.io în biblioteca ta, selectând Properietăți > DLC-uri.
     search:
         action: Caută

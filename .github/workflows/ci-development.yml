@@ -52,9 +52,14 @@ jobs:
             - name: Checkout repo
               uses: actions/checkout@v2
             - name: YAML Lint
-              uses: ibiqlik/action-yamllint@v1.0.0
+              uses: ibiqlik/action-yamllint@v3
               with:
                   file_or_dir: translations/*.yaml
+                  config_data: |
+                      extends: default
+                      rules:
+                       line-length:
+                        max: 300
 
     create-mod:
         name: create-mod
