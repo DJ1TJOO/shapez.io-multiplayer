@@ -111,5 +111,5 @@ jobs:
               uses: actions/upload-artifact@v2
               with:
                   name: shapezio-mod-build-${{ steps.hash.outputs.short }}
-                  path: "/build/"
+                  path: "./build/"
                   if-no-files-found: error
