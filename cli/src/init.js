@@ -56,38 +56,38 @@ async function promptForMissingOptions(options) {
     const questions = [];
     questions.push({
         name: "name",
-        message: "Please input the mod name:",
+        message: "Name:",
         default: defaultName,
     });
 
     questions.push({
         name: "modId",
-        message: "Please input the mod id:",
+        message: "Mod id:",
         default: defaultModId,
     });
 
     questions.push({
         name: "description",
-        message: "Please input the mod description:",
+        message: "Description:",
         default: defaultDescription,
     });
 
     questions.push({
         name: "author",
-        message: "Please input the author:",
+        message: "Author:",
         default: defaultAuthor,
     });
 
     questions.push({
         name: "version",
-        message: "Please input the mod version:",
+        message: "Version:",
         default: defaultVesion,
     });
 
     questions.push({
         type: "list",
         name: "packageManager",
-        message: "Please choose which package manager you want to use:",
+        message: "Choose which package manager you want to use:",
         choices: ["yarn", "npm"],
         default: defaultPackageManager,
     });

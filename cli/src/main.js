@@ -65,7 +65,7 @@ async function downloadShapez(options) {
             {
                 owner,
                 repo,
-                branch: commit === "latest" ? commit : branch,
+                branch: commit !== "latest" ? commit : branch,
             }
         );
         const artifactName = "shapezio-mod-build-" + lastCommit.data.sha.substring(0, 7);
@@ -152,7 +152,7 @@ export async function createProject(options) {
             task: () => updateTemplateFiles(options),
         },
         {
-            title: "Downloading latest shapez.io build",
+            title: `Downloading${options.shapez === "latest" ? " latest" : ""} shapez.io build`,
             task: () => downloadShapez(options),
         },
         {
@@ -195,7 +195,7 @@ export async function upgradeShapez(options) {
 
     const tasks = new Listr([
         {
-            title: "Downloading latest shapez.io build",
+            title: `Downloading${options.shapez === "latest" ? " latest" : ""} shapez.io build`,
             task: () => downloadShapez(options),
         },
     ]);
