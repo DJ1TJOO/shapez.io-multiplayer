@@ -6,7 +6,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const StringReplacePlugin = require("string-replace-webpack-plugin");
 const UnusedFilesPlugin = require("unused-files-webpack-plugin").UnusedFilesWebpackPlugin;
 
-module.exports = () => {
+module.exports = ({ injectCss = true }) => {
     const minifyNames = false;
 
     return {
@@ -202,29 +202,29 @@ module.exports = () => {
                     test: /\.js$/,
                     exclude: /node_modules/,
                     use: [
-                        {
-                            loader: "string-replace-loader",
-                            options: {
-                                search:
-                                    "import[ \\n]*{([a-zA-Z0-9_$, \\n]*)*}[ \\n]*from[ \\n]*[`|\"|'](shapez\\/[^]*?)[`|\"|'];",
-                                replace(match, variables, path) {
-                                    return `const {${variables}} = shapez["${path.replace("shapez/", "")}"];`;
+                        StringReplacePlugin.replace({
+                            replacements: [
+                                {
+                                    pattern:
+                                        /import[ \n]*{([a-zA-Z0-9_$, \n]*)*}[ \n]*from[ \n]*[`|"|'](shapez\/[^]*?)[`|"|'];/gms,
+                                    replacement: (match, variables, path) => {
+                                        return `const {${variables}} = shapez["${path.replace(
+                                            "shapez/",
+                                            ""
+                                        )}"];`;
+                                    },
                                 },
-                                flags: "gms",
-                            },
-                        },
-                        {
-                            loader: "string-replace-loader",
-                            options: {
-                                search:
-                                    "(const|var|let|[a-zA-Z0-9\\.]*?)?[ \\n]*([a-zA-Z0-9]*?)[ \\n]*=[ \\n]*(new )?[ \\n]*([a-zA-Z0-9\\.]*)?Mod\\(([^]*?)\\);",
-                                replace(match, type, variableName) {
-                                    const css = `${variableName}.registerCss(CSS_MAIN);\n${variableName}.registerCss(CSS_RESOURCES);`;
-                                    return `${match}\n${css}`;
+                                {
+                                    pattern:
+                                        /(const|var|let|[a-zA-Z0-9\.]*?)?[ \n]*([a-zA-Z0-9]*?)[ \n]*=[ \n]*(new )?[ \n]*([a-zA-Z0-9\.]*)?Mod\(([^]*?)\);/gms,
+                                    replacement: (match, type, variableName) => {
+                                        const css = `${variableName}.registerCss(CSS_MAIN);\n${variableName}.registerCss(CSS_RESOURCES);`;
+
+                                        return injectCss ? `${match}\n${css}` : `${match}`;
+                                    },
                                 },
-                                flags: "gms",
-                            },
-                        },
+                            ],
+                        }),
                     ],
                 },
                 {

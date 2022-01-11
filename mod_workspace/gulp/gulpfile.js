@@ -4,6 +4,7 @@ const browserSync = require("browser-sync").create({});
 const gulp = require("gulp");
 const fs = require("fs");
 const log = require("fancy-log");
+const argv = require("yargs").argv;
 
 function requireUncached(module) {
     delete require.cache[require.resolve(module)];
@@ -101,6 +102,7 @@ gulp.task("js.dev", cb => {
             $.webpackStream(
                 requireUncached("./webpack.config.js")({
                     watch: true,
+                    injectCss: argv["no-css"] === undefined,
                 })
             )
         )
@@ -111,7 +113,13 @@ gulp.task("js.dev", cb => {
 
 gulp.task("js", cb => {
     gulp.src("../src/js/main.js")
-        .pipe($.webpackStream(requireUncached("./webpack.production.config.js")()))
+        .pipe(
+            $.webpackStream(
+                requireUncached("./webpack.production.config.js")({
+                    injectCss: argv["no-css"] === undefined,
+                })
+            )
+        )
         .pipe(gulp.dest(buildFolder));
     return cb();
 });
