@@ -15,7 +15,7 @@ import { defaultBuildingVariant, MetaBuilding } from "../game/meta_building";
  */
 
 /**
- * Creates a new Mod.
+ * Creates a new Mod instance.
  * @class
  */
 export class Mod {

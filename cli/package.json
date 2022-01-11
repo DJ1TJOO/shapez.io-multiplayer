@@ -8,6 +8,9 @@
         "@dj1tjoo/create-shapezio-mod": "bin/create-shapezio-mod",
         "create-shapezio-mod": "bin/create-shapezio-mod"
     },
+    "scripts": {
+        "test": "node src/test.js"
+    },
     "publishConfig": {
         "access": "public"
     },
@@ -30,7 +33,6 @@
         "esm": "^3.2.25",
         "github-api": "^3.4.0",
         "inquirer": "^8.2.0",
-        "inquirer-list-input": "^0.1.2",
         "listr": "^0.14.3",
         "ncp": "^2.0.0",
         "octokit": "^1.7.1",

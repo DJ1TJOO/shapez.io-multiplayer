@@ -8,12 +8,9 @@ import { projectInstall } from "pkg-install";
 import { execSync } from "child_process";
 import { Octokit } from "@octokit/rest";
 import admZip from "adm-zip";
-import { gh } from "../config";
 import url from "url";
 
-const octokit = new Octokit({
-    auth: gh,
-});
+const octokit = new Octokit();
 const access = promisify(fs.access);
 const copy = promisify(ncp);
 
@@ -56,6 +53,7 @@ async function updateTemplateFiles(options) {
 }
 
 async function downloadShapez(options) {
+    const commit = options.shapez;
     let [owner, repo, tree, branch] = options.shapezRepo.replace("https://github.com/", "").split("/");
     if (tree !== "tree" || !branch) {
         branch = "master";
@@ -67,7 +65,7 @@ async function downloadShapez(options) {
             {
                 owner,
                 repo,
-                branch,
+                branch: commit === "latest" ? commit : branch,
             }
         );
         const artifactName = "shapezio-mod-build-" + lastCommit.data.sha.substring(0, 7);
@@ -81,18 +79,32 @@ async function downloadShapez(options) {
         );
         const artifactMeta = artifacts.data.artifacts.find(x => x.name === artifactName);
 
-        const artifact = await octokit.actions.downloadArtifact({
-            owner,
-            repo,
-            artifact_id: artifactMeta.id,
-            archive_format: "zip",
-        });
+        const workflows = await octokit.request(
+            "GET https://api.github.com/repos/{owner}/{repo}/actions/workflows/ci-development.yml/runs",
+            {
+                owner,
+                repo,
+            }
+        );
+        const workflowMeta = workflows.data.workflow_runs.sort(
+            (a, b) => new Date(b.date) - new Date(a.date)
+        )[0];
+
+        const artifact = await octokit.request(
+            `GET https://nightly.link/{owner}/{repo}/suites/{check_suite_id}/artifacts/{artifact_id}`,
+            {
+                owner,
+                repo,
+                check_suite_id: workflowMeta.check_suite_id,
+                artifact_id: artifactMeta.id,
+            }
+        );
 
         fs.writeFileSync("./shapez-zip.zip", Buffer.from(artifact.data));
 
         const zip = new admZip("./shapez-zip.zip");
-        zip.extractEntryTo("types.d.ts", "./src/js/");
-        zip.extractAllTo("./shapez");
+        zip.extractEntryTo("types.d.ts", "./src/js/", true, true);
+        zip.extractAllTo("./shapez", true);
 
         fs.unlinkSync("./shapez-zip.zip");
 
@@ -158,9 +170,37 @@ export async function createProject(options) {
             skip: () =>
                 !options.runInstall ? "Pass --install to automatically install dependencies" : undefined,
         },
+        {
+            title: "Install gulp dependencies",
+            task: () =>
+                projectInstall({
+                    prefer: options.packageManager,
+                    cwd: path.join(options.targetDirectory, "gulp"),
+                }),
+            skip: () =>
+                !options.runInstall ? "Pass --install to automatically install dependencies" : undefined,
+        },
     ]);
 
     await tasks.run();
     console.log("%s Project ready", chalk.green.bold("DONE"));
+    return true;
+}
+
+export async function upgradeShapez(options) {
+    options = {
+        ...options,
+        targetDirectory: options.targetDirectory || process.cwd(),
+    };
+
+    const tasks = new Listr([
+        {
+            title: "Downloading latest shapez.io build",
+            task: () => downloadShapez(options),
+        },
+    ]);
+
+    await tasks.run();
+    console.log("%s Shapez ready", chalk.green.bold("DONE"));
     return true;
 }
