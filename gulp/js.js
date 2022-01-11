@@ -157,7 +157,7 @@ function gulptasksJS($, gulp, buildFolder, browserSync) {
             )
             .pipe(gulp.dest(buildFolder));
     });
-    gulp.task("js.mod", gulp.parallel("js.mod.transpiled", "js.mod.latest"));
+    gulp.task("js.mod", gulp.series("js.mod.transpiled", "js.mod.latest"));
 
     //// PROD
 
