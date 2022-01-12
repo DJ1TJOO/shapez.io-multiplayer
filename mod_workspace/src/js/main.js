@@ -1,3 +1,6 @@
+import { cachebust } from "shapez/core/cachebust";
+import { TextualGameState } from "shapez/core/textual_game_state";
+import { makeDiv } from "shapez/core/utils";
 import { Mod } from "shapez/modloader/mod";
 
 const mod = new Mod("test", {
@@ -6,7 +9,8 @@ const mod = new Mod("test", {
     authors: ["DJ1TJOO"],
     version: "0.0.1",
 });
-class AboutModsState extends shapez.TextualGameState {
+
+class AboutModsState extends TextualGameState {
     constructor() {
         super("AboutModsState");
     }
@@ -19,7 +23,7 @@ class AboutModsState extends shapez.TextualGameState {
         return `
             <div class="head">
                 <div class="logo">
-                    <img src="${shapez.cachebust("res/logo.png")}" alt="shapez.io Logo">
+                    <img src="${cachebust("res/logo.png")}" alt="shapez.io Logo">
                     <span class="updateLabel">Mods</span>
                 </div>
             </div>
@@ -56,7 +60,7 @@ mod.modManager.app.stateMgr.stateChanged.add(
         // Add buttons
         const buttonsElement = gameState.htmlElement.querySelector(".topButtons");
 
-        const aboutButton = shapez.makeDiv(buttonsElement, null, ["aboutButton", "settingsButton"]);
+        const aboutButton = makeDiv(buttonsElement, null, ["aboutButton", "settingsButton"]);
         aboutButton.addEventListener("click", () => {
             mod.modManager.app.stateMgr.moveToState("AboutModsState");
         });
