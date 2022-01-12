@@ -88,6 +88,7 @@ function gulptasksMod($, gulp, buildFolder, browserSync) {
                             (matched, moduleName) => `declare module "shapez/${moduleName}"`
                         )
                     )
+                    .pipe($.replace(/var/gms, "let"))
                     .pipe(gulp.dest("../build/"));
                 stream.on("end", cb);
                 stream.on("error", cb);
