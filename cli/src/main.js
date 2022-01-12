@@ -20,6 +20,12 @@ async function copyTemplateFiles(options) {
     });
 }
 
+async function updateBuildFiles(options) {
+    return copy(path.join(options.templateDirectory, "gulp"), path.join(options.targetDirectory, "gulp"), {
+        clobber: true,
+    });
+}
+
 async function updateTemplateFiles(options) {
     // Paths
     const targetDirectory = options.targetDirectory;
@@ -154,6 +160,7 @@ export async function createProject(options) {
         {
             title: `Downloading${options.shapez === "latest" ? " latest" : ""} shapez.io build`,
             task: () => downloadShapez(options),
+            skip: () => !options.installShapez,
         },
         {
             title: "Initialize git",
@@ -187,7 +194,7 @@ export async function createProject(options) {
     return true;
 }
 
-export async function upgradeShapez(options) {
+export async function upgradeProject(options) {
     options = {
         ...options,
         targetDirectory: options.targetDirectory || process.cwd(),
@@ -195,12 +202,17 @@ export async function upgradeShapez(options) {
 
     const tasks = new Listr([
         {
+            title: "Updating build files",
+            task: () => updateBuildFiles(options),
+        },
+        {
             title: `Downloading${options.shapez === "latest" ? " latest" : ""} shapez.io build`,
             task: () => downloadShapez(options),
+            skip: () => !options.installShapez,
         },
     ]);
 
     await tasks.run();
-    console.log("%s Shapez ready", chalk.green.bold("DONE"));
+    console.log("%s Upgrade ready", chalk.green.bold("DONE"));
     return true;
 }

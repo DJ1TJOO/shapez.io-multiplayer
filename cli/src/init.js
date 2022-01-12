@@ -38,12 +38,14 @@ async function promptForMissingOptions(options) {
     const defaultPackageManager = "yarn";
     const defaultShapez = "latest";
     const defaultShapezRepo = "https://github.com/DJ1TJOO/shapez.io/tree/modloader-try-again";
+    const defaultInstallShapez = true;
 
     if (options.skipPrompts) {
         return {
             ...options,
             shapezRepo: options.shapezRepo || defaultShapezRepo,
             shapez: options.shapez || defaultShapez,
+            installShapez: options.shapez ? true : defaultInstallShapez,
             name: defaultName,
             modId: defaultModId,
             description: defaultDescription,
@@ -62,7 +64,7 @@ async function promptForMissingOptions(options) {
 
     questions.push({
         name: "modId",
-        message: "Mod id:",
+        message: "Mod ID:",
         default: defaultModId,
     });
 
@@ -113,16 +115,16 @@ async function promptForMissingOptions(options) {
     if (!options.shapez) {
         questions.push({
             type: "confirm",
-            name: "latestShapez",
-            message: "Download latest shapez.io build?",
-            default: true,
+            name: "installShapez",
+            message: "Download shapez.io build?",
+            default: defaultInstallShapez,
         });
 
         questions.push({
             name: "shapez",
             message: "Please input the shapez commit hash you want to use:",
             default: defaultShapez,
-            when: answers => !answers.latestShapez,
+            when: answers => answers.installShapez,
         });
     }
 
@@ -130,15 +132,16 @@ async function promptForMissingOptions(options) {
     return {
         ...options,
         shapezRepo: options.shapezRepo || defaultShapezRepo,
-        shapez: options.shapez || answers.shapez || defaultShapez,
+        shapez: options.shapez || answers.shapez,
+        installShapez: options.shapez ? true : answers.installShapez,
         runInstall: options.runInstall || answers.runInstall,
         git: options.git || answers.git,
-        name: options.name || answers.name,
-        modId: options.modId || answers.modId,
-        description: options.description || answers.description,
-        author: options.author || answers.author,
-        version: options.version || answers.version,
-        packageManager: options.packageManager || answers.packageManager,
+        name: answers.name,
+        modId: answers.modId,
+        description: answers.description,
+        author: answers.author,
+        version: answers.version,
+        packageManager: answers.packageManager,
     };
 }
 
