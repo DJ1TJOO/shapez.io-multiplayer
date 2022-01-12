@@ -3,7 +3,7 @@
  */
 
 import { Mod } from "./mod";
-import { exports } from "./exports";
+import { setExports } from "./exports";
 import { queryParamOptions } from "../core/query_parameters";
 
 export class ModManager {
@@ -25,6 +25,9 @@ export class ModManager {
          * }>}
          */
         this.translations = [];
+
+        // Set exports
+        setExports();
 
         // Load local mod for mod development
         if (G_IS_MOD || queryParamOptions.modVersion) {

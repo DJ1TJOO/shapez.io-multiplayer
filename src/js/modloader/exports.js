@@ -578,8 +578,10 @@ export const exports = {
     "translations": import_291,
 };
 
-Object.defineProperty(window, "shapez", {
-    value: exports,
-    writable: false,
-    configurable: false,
-});
+export function setExports() {
+    Object.defineProperty(window, "shapez", {
+        value: exports,
+        writable: false,
+        configurable: false,
+    });
+}

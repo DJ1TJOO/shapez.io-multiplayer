@@ -129,7 +129,21 @@ function gulptasksMod($, gulp, buildFolder, browserSync) {
                     .pipe($.replace(/declare (function|const|let)[^]*?;/gms, ""))
                     .pipe(
                         $.footer(`declare const CSS_MAIN: string;
-                                  declare const CSS_RESOURCES: string;`)
+                                  declare const CSS_RESOURCES: string;
+                                  declare const ATLASES: {
+                                        hq: {
+                                            src: string;
+                                            atlasData: import("shapez/core/loader").AtlasDefinition;
+                                        };
+                                        mq: {
+                                            src: string;
+                                            atlasData: import("shapez/core/loader").AtlasDefinition;
+                                        };
+                                        lq: {
+                                            src: string;
+                                            atlasData: import("shapez/core/loader").AtlasDefinition;
+                                        };
+                                    };`)
                     )
                     .pipe(
                         $.prettier({

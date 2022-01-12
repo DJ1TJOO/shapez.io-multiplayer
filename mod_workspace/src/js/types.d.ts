@@ -140,6 +140,7 @@ declare module "shapez/translations" {
         app: import("shapez/application").Application,
         id: string
     ): void;
+    export function updateApplicationLanguageMods(app: any, id: any): void;
     export let T: any;
 }
 declare module "shapez/core/utils" {
@@ -12222,6 +12223,10 @@ declare module "shapez/profile/application_settings" {
     export const allApplicationSettings: Array<BaseSetting>;
     export class ApplicationSettings extends ReadWriteProxy {
         constructor(app: any);
+        initialized: boolean;
+        signals: {
+            initialized: Signal;
+        };
         initialize(): Promise<void>;
         save(): Promise<void>;
         /**
@@ -12267,6 +12272,7 @@ declare module "shapez/profile/application_settings" {
     }
     import { BaseSetting } from "shapez/profile/setting_types";
     import { ReadWriteProxy } from "shapez/core/read_write_proxy";
+    import { Signal } from "shapez/core/signal";
     class SettingsStorage {
         uiScale: string;
         fullscreen: any;
@@ -12413,7 +12419,7 @@ declare module "shapez/core/textual_game_state" {
          * Goes to a new state, telling him to go back to this state later
          * @param {string} stateId
          */
-        moveToStateAddGoBack(stateId: string): void;
+        moveToStateAddGoBack(stateId: string, payload?: {}): void;
         /**
          * Removes all click detectors, except the one on the back button. Useful when regenerating
          * content.
@@ -12916,6 +12922,17 @@ declare module "shapez/modloader/mod" {
      * }} ModInfo
      */
     /**
+     * @typedef {{
+     * [x: string]: {
+     *  type: "bool" | "enum" | "range",
+     *  value: boolean | string | number,
+     *  title?: string,
+     *  description?: string,
+     *  enabled?: Function
+     * }
+     * }} ModSettings
+     */
+    /**
      * Creates a new Mod instance.
      * @class
      */
@@ -12924,9 +12941,10 @@ declare module "shapez/modloader/mod" {
          * Creates a Mod
          * @param {string} id Id of mod
          * @param {ModInfo} info Information about the mod
+         * @param {ModSettings} settings Mod settings, defauts to {}
          * @param {boolean} enabled Starts mod enabled, defauts to true
          */
-        constructor(id: string, info: ModInfo, enabled?: boolean);
+        constructor(id: string, info: ModInfo, settings?: ModSettings, enabled?: boolean);
         id: string;
         info: {
             name: string;
@@ -12934,12 +12952,27 @@ declare module "shapez/modloader/mod" {
             authors: Array<string>;
             version: string;
         };
+        settings: {
+            [x: string]: {
+                type: "bool" | "enum" | "range";
+                value: boolean | string | number;
+                title?: string;
+                description?: string;
+                enabled?: Function;
+            };
+        };
         enabled: boolean;
         signals: {
             enable: Signal;
             disable: Signal;
         };
         modManager: import("shapez/modloader/mod_manager").ModManager;
+        /**
+         * Registers a new atlas
+         * @param {string} data
+         * @param {import("shapez/core/loader").AtlasDefinition} sourceData
+         */
+        registerAtlas(data: string, sourceData: import("shapez/core/loader").AtlasDefinition): void;
         /**
          * Register new translations for language
          * @param {string} language
@@ -12977,6 +13010,15 @@ declare module "shapez/modloader/mod" {
         description: string;
         authors: Array<string>;
         version: string;
+    };
+    export type ModSettings = {
+        [x: string]: {
+            type: "bool" | "enum" | "range";
+            value: boolean | string | number;
+            title?: string;
+            description?: string;
+            enabled?: Function;
+        };
     };
     import { Signal } from "shapez/core/signal";
     import { MetaBuilding } from "shapez/game/meta_building";
@@ -13481,3 +13523,19 @@ declare module "shapez/application" {
     import { AnalyticsInterface } from "shapez/platform/analytics";
     import { Vector } from "shapez/core/vector";
 }
+declare const CSS_MAIN: string;
+declare const CSS_RESOURCES: string;
+declare const ATLASES: {
+    hq: {
+        src: string;
+        atlasData: import("shapez/core/loader").AtlasDefinition;
+    };
+    mq: {
+        src: string;
+        atlasData: import("shapez/core/loader").AtlasDefinition;
+    };
+    lq: {
+        src: string;
+        atlasData: import("shapez/core/loader").AtlasDefinition;
+    };
+};

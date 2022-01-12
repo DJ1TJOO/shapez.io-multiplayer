@@ -1,9 +1,11 @@
 import { GameState } from "../core/game_state";
 import { GLOBAL_APP } from "../core/globals";
 import { gMetaBuildingRegistry } from "../core/global_registries";
+import { Loader } from "../core/loader";
 import { Signal } from "../core/signal";
 import { addBuildingCodeCache, gBuildingVariants, registerBuildingVariant } from "../game/building_codes";
 import { defaultBuildingVariant, MetaBuilding } from "../game/meta_building";
+import { updateApplicationLanguageMods } from "../translations";
 
 /**
  * @typedef {{
@@ -15,6 +17,18 @@ import { defaultBuildingVariant, MetaBuilding } from "../game/meta_building";
  */
 
 /**
+ * @typedef {{
+ * [x: string]: {
+ *  type: "bool" | "enum" | "range",
+ *  value: boolean | string | number,
+ *  title?: string,
+ *  description?: string,
+ *  enabled?: Function
+ * }
+ * }} ModSettings
+ */
+
+/**
  * Creates a new Mod instance.
  * @class
  */
@@ -23,11 +37,13 @@ export class Mod {
      * Creates a Mod
      * @param {string} id Id of mod
      * @param {ModInfo} info Information about the mod
+     * @param {ModSettings} settings Mod settings, defauts to {}
      * @param {boolean} enabled Starts mod enabled, defauts to true
      */
-    constructor(id, info, enabled = true) {
+    constructor(id, info, settings = {}, enabled = true) {
         this.id = id;
         this.info = info;
+        this.settings = settings;
         this.enabled = enabled;
 
         // Setup signals
@@ -41,6 +57,20 @@ export class Mod {
     }
 
     /**
+     * Registers a new atlas
+     * @param {string} src
+     * @param {import("../core/loader").AtlasDefinition} sourceData
+     */
+    registerAtlas(src, sourceData) {
+        const sourceImage = new Image();
+        sourceImage.crossOrigin = "anonymous";
+        sourceImage.onload = () => {
+            Loader.internalParseAtlas(sourceData, sourceImage);
+        };
+        sourceImage.src = src;
+    }
+
+    /**
      * Register new translations for language
      * @param {string} language
      * @param {object} translations
@@ -50,6 +80,15 @@ export class Mod {
             language,
             data: translations,
         });
+
+        // Update language to add mod translations
+        if (this.modManager.app.settings.initialized) {
+            updateApplicationLanguageMods(this.modManager.app, this.modManager.app.settings.getLanguage());
+        } else {
+            this.modManager.app.settings.signals.initialized.add(() =>
+                updateApplicationLanguageMods(this.modManager.app, this.modManager.app.settings.getLanguage())
+            );
+        }
     }
 
     registerCss(css) {

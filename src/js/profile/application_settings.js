@@ -9,6 +9,7 @@ import { ExplainedResult } from "../core/explained_result";
 import { THEMES, applyGameTheme } from "../game/theme";
 import { T } from "../translations";
 import { LANGUAGES } from "../languages";
+import { Signal } from "../core/signal";
 
 const logger = createLogger("application_settings");
 
@@ -339,6 +340,10 @@ class SettingsStorage {
 export class ApplicationSettings extends ReadWriteProxy {
     constructor(app) {
         super(app, "app_settings.bin");
+        this.initialized = false;
+        this.signals = {
+            initialized: new Signal(),
+        };
     }
 
     initialize() {
@@ -353,7 +358,11 @@ export class ApplicationSettings extends ReadWriteProxy {
                 }
             })
 
-            .then(() => this.writeAsync());
+            .then(() => this.writeAsync())
+            .then(() => {
+                this.initialized = true;
+                this.signals.initialized.dispatch();
+            });
     }
 
     save() {

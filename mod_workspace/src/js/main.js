@@ -1,50 +1,44 @@
-import { cachebust } from "shapez/core/cachebust";
-import { TextualGameState } from "shapez/core/textual_game_state";
 import { makeDiv } from "shapez/core/utils";
-import { Mod } from "shapez/modloader/mod";
+import { ModsState } from "./states/mods";
+import { mod } from "./mod";
+import { AboutModsState } from "./states/about_mods";
 
-const mod = new Mod("test", {
-    name: "TestMod",
-    description: "A test mod for modloader",
-    authors: ["DJ1TJOO"],
-    version: "0.0.1",
-});
-
-class AboutModsState extends TextualGameState {
-    constructor() {
-        super("AboutModsState");
-    }
-
-    getStateHeaderTitle() {
-        return "Test";
-    }
-
-    getMainContentHTML() {
-        return `
-            <div class="head">
-                <div class="logo">
-                    <img src="${cachebust("res/logo.png")}" alt="shapez.io Logo">
-                    <span class="updateLabel">Mods</span>
-                </div>
-            </div>
-            <div class="text">
-            dddd
-            </div>
-        `;
-    }
-
-    onEnter() {}
-}
+mod.registerState(ModsState);
+mod.registerState(AboutModsState);
 
 mod.registerTranslation("en", {
-    mainMenu: {
-        continue: "Jeee",
+    modSettings: {
+        title: "Mod settings",
+    },
+    aboutMods: {
+        title: "About mods",
+        text: "This is a page about mods",
+    },
+    mods: {
+        title: "Mods",
+        categories: {
+            installedmods: "Installed mods",
+            exploreMods: "Explore mods",
+            exploreModpacks: "Explore modpacks",
+        },
     },
 });
 
 mod.registerTranslation("nl", {
-    mainMenu: {
-        continue: "Nee",
+    modSettings: {
+        title: "Mod instellingen",
+    },
+    aboutMods: {
+        title: "Over mods",
+        text: "Dit is een pagina mods",
+    },
+    mods: {
+        title: "Mods",
+        categories: {
+            installedmods: "Geïnstalleerde mods",
+            exploreMods: "Verken mods",
+            exploreModpacks: "Verken modpacks",
+        },
     },
 });
 
@@ -60,13 +54,11 @@ mod.modManager.app.stateMgr.stateChanged.add(
         // Add buttons
         const buttonsElement = gameState.htmlElement.querySelector(".topButtons");
 
-        const aboutButton = makeDiv(buttonsElement, null, ["aboutButton", "settingsButton"]);
+        const aboutButton = makeDiv(buttonsElement, null, ["modsButton"]);
         aboutButton.addEventListener("click", () => {
-            mod.modManager.app.stateMgr.moveToState("AboutModsState");
+            mod.modManager.app.stateMgr.currentState.moveToState("ModsState");
         });
     }
 );
-
-mod.registerState(AboutModsState);
 
 console.log(mod);

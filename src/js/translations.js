@@ -118,6 +118,26 @@ function matchDataRecursive(dest, src) {
     }
 }
 
+function overwriteDataRecursive(dest, src) {
+    if (typeof dest !== "object" || typeof src !== "object") {
+        return;
+    }
+
+    for (const key in src) {
+        // console.log("copy", key);
+        const data = src[key];
+        if (typeof data === "object") {
+            if (!dest[key]) dest[key] = {};
+            overwriteDataRecursive(dest[key], src[key]);
+        } else if (typeof data === "string" || typeof data === "number") {
+            // console.log("match string", key);
+            dest[key] = src[key];
+        } else {
+            logger.log("Unknown type:", typeof data, "in key", key);
+        }
+    }
+}
+
 /**
  * Updates application language
  * @param {import('./application').Application} app
@@ -137,14 +157,16 @@ export function updateApplicationLanguage(app, id) {
         logger.log("Applying translations ...");
         matchDataRecursive(T, data.data);
 
-        logger.log("Applying mod translations ...");
-        for (const translation of app.modManager.translations.filter(x => x.language === id)) {
-            matchDataRecursive(T, translation.data);
-        }
+        updateApplicationLanguageMods(app, id);
     } else {
-        logger.log("Applying mod translations ...");
-        for (const translation of app.modManager.translations.filter(x => x.language === id)) {
-            matchDataRecursive(T, translation.data);
-        }
+        updateApplicationLanguageMods(app, id);
+    }
+}
+
+export function updateApplicationLanguageMods(app, id) {
+    console.log(id);
+    logger.log("Applying mod translations ...");
+    for (const translation of app.modManager.translations.filter(x => x.language === id)) {
+        overwriteDataRecursive(T, translation.data);
     }
 }
