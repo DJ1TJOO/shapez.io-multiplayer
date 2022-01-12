@@ -13,6 +13,8 @@ function gulptasksJS($, gulp, folders) {
                     requireUncached("./webpack.config.js")({
                         watch: true,
                         injectCss: argv["no-css"] === undefined,
+                        injectAtlas: argv["no-atlas"] === undefined,
+                        injectTranslations: argv["no-translations"] === undefined,
                     })
                 )
             )
@@ -27,6 +29,8 @@ function gulptasksJS($, gulp, folders) {
                 $.webpackStream(
                     requireUncached("./webpack.production.config.js")({
                         injectCss: argv["no-css"] === undefined,
+                        injectAtlas: argv["no-atlas"] === undefined,
+                        injectTranslations: argv["no-translations"] === undefined,
                     })
                 )
             )

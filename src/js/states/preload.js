@@ -101,6 +101,9 @@ export class PreloadState extends GameState {
             .then(() => this.app.analytics.initialize())
             .then(() => this.app.gameAnalytics.initialize())
 
+            .then(() => this.setStatus("Initializing mods"))
+            .then(() => this.app.modManager.initialize())
+
             .then(() => this.setStatus("Initializing settings"))
             .then(() => {
                 return this.app.settings.initialize();

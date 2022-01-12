@@ -5,6 +5,8 @@ import { Loader } from "../core/loader";
 import { Signal } from "../core/signal";
 import { addBuildingCodeCache, gBuildingVariants, registerBuildingVariant } from "../game/building_codes";
 import { defaultBuildingVariant, MetaBuilding } from "../game/meta_building";
+import { LANGUAGES } from "../languages";
+import { allApplicationSettings, createLanguageEnum } from "../profile/application_settings";
 import { updateApplicationLanguageMods } from "../translations";
 
 /**
@@ -74,20 +76,43 @@ export class Mod {
      * Register new translations for language
      * @param {string} language
      * @param {object} translations
+     * @param {{
+     *  name: string
+     *  code: string,
+     *  region: string,
+     * }} translation
      */
-    registerTranslation(language, translations) {
-        this.modManager.translations.push({
-            language,
-            data: translations,
-        });
+    registerTranslation(language, translations, translation = null) {
+        if (translation && !LANGUAGES[language]) {
+            LANGUAGES[language] = { ...translation, data: translations };
 
-        // Update language to add mod translations
-        if (this.modManager.app.settings.initialized) {
-            updateApplicationLanguageMods(this.modManager.app, this.modManager.app.settings.getLanguage());
+            allApplicationSettings[allApplicationSettings.findIndex(x => x.id === "language")] =
+                createLanguageEnum(LANGUAGES);
+
+            this.modManager.translations.push({
+                language,
+                data: translations,
+            });
         } else {
-            this.modManager.app.settings.signals.initialized.add(() =>
-                updateApplicationLanguageMods(this.modManager.app, this.modManager.app.settings.getLanguage())
-            );
+            this.modManager.translations.push({
+                language,
+                data: translations,
+            });
+
+            // Update language to add mod translations
+            if (this.modManager.app.settings.initialized) {
+                updateApplicationLanguageMods(
+                    this.modManager.app,
+                    this.modManager.app.settings.getLanguage()
+                );
+            } else {
+                this.modManager.app.settings.signals.initialized.add(() =>
+                    updateApplicationLanguageMods(
+                        this.modManager.app,
+                        this.modManager.app.settings.getLanguage()
+                    )
+                );
+            }
         }
     }
 

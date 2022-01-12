@@ -6,7 +6,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const StringReplacePlugin = require("string-replace-webpack-plugin");
 const UnusedFilesPlugin = require("unused-files-webpack-plugin").UnusedFilesWebpackPlugin;
 
-module.exports = ({ injectCss = true }) => {
+module.exports = ({ injectCss = true, injectAtlas = true, injectTranslations = true }) => {
     const minifyNames = false;
 
     return {
@@ -130,6 +130,61 @@ module.exports = ({ injectCss = true }) => {
                     } catch (error) {}
                     return "`" + css + "`";
                 }),
+                ATLASES: webpack.DefinePlugin.runtimeValue(function () {
+                    const atlases = new Map();
+                    const atlasJsons = new Map();
+                    const atlasFiles = fs.readdirSync("../build/atlases");
+                    for (let i = 0; i < atlasFiles.length; i++) {
+                        const filename = atlasFiles[i];
+                        const ext = path.extname(filename);
+                        const name = path.basename(filename, ext).split("_")[1];
+                        const readPath = path.join("../build/atlases", filename);
+
+                        if (ext === ".png") {
+                            atlases.set(
+                                name,
+                                "data:image/png;base64," +
+                                    Buffer.from(fs.readFileSync(readPath)).toString("base64")
+                            );
+                        } else if (ext === ".json") {
+                            const json = JSON.parse(fs.readFileSync(readPath, "utf8"));
+                            json.sourceData = json.frames;
+                            delete json.frames;
+                            atlasJsons.set(name, JSON.stringify(json));
+                        }
+                    }
+
+                    return {
+                        hq: {
+                            src: "`" + atlases.get("hq") + "`",
+                            atlasData: atlasJsons.get("hq"),
+                        },
+                        mq: {
+                            src: "`" + atlases.get("mq") + "`",
+                            atlasData: atlasJsons.get("mq"),
+                        },
+                        lq: {
+                            src: "`" + atlases.get("lq") + "`",
+                            atlasData: atlasJsons.get("lq"),
+                        },
+                    };
+                }),
+                TRANSLATIONS: webpack.DefinePlugin.runtimeValue(function () {
+                    const translations = {};
+                    const translationFiles = fs.readdirSync("../build/translations");
+                    for (let i = 0; i < translationFiles.length; i++) {
+                        const filename = translationFiles[i];
+                        const ext = path.extname(filename);
+                        const name = path.basename(filename, ext);
+                        const readPath = path.join("../build/translations", filename);
+
+                        if (ext === ".json") {
+                            translations[name] = fs.readFileSync(readPath, "utf8");
+                        }
+                    }
+
+                    return translations;
+                }),
             }),
             new UnusedFilesPlugin({
                 failOnUnused: false,
@@ -221,6 +276,24 @@ module.exports = ({ injectCss = true }) => {
                                         const css = `${variableName}.registerCss(CSS_MAIN);\n${variableName}.registerCss(CSS_RESOURCES);`;
 
                                         return injectCss ? `${match}\n${css}` : `${match}`;
+                                    },
+                                },
+                                {
+                                    pattern:
+                                        /(const|var|let|[a-zA-Z0-9\.]*?)?[ \n]*([a-zA-Z0-9]*?)[ \n]*=[ \n]*(new )?[ \n]*([a-zA-Z0-9\.]*)?Mod\(([^]*?)\);/gms,
+                                    replacement: (match, type, variableName) => {
+                                        const atlases = `const atlases = ATLASES;\n${variableName}.registerAtlas(atlases.hq.src, atlases.hq.atlasData);\n${variableName}.registerAtlas(atlases.mq.src, atlases.mq.atlasData);\n${variableName}.registerAtlas(atlases.lq.src, atlases.lq.atlasData);`;
+
+                                        return injectAtlas ? `${match}\n${atlases}` : `${match}`;
+                                    },
+                                },
+                                {
+                                    pattern:
+                                        /(const|var|let|[a-zA-Z0-9\.]*?)?[ \n]*([a-zA-Z0-9]*?)[ \n]*=[ \n]*(new )?[ \n]*([a-zA-Z0-9\.]*)?Mod\(([^]*?)\);/gms,
+                                    replacement: (match, type, variableName) => {
+                                        const translations = `const translations = TRANSLATIONS;\nfor (const translationId in translations) {\nconst translation = translations[translationId];\n${variableName}.registerTranslation(translationId, translation, translation.name ? { name: translation.name, code: translationId, region: translation.region || "" } : null);\n}`;
+
+                                        return injectTranslations ? `${match}\n${translations}` : `${match}`;
                                     },
                                 },
                             ],

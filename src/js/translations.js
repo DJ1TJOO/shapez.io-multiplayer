@@ -164,7 +164,6 @@ export function updateApplicationLanguage(app, id) {
 }
 
 export function updateApplicationLanguageMods(app, id) {
-    console.log(id);
     logger.log("Applying mod translations ...");
     for (const translation of app.modManager.translations.filter(x => x.language === id)) {
         overwriteDataRecursive(T, translation.data);

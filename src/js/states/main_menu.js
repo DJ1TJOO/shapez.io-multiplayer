@@ -435,6 +435,7 @@ export class MainMenuState extends GameState {
     onLanguageChooseClicked() {
         this.app.analytics.trackUiClick("choose_language");
         const setting = /** @type {EnumSetting} */ (getApplicationSettingById("language"));
+        console.log(setting);
 
         const { optionSelected } = this.dialogs.showOptionChooser(T.settings.labels.language.title, {
             active: this.app.settings.getLanguage(),

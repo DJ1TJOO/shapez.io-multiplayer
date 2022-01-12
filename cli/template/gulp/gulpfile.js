@@ -101,16 +101,20 @@ css.gulptasksCSS($, gulp, folders);
 const atlas = require("./atlas");
 atlas.gulptasksAtlas($, gulp, folders);
 
+// Translations
+const translations = require("./translations");
+translations.gulptasksTranslations($, gulp, folders);
+
 // Builds
 gulp.task(
     "main.build",
     // TODO: add builds
-    gulp.series("utils.cleanBuildFolder", "atlas.allOptimized", "css.main.prod", "js")
+    gulp.series("utils.cleanBuildFolder", "translations", "atlas.allOptimized", "css.prod", "js")
 );
 gulp.task(
     "main.build.dev",
     // TODO: add builds
-    gulp.series("utils.cleanBuildFolder", "atlas.allOptimized", "css.main.dev", "js.dev")
+    gulp.series("utils.cleanBuildFolder", "translations", "atlas.allOptimized", "css.dev", "js.dev")
 );
 
 // Watch
@@ -120,6 +124,22 @@ function getGlobs(folder, customExtenstions = null) {
         path.relative(__dirname, path.join(folder, "**", "*." + customExtenstions || ext)).replace(/\\/g, "/")
     );
 }
+
+gulp.task("main.watch.translations", function () {
+    // Watch the source folder and reload when anything changed
+    const src = getGlobs(folders.src, ["yaml"]);
+    return gulp.watch(
+        src,
+        gulp.series(
+            "translations",
+            function rebuild(cb) {
+                exec("touch " + path.relative(__dirname, path.join(folders.src, "js", "main.js")));
+                cb();
+            },
+            "main.serve.shapez.reload"
+        )
+    );
+});
 
 gulp.task("main.watch.atlas", function () {
     // Watch the source folder and reload when anything changed
@@ -168,13 +188,26 @@ gulp.task("main.watch.shapezBuildFolder", function () {
 
 gulp.task(
     "main.watch.folders",
-    gulp.parallel("main.watch.scss", "main.watch.js", "main.watch.atlas", "main.watch.shapezBuildFolder")
+    gulp.parallel(
+        "main.watch.scss",
+        "main.watch.js",
+        "main.watch.atlas",
+        "main.watch.translations",
+        "main.watch.shapezBuildFolder"
+    )
 );
 
 gulp.task("main.watch", gulp.series("main.build.dev", "main.serve", "main.watch.folders"));
 gulp.task(
     "main.watch.mod",
-    gulp.parallel("main.build.dev", "main.serve.mod", "main.watch.scss", "main.watch.js", "main.watch.atlas")
+    gulp.parallel(
+        "main.build.dev",
+        "main.serve.mod",
+        "main.watch.scss",
+        "main.watch.translations",
+        "main.watch.js",
+        "main.watch.atlas"
+    )
 );
 
 gulp.task("default", gulp.series("main.watch"));

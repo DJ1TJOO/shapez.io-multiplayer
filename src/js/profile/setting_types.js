@@ -25,12 +25,17 @@ export class BaseSetting {
      * @param {string} categoryId
      * @param {function(Application, any):void} changeCb
      * @param {function(Application) : boolean=} enabledCb
+     * @param {function(any) : boolean=} validate
      */
-    constructor(id, categoryId, changeCb, enabledCb = null) {
+    constructor(id, categoryId, changeCb, enabledCb = null, validate = null) {
         this.id = id;
         this.categoryId = categoryId;
         this.changeCb = changeCb;
         this.enabledCb = enabledCb;
+
+        if (validate) {
+            this.validate = validate.bind(this);
+        }
 
         /** @type {Application} */
         this.app = null;
@@ -106,7 +111,7 @@ export class BaseSetting {
     /**
      * Validates the set value
      * @param {any} value
-     * @returns {boolean}
+     * @returns {boolean | string}
      */
     validate(value) {
         abstract;
@@ -128,9 +133,10 @@ export class EnumSetting extends BaseSetting {
             changeCb = null,
             magicValue = null,
             enabledCb = null,
+            validate = null,
         }
     ) {
-        super(id, category, changeCb, enabledCb);
+        super(id, category, changeCb, enabledCb, validate);
 
         this.options = options;
         this.valueGetter = valueGetter;

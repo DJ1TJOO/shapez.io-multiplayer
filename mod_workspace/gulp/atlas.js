@@ -50,7 +50,7 @@ function gulptasksAtlas($, gulp, folders) {
     ];
 
     // Where the resources folder are
-    const resourcesDestFolder = path.join(folders.build, "..", "build_res");
+    const resourcesDestFolder = path.join(folders.build, "..", "build", "atlases");
 
     /**
      * Determines if an atlas must use lossless compression
@@ -63,7 +63,7 @@ function gulptasksAtlas($, gulp, folders) {
     gulp.task("atlas.buildAtlas", cb => {
         const config = JSON.stringify("./atlas.json");
         const source = JSON.stringify("../src/res");
-        const dest = JSON.stringify("../build_res");
+        const dest = JSON.stringify("../build/atlases");
 
         try {
             // First check whether Java is installed
@@ -104,19 +104,19 @@ function gulptasksAtlas($, gulp, folders) {
 
     // Converts .atlas LibGDX files to JSON
     gulp.task("atlas.atlasToJson", cb => {
-        atlasToJson.convert("../build_res");
+        atlasToJson.convert("../build/atlases");
         cb();
     });
 
     // Copies the atlas to the final destination
     gulp.task("atlas.atlas", () => {
-        return gulp.src(["../build_res/*.png"]).pipe(gulp.dest(resourcesDestFolder));
+        return gulp.src(["../build/atlases/*.png"]).pipe(gulp.dest(resourcesDestFolder));
     });
 
     // Copies the atlas to the final destination after optimizing it (lossy compression)
     gulp.task("atlas.atlasOptimized", () => {
         return gulp
-            .src(["../build_res/*.png"])
+            .src(["../build/atlases/*.png"])
             .pipe(
                 $.if(
                     fname => fileMustBeLossless(fname.history[0]),

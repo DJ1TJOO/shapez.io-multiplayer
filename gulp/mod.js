@@ -30,7 +30,7 @@ function gulptasksMod($, gulp, buildFolder, browserSync) {
 
             // File paths
             const name = path.basename(filePath, ".js");
-            if (name === "exports") continue;
+            if (name === "exports" || name === "mod_manager") continue;
 
             const exportPath = path
                 .join(path.relative(path.join(__dirname, "..", "src", "js"), path.dirname(filePath)), name)
@@ -58,11 +58,13 @@ function gulptasksMod($, gulp, buildFolder, browserSync) {
                 ${exports.join("\n")}
             };
 
-            Object.defineProperty(window, "shapez", {
-                value: exports,
-                writable: false,
-                configurable: false,
-            });
+            export function setExports() {
+                Object.defineProperty(window, "shapez", {
+                    value: exports,
+                    writable: false,
+                    configurable: false,
+                });
+            }
             `,
             {}
         );
@@ -143,7 +145,10 @@ function gulptasksMod($, gulp, buildFolder, browserSync) {
                                             src: string;
                                             atlasData: import("shapez/core/loader").AtlasDefinition;
                                         };
-                                    };`)
+                                    };
+                                  declare const TRANSLATIONS: {
+                                      [x: string]: object
+                                  };`)
                     )
                     .pipe(
                         $.prettier({

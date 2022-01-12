@@ -134,9 +134,8 @@ if (G_IS_DEV) {
     refreshRateOptions.push("10000");
 }
 
-/** @type {Array<BaseSetting>} */
-export const allApplicationSettings = [
-    new EnumSetting("language", {
+export function createLanguageEnum(LANGUAGES) {
+    return new EnumSetting("language", {
         options: Object.keys(LANGUAGES),
         valueGetter: key => key,
         textGetter: key => LANGUAGES[key].name,
@@ -144,7 +143,23 @@ export const allApplicationSettings = [
         restartRequired: true,
         changeCb: (app, id) => null,
         magicValue: "auto-detect",
-    }),
+        validate: function (value) {
+            if (value === this.magicValue) {
+                return true;
+            }
+
+            const availableValues = this.options.map(option => this.valueGetter(option));
+            if (availableValues.indexOf(value) < 0) {
+                return this.magicValue;
+            }
+            return true;
+        },
+    });
+}
+
+/** @type {Array<BaseSetting>} */
+export const allApplicationSettings = [
+    createLanguageEnum(LANGUAGES),
 
     new EnumSetting("uiScale", {
         options: uiScales.sort((a, b) => a.size - b.size),
@@ -522,7 +537,10 @@ export class ApplicationSettings extends ReadWriteProxy {
         for (let i = 0; i < allApplicationSettings.length; ++i) {
             const setting = allApplicationSettings[i];
             const storedValue = settings[setting.id];
-            if (!setting.validate(storedValue)) {
+            const validated = setting.validate(storedValue);
+            if (typeof validated === "string") {
+                data.settings[setting.id] = validated;
+            } else if (!validated) {
                 return ExplainedResult.bad(
                     "Bad setting value for " +
                         setting.id +

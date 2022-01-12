@@ -71,6 +71,7 @@ export class Application {
         this.unloaded = false;
 
         // Global stuff
+        this.modManager = new ModManager(this);
         this.settings = new ApplicationSettings(this);
         this.ticker = new AnimationFrame();
         this.stateMgr = new StateManager(this);
@@ -78,7 +79,6 @@ export class Application {
         this.inputMgr = new InputDistributor(this);
         this.backgroundResourceLoader = new BackgroundResourcesLoader(this);
         this.clientApi = new ClientAPI(this);
-        this.modManager = new ModManager(this);
 
         // TODO: add mod loading
 

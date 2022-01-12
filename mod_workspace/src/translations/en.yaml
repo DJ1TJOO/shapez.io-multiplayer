@@ -1,0 +1,13 @@
+modSettings:
+    title: Mod settings
+
+aboutMods:
+    title: About mods
+    text: This is a page about mods
+
+mods:
+    title: Mods
+    categories:
+        installedmods: Installed mods
+        exploreMods: Explore mods
+        exploreModpacks: Explore modpacks

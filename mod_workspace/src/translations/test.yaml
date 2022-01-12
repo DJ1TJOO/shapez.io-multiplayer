@@ -1,0 +1,15 @@
+name: test lang
+
+modSettings:
+    title: Mod instellingen test
+
+aboutMods:
+    title: Over mods test
+    text: Dit is een pagina mods test
+
+mods:
+    title: Mods test
+    categories:
+        installedmods: Geïnstalleerde mods test
+        exploreMods: Verken mods test
+        exploreModpacks: Verken modpacks test

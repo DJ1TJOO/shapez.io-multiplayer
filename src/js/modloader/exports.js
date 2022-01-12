@@ -226,7 +226,6 @@ import * as import_226 from "../game/time/regular_game_speed";
 import * as import_227 from "../game/tutorial_goals_mappings";
 import * as import_228 from "../game/tutorial_goals";
 import * as import_229 from "../languages";
-import * as import_232 from "./mod_manager";
 import * as import_233 from "./mod";
 import * as import_234 from "../platform/achievement_provider";
 import * as import_235 from "../platform/ad_provider";
@@ -516,7 +515,6 @@ export const exports = {
     "game/tutorial_goals_mappings": import_227,
     "game/tutorial_goals": import_228,
     "languages": import_229,
-    "modloader/mod_manager": import_232,
     "modloader/mod": import_233,
     "platform/achievement_provider": import_234,
     "platform/ad_provider": import_235,

@@ -28,10 +28,12 @@ export class ModManager {
 
         // Set exports
         setExports();
+    }
 
+    initialize() {
         // Load local mod for mod development
         if (G_IS_MOD || queryParamOptions.modVersion) {
-            this.loadMod("http://localhost:3010/mod.js");
+            return this.loadMod("http://localhost:3010/mod.js");
         }
     }
 
