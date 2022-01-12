@@ -128,6 +128,10 @@ function gulptasksMod($, gulp, buildFolder, browserSync) {
                     .pipe($.replace(/var/gms, "let"))
                     .pipe($.replace(/declare (function|const|let)[^]*?;/gms, ""))
                     .pipe(
+                        $.footer(`declare const CSS_MAIN: string;
+                                  declare const CSS_RESOURCES: string;`)
+                    )
+                    .pipe(
                         $.prettier({
                             editorconfig: true,
                         })

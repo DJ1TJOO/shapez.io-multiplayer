@@ -83,6 +83,7 @@
         "gulp-dom": "^1.0.0",
         "gulp-flatten": "^0.4.0",
         "gulp-fluent-ffmpeg": "^2.0.0",
+        "gulp-footer": "^2.1.0",
         "gulp-html-beautify": "^1.0.1",
         "gulp-htmlmin": "^5.0.1",
         "gulp-if": "^3.0.0",

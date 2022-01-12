@@ -5755,6 +5755,14 @@ gulp-fluent-ffmpeg@^2.0.0:
     plugin-error "^1.0.1"
     through2 "^3.0.1"
 
+gulp-footer@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/gulp-footer/-/gulp-footer-2.1.0.tgz#2dee0faca1139848d0a2368fec78717906661232"
+  integrity sha512-CK3nRBP3PG59XN2L1rDLkBHA7goYsW+tJuVQccLP9jq3mpBT2kuRq0ImgNjrUkDbF948aCVQH4J7uIEqiZ2MHA==
+  dependencies:
+    lodash "^4.17.21"
+    map-stream "^0.0.7"
+
 gulp-html-beautify@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/gulp-html-beautify/-/gulp-html-beautify-1.0.1.tgz"
@@ -7797,6 +7805,11 @@ lodash@^4.0.0, lodash@^4.15.0, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.12
   resolved "https://registry.npmjs.org/lodash/-/lodash-4.17.15.tgz"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
 
+lodash@^4.17.21:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
+
 lodash@~1.0.1:
   version "1.0.2"
   resolved "https://registry.npmjs.org/lodash/-/lodash-1.0.2.tgz"
@@ -7935,6 +7948,11 @@ map-obj@^1.0.0, map-obj@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/map-obj/-/map-obj-1.0.1.tgz"
   integrity sha1-2TPOuSBdgr3PSIb2dCvcK03qFG0=
+
+map-stream@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/map-stream/-/map-stream-0.0.7.tgz#8a1f07896d82b10926bd3744a2420009f88974a8"
+  integrity sha1-ih8HiW2CsQkmvTdEokIACfiJdKg=
 
 map-visit@^1.0.0:
   version "1.0.0"
