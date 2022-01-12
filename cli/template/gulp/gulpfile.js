@@ -125,7 +125,6 @@ gulp.task("js", cb => {
 });
 
 // Css
-// TODO: generate css from scss and inject into mod
 function postcssAssetsPlugin() {
     return $.postcssAssets({
         loadPaths: [path.join(srcFolder, "res")],
@@ -276,7 +275,9 @@ gulp.task("main.watch.shapezBuildFolder", function () {
 });
 
 gulp.task("main.watch.folders", gulp.parallel("main.watch.scss", "main.watch.shapezBuildFolder"));
+
 gulp.task("main.watch", gulp.series("main.build.dev", "main.serve", "main.watch.folders"));
+gulp.task("main.watch.mod", gulp.series("main.build.dev", "main.serve.mod", "main.watch.scss"));
 
 // function (cb) {
 // TODO: add builds for watch

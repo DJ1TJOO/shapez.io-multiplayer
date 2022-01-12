@@ -36,7 +36,7 @@ declare const bgFps: 30;
 declare const desiredMsDelay: number;
 declare let lastTick: number;
 declare module "shapez/core/config.local" {
-    var _default: {};
+    let _default: {};
     export default _default;
 }
 declare module "shapez/core/config" {
@@ -6205,7 +6205,7 @@ declare module "shapez/game/hud/parts/waypoints" {
     import { enumMouseButton } from "game/camera";
 }
 declare module "shapez/savegame/savegame_typedefs" {
-    var _default: {};
+    let _default: {};
     export default _default;
     export type Entity = import("game/entity").Entity;
     export type SavegameStats = {
@@ -8472,7 +8472,7 @@ declare module "shapez/game/hud/parts/vignette_overlay" {
     import { BaseHUDPart } from "game/hud/base_hud_part";
 }
 declare module "shapez/game/hud/trailer_points" {
-    var _default: {
+    let _default: {
         pos: {
             x: number;
             y: number;
@@ -12883,7 +12883,7 @@ declare module "shapez/modloader/mod" {
     import { GameState } from "core/game_state";
 }
 declare module "shapez/core/config.local.template" {
-    var _default: {};
+    let _default: {};
     export default _default;
 }
 declare module "shapez/game/component_registry" {
