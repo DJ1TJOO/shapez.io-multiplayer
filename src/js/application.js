@@ -81,8 +81,6 @@ export class Application {
         this.modManager = new ModManager(this);
 
         // TODO: add mod loading
-        // temp mod for testing
-        this.modManager.loadMod("http://localhost:3010/mod.js");
 
         // Restrictions (Like demo etc)
         this.restrictionMgr = new RestrictionManager(this);

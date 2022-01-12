@@ -4,6 +4,7 @@
 
 import { Mod } from "./mod";
 import { exports } from "./exports";
+import { queryParamOptions } from "../core/query_parameters";
 
 export class ModManager {
     /**
@@ -24,6 +25,11 @@ export class ModManager {
          * }>}
          */
         this.translations = [];
+
+        // Load local mod for mod development
+        if (G_IS_MOD || queryParamOptions.modVersion) {
+            this.loadMod("http://localhost:3010/mod.js");
+        }
     }
 
     /**
