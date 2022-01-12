@@ -103,15 +103,6 @@ async function promptForMissingOptions(options) {
         });
     }
 
-    if (!options.install) {
-        questions.push({
-            type: "confirm",
-            name: "runInstall",
-            message: "Install all modules?",
-            default: true,
-        });
-    }
-
     if (!options.shapez) {
         questions.push({
             type: "confirm",
@@ -125,6 +116,15 @@ async function promptForMissingOptions(options) {
             message: "Please input the shapez commit hash you want to use:",
             default: defaultShapez,
             when: answers => answers.installShapez,
+        });
+    }
+
+    if (!options.runInstall) {
+        questions.push({
+            type: "confirm",
+            name: "runInstall",
+            message: "Install all modules?",
+            default: true,
         });
     }
 

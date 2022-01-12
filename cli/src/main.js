@@ -200,15 +200,45 @@ export async function upgradeProject(options) {
         targetDirectory: options.targetDirectory || process.cwd(),
     };
 
+    const pathName = url.fileURLToPath(import.meta.url);
+    const templateDir = path.resolve(pathName, "../../template/");
+    options.templateDirectory = templateDir;
+
     const tasks = new Listr([
         {
             title: "Updating build files",
             task: () => updateBuildFiles(options),
+            skip: () => !options.updateFiles,
+        },
+        {
+            title: "Copy new project files",
+            task: () => copyTemplateFiles(options),
+            skip: () => !options.updateFiles,
         },
         {
             title: `Downloading${options.shapez === "latest" ? " latest" : ""} shapez.io build`,
             task: () => downloadShapez(options),
             skip: () => !options.installShapez,
+        },
+        {
+            title: "Install dependencies",
+            task: () =>
+                projectInstall({
+                    prefer: options.packageManager,
+                    cwd: options.targetDirectory,
+                }),
+            skip: () =>
+                !options.runInstall ? "Pass --install to automatically install dependencies" : undefined,
+        },
+        {
+            title: "Install gulp dependencies",
+            task: () =>
+                projectInstall({
+                    prefer: options.packageManager,
+                    cwd: path.join(options.targetDirectory, "gulp"),
+                }),
+            skip: () =>
+                !options.runInstall ? "Pass --install to automatically install dependencies" : undefined,
         },
     ]);
 
