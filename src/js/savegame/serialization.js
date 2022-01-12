@@ -136,7 +136,7 @@ export const types = {
 
 /**
  * A full schema declaration
- * @typedef {Object.<string, BaseDataType>} Schema
+ * @typedef {Object.<string, BaseDataType> | object} Schema
  */
 
 const globalSchemaCache = {};

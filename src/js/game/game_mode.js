@@ -127,7 +127,7 @@ export class GameMode extends BasicSerializableObject {
         return 3.5;
     }
 
-    /** @returns {Object<string, Array>} */
+    /** @returns {Object<string, Array<object>>} */
     getUpgrades() {
         return {
             belt: [],

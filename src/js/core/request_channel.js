@@ -8,7 +8,7 @@ export const PROMISE_ABORTED = "promise-aborted";
 
 export class RequestChannel {
     constructor() {
-        /** @type {Array<Promise>} */
+        /** @type {Array<Promise<any>>} */
         this.pendingPromises = [];
     }
 

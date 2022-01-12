@@ -14,7 +14,7 @@ export class PuzzleGameMode extends GameMode {
         return enumGameModeTypes.puzzle;
     }
 
-    /** @returns {object} */
+    /** @returns {import("../../savegame/serialization").Schema} */
     static getSchema() {
         return {
             zoneHeight: types.uint,

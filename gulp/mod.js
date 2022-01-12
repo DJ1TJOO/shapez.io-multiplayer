@@ -3,6 +3,17 @@ const path = require("path");
 const glob = require("glob");
 const exec = require("child_process").exec;
 
+function getClosest(string, offset, regex) {
+    let indices = [];
+
+    let result;
+    while ((result = regex.exec(string))) {
+        indices.push(result);
+    }
+
+    return indices.reverse().find(x => x.index <= offset);
+}
+
 function gulptasksMod($, gulp, buildFolder, browserSync) {
     gulp.task("mod.exports", () => {
         const imports = [];
@@ -88,10 +99,42 @@ function gulptasksMod($, gulp, buildFolder, browserSync) {
                             (matched, moduleName) => `declare module "shapez/${moduleName}"`
                         )
                     )
+                    .pipe(
+                        $.replace(/import\("([^]*?)"\)/gms, (matched, moduleName, offset, string) => {
+                            moduleName = moduleName.replace(".js", "");
+                            if (moduleName.startsWith(".")) {
+                                const closest = getClosest(string, offset, /declare module "([^]*?)"/gms);
+
+                                const parent = path.dirname(
+                                    closest["0"].replace('declare module "', "").replace('"', "")
+                                );
+                                const module = path.join(parent, moduleName).replace(/\\/g, "/");
+
+                                return `import("${module}")`;
+                            } else {
+                                return `import("shapez/${moduleName}")`;
+                            }
+                        })
+                    )
+                    .pipe(
+                        $.replace(
+                            /import {([^]*?)} from "([^]*?)";/gms,
+                            (matched, imports, moduleName) =>
+                                `import {${imports}} from "shapez/${moduleName
+                                    .replace(/\.\.\//gms, "")
+                                    .replace(".js", "")}"`
+                        )
+                    )
                     .pipe($.replace(/var/gms, "let"))
                     .pipe(gulp.dest("../build/"));
-                stream.on("end", cb);
-                stream.on("error", cb);
+                stream.on("end", () => {
+                    fs.unlinkSync("../types.d.ts");
+                    cb();
+                });
+                stream.on("error", () => {
+                    fs.unlinkSync("../types.d.ts");
+                    cb();
+                });
             }
         );
     });

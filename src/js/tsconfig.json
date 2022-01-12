@@ -55,5 +55,6 @@
         // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
         "resolveJsonModule": true
     },
-    "exclude": ["webworkers"]
+    "exclude": ["webworkers"],
+    "include": ["globals.d.ts"]
 }

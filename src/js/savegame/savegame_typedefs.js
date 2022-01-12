@@ -41,8 +41,6 @@
  * }} SavegamesData
  */
 
-import { MetaBuilding } from "../game/meta_building";
-
 // Notice: Update backend too
 /**
  * @typedef {{
