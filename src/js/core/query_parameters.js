@@ -4,6 +4,7 @@ const options = queryString.parse(location.search);
 export let queryParamOptions = {
     embedProvider: null,
     fullVersion: false,
+    modVersion: false,
     sandboxMode: false,
 };
 
@@ -19,4 +20,9 @@ if (options.fullVersion && !G_IS_RELEASE) {
 // Allow testing full version outside of standalone
 if (options.sandboxMode && !G_IS_RELEASE) {
     queryParamOptions.sandboxMode = true;
+}
+
+// Allow testing full version outside of standalone
+if (options.modVersion && !G_IS_RELEASE) {
+    queryParamOptions.modVersion = true;
 }
