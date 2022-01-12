@@ -126,6 +126,12 @@ function gulptasksMod($, gulp, buildFolder, browserSync) {
                         )
                     )
                     .pipe($.replace(/var/gms, "let"))
+                    .pipe($.replace(/declare (function|const|let)[^]*?;/gms, ""))
+                    .pipe(
+                        $.prettier({
+                            editorconfig: true,
+                        })
+                    )
                     .pipe(gulp.dest("../build/"));
                 stream.on("end", () => {
                     fs.unlinkSync("../types.d.ts");

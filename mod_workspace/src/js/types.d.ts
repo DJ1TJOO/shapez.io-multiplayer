@@ -31,10 +31,7 @@ declare module "shapez/core/signal" {
         removeAll(): void;
     }
 }
-declare function tick(): void;
-declare const bgFps: 30;
-declare const desiredMsDelay: number;
-declare let lastTick: number;
+
 declare module "shapez/core/config.local" {
     let _default: {};
     export default _default;
@@ -44,15 +41,15 @@ declare module "shapez/core/config" {
     export const SUPPORT_TOUCH: false;
     export const IS_MAC: boolean;
     export namespace THIRDPARTY_URLS {
-        const discord: string;
-        const github: string;
-        const reddit: string;
-        const shapeViewer: string;
-        const privacyPolicy: string;
-        const standaloneStorePage: string;
-        const stanaloneCampaignLink: string;
-        const puzzleDlcStorePage: string;
-        const levelTutorialVideos: {
+        export const discord: string;
+        export const github: string;
+        export const reddit: string;
+        export const shapeViewer: string;
+        export const privacyPolicy: string;
+        export const standaloneStorePage: string;
+        export const stanaloneCampaignLink: string;
+        export const puzzleDlcStorePage: string;
+        export const levelTutorialVideos: {
             21: string;
             25: string;
             26: string;
@@ -60,11 +57,11 @@ declare module "shapez/core/config" {
     }
     export const A_B_TESTING_LINK_TYPE: "steam_2_npr";
     export namespace globalConfig {
-        const minerSpeedItemsPerSecond: number;
-        const mapChunkWorldSize: number;
-        const mapChunkOverviewMinZoom: number;
-        const warmupTimeSecondsFast: number;
-        const warmupTimeSecondsRegular: number;
+        export const minerSpeedItemsPerSecond: number;
+        export const mapChunkWorldSize: number;
+        export const mapChunkOverviewMinZoom: number;
+        export const warmupTimeSecondsFast: number;
+        export const warmupTimeSecondsRegular: number;
     }
     export const IS_MOBILE: boolean;
 }
@@ -385,7 +382,7 @@ declare module "shapez/core/utils" {
      */
     export function rotateFlatMatrix3x3(flatMatrix: Array<number>): number[];
     /**
-     * Generates rotated variants of the matrix
+     * Generates rotated letiants of the matrix
      * @param {Array<number>} originalMatrix
      * @returns {Object<number, Array<number>>}
      */
@@ -570,10 +567,10 @@ declare module "shapez/core/vector" {
     export function mixVector(v1: Vector, v2: Vector, a: number): Vector;
     export type enumDirection = string;
     export namespace enumDirection {
-        const top: string;
-        const right: string;
-        const bottom: string;
-        const left: string;
+        export const top: string;
+        export const right: string;
+        export const bottom: string;
+        export const left: string;
     }
     export type enumInvertedDirections = string;
     /**
@@ -589,7 +586,7 @@ declare module "shapez/core/vector" {
     export const enumDirectionToAngle: {
         [x: string]: number;
     };
-    export type enumAngleToDirection = enumDirection;
+    export type enumAngleToDirection = string;
     /**
      * @enum {enumDirection}
      */
@@ -633,8 +630,8 @@ declare module "shapez/core/vector" {
          * @param {number=} y
          */
         constructor(x?: number | undefined, y?: number | undefined);
-        x: number;
-        y: number;
+        x: any;
+        y: any;
         /**
          * return a copy of the vector
          * @returns {Vector}
@@ -909,8 +906,8 @@ declare module "shapez/core/vector" {
          * Creates a simple representation of the vector
          */
         serializeSimple(): {
-            x: number;
-            y: number;
+            x: any;
+            y: any;
         };
         /**
          * @returns {number}
@@ -935,7 +932,7 @@ declare module "shapez/core/vector" {
 declare module "shapez/savegame/serialization_data_types" {
     /**
      *
-     * @param {import("shapez/serialization").Schema} schema
+     * @param {import("shapez/savegame/serialization").Schema} schema
      */
     export function schemaToJsonSchema(schema: import("shapez/savegame/serialization").Schema): {
         type: string;
@@ -1030,8 +1027,8 @@ declare module "shapez/savegame/serialization_data_types" {
          * @param {FactoryTemplate<*>} registry
          * @param {(GameRoot, object) => object} customResolver
          */
-        constructor(registry: FactoryTemplate<any>, customResolver?: (GameRoot: any, object: any) => object);
-        registry: FactoryTemplate<any>;
+        constructor(registry: any, customResolver?: (GameRoot: any, object: any) => object);
+        registry: any;
         customResolver: (GameRoot: any, object: any) => object;
     }
     export class TypeClassData extends BaseDataType {
@@ -1039,8 +1036,8 @@ declare module "shapez/savegame/serialization_data_types" {
          *
          * @param {FactoryTemplate<*>} registry
          */
-        constructor(registry: FactoryTemplate<any>);
-        registry: FactoryTemplate<any>;
+        constructor(registry: any);
+        registry: any;
     }
     export class TypeClassFromMetaclass extends BaseDataType {
         /**
@@ -1048,8 +1045,8 @@ declare module "shapez/savegame/serialization_data_types" {
          * @param {typeof BasicSerializableObject} classHandle
          * @param {SingletonFactoryTemplate<*>} registry
          */
-        constructor(classHandle: typeof BasicSerializableObject, registry: SingletonFactoryTemplate<any>);
-        registry: SingletonFactoryTemplate<any>;
+        constructor(classHandle: typeof BasicSerializableObject, registry: any);
+        registry: any;
         classHandle: typeof BasicSerializableObject;
     }
     export class TypeMetaClass extends BaseDataType {
@@ -1057,8 +1054,8 @@ declare module "shapez/savegame/serialization_data_types" {
          *
          * @param {SingletonFactoryTemplate<*>} registry
          */
-        constructor(registry: SingletonFactoryTemplate<any>);
-        registry: SingletonFactoryTemplate<any>;
+        constructor(registry: any);
+        registry: any;
     }
     export class TypeArray extends BaseDataType {
         /**
@@ -1089,7 +1086,7 @@ declare module "shapez/savegame/serialization_data_types" {
         /**
          * @param {FactoryTemplate<*>|SingletonFactoryTemplate<*>} registry
          */
-        constructor(registry: FactoryTemplate<any> | SingletonFactoryTemplate<any>);
+        constructor(registry: any | any);
         registry: any;
     }
     export class TypePair extends BaseDataType {
@@ -1253,6 +1250,11 @@ declare module "shapez/game/component" {
          */
         static getSchema(): {};
         /**
+         * Fixes typeof DerivedComponent is not assignable to typeof Component, compiled out
+         * in non-dev builds
+         */
+        constructor(...args: any[]);
+        /**
          * Copy the current state to another component
          * @param {Component} otherComponent
          */
@@ -1276,18 +1278,15 @@ declare module "shapez/game/component" {
 }
 declare module "shapez/game/base_item" {
     /** @type {ItemType[]} **/
-    export const itemTypes: ItemType[];
+    export const itemTypes: any[];
     /**
      * Class for items on belts etc. Not an entity for performance reasons
      */
     export class BaseItem extends BasicSerializableObject {
         static getId(): string;
-        /** @returns {object} */
-        static getSchema(): object;
-        constructor();
-        _type: ItemType;
+        _type: any;
         /** @returns {ItemType} **/
-        getItemType(): ItemType;
+        getItemType(): any;
         /**
          * Returns a string id of the item
          * @returns {string}
@@ -1542,22 +1541,22 @@ declare module "shapez/core/rectangle" {
 }
 declare module "shapez/platform/sound" {
     export namespace SOUNDS {
-        const uiClick: string;
-        const uiError: string;
-        const dialogError: string;
-        const dialogOk: string;
-        const swishHide: string;
-        const swishShow: string;
-        const badgeNotification: string;
-        const levelComplete: string;
-        const destroyBuilding: string;
-        const placeBuilding: string;
-        const placeBelt: string;
-        const copy: string;
+        export const uiClick: string;
+        export const uiError: string;
+        export const dialogError: string;
+        export const dialogOk: string;
+        export const swishHide: string;
+        export const swishShow: string;
+        export const badgeNotification: string;
+        export const levelComplete: string;
+        export const destroyBuilding: string;
+        export const placeBuilding: string;
+        export const placeBelt: string;
+        export const copy: string;
     }
     export namespace MUSIC {
-        const theme: string;
-        const menu: string;
+        export const theme: string;
+        export const menu: string;
     }
     export class SoundInstanceInterface {
         constructor(key: any, url: any);
@@ -1662,18 +1661,18 @@ declare module "shapez/platform/sound" {
 }
 declare module "shapez/game/building_codes" {
     /**
-     * Registers a new variant
+     * Registers a new letiant
      * @param {string} group
      * @param {number} code
      * @param {typeof MetaBuilding} meta
-     * @param {string} variant
+     * @param {string} letiant
      * @param {number} rotationVariant
      */
     export function registerBuildingVariant(
         group: string,
         code: number,
         meta: typeof MetaBuilding,
-        variant?: string,
+        letiant?: string,
         rotationVariant?: number
     ): void;
     /**
@@ -1692,22 +1691,22 @@ declare module "shapez/game/building_codes" {
      */
     export function addBuildingCodeCache(code: string): void;
     /**
-     * Finds the code for a given variant
+     * Finds the code for a given letiant
      * @param {MetaBuilding} metaBuilding
-     * @param {string} variant
+     * @param {string} letiant
      * @param {number} rotationVariant
      * @returns {string}
      */
     export function getCodeFromBuildingData(
         metaBuilding: MetaBuilding,
-        variant: string,
+        letiant: string,
         rotationVariant: number
     ): string;
     /**
      * @typedef {{
      *   metaClass: typeof MetaBuilding,
      *   metaInstance?: MetaBuilding,
-     *   variant?: string,
+     *   letiant?: string,
      *   rotationVariant?: number,
      *   tileSize?: Vector,
      *   sprite?: AtlasSprite,
@@ -1716,7 +1715,7 @@ declare module "shapez/game/building_codes" {
      * }} BuildingVariantIdentifier
      */
     /**
-     * Stores a lookup table for all building variants (for better performance)
+     * Stores a lookup table for all building letiants (for better performance)
      * @type {Object<number, BuildingVariantIdentifier>}
      */
     export const gBuildingVariants: {
@@ -1725,7 +1724,7 @@ declare module "shapez/game/building_codes" {
     export type BuildingVariantIdentifier = {
         metaClass: typeof MetaBuilding;
         metaInstance?: MetaBuilding;
-        variant?: string;
+        letiant?: string;
         rotationVariant?: number;
         tileSize?: Vector;
         sprite?: AtlasSprite;
@@ -1788,16 +1787,16 @@ declare module "shapez/game/components/static_map_entity" {
         getSilhouetteColor(): string;
         /**
          * Returns the meta building
-         * @returns {import("shapez/meta_building").MetaBuilding}
+         * @returns {import("shapez/game/meta_building").MetaBuilding}
          */
-        getMetaBuilding(): import("shapez/meta_building").MetaBuilding;
+        getMetaBuilding(): import("shapez/game/meta_building").MetaBuilding;
         /**
-         * Returns the buildings variant
+         * Returns the buildings letiant
          * @returns {string}
          */
         getVariant(): string;
         /**
-         * Returns the buildings rotation variant
+         * Returns the buildings rotation letiant
          * @returns {number}
          */
         getRotationVariant(): number;
@@ -1949,21 +1948,21 @@ declare module "shapez/core/dpi_manager" {
 declare module "shapez/game/colors" {
     export type enumColors = string;
     export namespace enumColors {
-        const red: string;
-        const green: string;
-        const blue: string;
-        const yellow: string;
-        const purple: string;
-        const cyan: string;
-        const white: string;
-        const uncolored: string;
+        export const red: string;
+        export const green: string;
+        export const blue: string;
+        export const yellow: string;
+        export const purple: string;
+        export const cyan: string;
+        export const white: string;
+        export const uncolored: string;
     }
     export type enumColorToShortcode = string;
     /** @enum {string} */
     export const enumColorToShortcode: {
         [x: string]: string;
     };
-    export type enumShortcodeToColor = enumColors;
+    export type enumShortcodeToColor = string;
     /** @enum {enumColors} */
     export const enumShortcodeToColor: {};
     export type enumColorsToHexCode = string;
@@ -1984,8 +1983,8 @@ declare module "shapez/game/colors" {
 declare module "shapez/game/theme" {
     export function applyGameTheme(id: any): void;
     export namespace THEMES {
-        const dark: any;
-        const light: any;
+        export const dark: any;
+        export const light: any;
     }
     export let THEME: any;
 }
@@ -1993,22 +1992,22 @@ declare module "shapez/game/shape_definition" {
     /**
      * Converts the given parameters to a valid shape definition
      * @param {*} layers
-     * @returns {Array<import("shapez/shape_definition").ShapeLayer>}
+     * @returns {Array<import("shapez/game/shape_definition").ShapeLayer>}
      */
     export function createSimpleShape(layers: any): Array<import("shapez/game/shape_definition").ShapeLayer>;
     export type enumSubShape = string;
     export namespace enumSubShape {
-        const rect: string;
-        const circle: string;
-        const star: string;
-        const windmill: string;
+        export const rect: string;
+        export const circle: string;
+        export const star: string;
+        export const windmill: string;
     }
     export type enumSubShapeToShortcode = string;
     /** @enum {string} */
     export const enumSubShapeToShortcode: {
         [x: string]: string;
     };
-    export type enumShortcodeToSubShape = enumSubShape;
+    export type enumShortcodeToSubShape = string;
     /** @enum {enumSubShape} */
     export const enumShortcodeToSubShape: {};
     export class ShapeDefinition extends BasicSerializableObject {
@@ -2136,7 +2135,24 @@ declare module "shapez/game/shape_definition" {
     /**
      * Order is Q1 (tr), Q2(br), Q3(bl), Q4(tl)
      */
-    export type ShapeLayer = [ShapeLayerItem?, ShapeLayerItem?, ShapeLayerItem?, ShapeLayerItem?];
+    export type ShapeLayer = [
+        {
+            subShape: enumSubShape;
+            color: enumColors;
+        },
+        {
+            subShape: enumSubShape;
+            color: enumColors;
+        },
+        {
+            subShape: enumSubShape;
+            color: enumColors;
+        },
+        {
+            subShape: enumSubShape;
+            color: enumColors;
+        }
+    ];
     import { BasicSerializableObject } from "shapez/savegame/serialization";
     import { DrawParameters } from "shapez/core/draw_parameters";
     import { enumColors } from "shapez/game/colors";
@@ -2256,7 +2272,7 @@ declare module "shapez/game/belt_path" {
          */
         computeBounds(): Rectangle;
         /**
-         * Recomputes cache variables once the path was changed
+         * Recomputes cache letiables once the path was changed
          */
         onPathChanged(): void;
         boundAcceptor: (BaseItem: any, number?: any) => boolean;
@@ -2457,7 +2473,7 @@ declare module "shapez/game/components/item_acceptor" {
     export type ItemAcceptorSlot = {
         pos: Vector;
         directions: enumDirection[];
-        filter?: ItemType;
+        filter?: any;
     };
     /**
      * Contains information about a slot plus its location
@@ -2470,7 +2486,7 @@ declare module "shapez/game/components/item_acceptor" {
     export type ItemAcceptorSlotConfig = {
         pos: Vector;
         directions: enumDirection[];
-        filter?: ItemType;
+        filter?: any;
     };
     import { Component } from "shapez/game/component";
     import { BaseItem } from "shapez/game/base_item";
@@ -2485,7 +2501,7 @@ declare module "shapez/game/components/item_ejector" {
      *    item: BaseItem,
      *    lastItem: BaseItem,
      *    progress: number?,
-     *    cachedDestSlot?: import("shapez/item_acceptor").ItemAcceptorLocatedSlot,
+     *    cachedDestSlot?: import("shapez/game/components/item_acceptor").ItemAcceptorLocatedSlot,
      *    cachedBeltPath?: BeltPath,
      *    cachedTargetEntity?: Entity
      * }} ItemEjectorSlot
@@ -2579,7 +2595,7 @@ declare module "shapez/game/components/item_ejector" {
 }
 declare module "shapez/game/components/belt" {
     export const curvedBeltLength: 0.78;
-    /** @type {import("shapez/item_acceptor").ItemAcceptorSlot} */
+    /** @type {import("shapez/game/components/item_acceptor").ItemAcceptorSlot} */
     export const FAKE_BELT_ACCEPTOR_SLOT: import("shapez/game/components/item_acceptor").ItemAcceptorSlot;
     /** @type {Object<enumDirection, import("shapez/game/components/item_ejector").ItemEjectorSlot>} */
     export const FAKE_BELT_EJECTOR_SLOT_BY_DIRECTION: any;
@@ -2603,9 +2619,9 @@ declare module "shapez/game/components/belt" {
         getEffectiveLengthTiles(): number;
         /**
          * Returns fake acceptor slot used for matching
-         * @returns {import("shapez/item_acceptor").ItemAcceptorSlot}
+         * @returns {import("shapez/game/components/item_acceptor").ItemAcceptorSlot}
          */
-        getFakeAcceptorSlot(): import("shapez/item_acceptor").ItemAcceptorSlot;
+        getFakeAcceptorSlot(): import("shapez/game/components/item_acceptor").ItemAcceptorSlot;
         /**
          * Returns fake acceptor slot used for matching
          * @returns {import("shapez/game/components/item_ejector").ItemEjectorSlot}
@@ -2635,10 +2651,10 @@ declare module "shapez/game/components/belt_underlays" {
      */
     export type enumClippedBeltUnderlayType = string;
     export namespace enumClippedBeltUnderlayType {
-        const full: string;
-        const bottomOnly: string;
-        const topOnly: string;
-        const none: string;
+        export const full: string;
+        export const bottomOnly: string;
+        export const topOnly: string;
+        export const none: string;
     }
     /**
      * @typedef {{
@@ -2653,7 +2669,11 @@ declare module "shapez/game/components/belt_underlays" {
          * @param {Array<BeltUnderlayTile>=} param0.underlays Where to render belt underlays
          */
         constructor({ underlays }: { underlays?: Array<BeltUnderlayTile> | undefined });
-        underlays: BeltUnderlayTile[];
+        underlays: {
+            pos: Vector;
+            direction: enumDirection;
+            cachedType?: enumClippedBeltUnderlayType;
+        }[];
     }
     export type BeltUnderlayTile = {
         pos: Vector;
@@ -2665,28 +2685,30 @@ declare module "shapez/game/components/belt_underlays" {
     import { enumDirection } from "shapez/core/vector";
 }
 declare module "shapez/game/components/hub" {
-    export class HubComponent extends Component {}
+    export class HubComponent extends Component {
+        constructor(...args: any[]);
+    }
     import { Component } from "shapez/game/component";
 }
 declare module "shapez/game/components/item_processor" {
     export type enumItemProcessorTypes = string;
     export namespace enumItemProcessorTypes {
-        const balancer: string;
-        const cutter: string;
-        const cutterQuad: string;
-        const rotater: string;
-        const rotaterCCW: string;
-        const rotater180: string;
-        const stacker: string;
-        const trash: string;
-        const mixer: string;
-        const painter: string;
-        const painterDouble: string;
-        const painterQuad: string;
-        const hub: string;
-        const filter: string;
-        const reader: string;
-        const goal: string;
+        export const balancer: string;
+        export const cutter: string;
+        export const cutterQuad: string;
+        export const rotater: string;
+        export const rotaterCCW: string;
+        export const rotater180: string;
+        export const stacker: string;
+        export const trash: string;
+        export const mixer: string;
+        export const painter: string;
+        export const painterDouble: string;
+        export const painterQuad: string;
+        export const hub: string;
+        export const filter: string;
+        export const reader: string;
+        export const goal: string;
     }
     export type enumItemProcessorRequirements = string;
     export namespace enumItemProcessorRequirements {
@@ -2730,7 +2752,7 @@ declare module "shapez/game/components/item_processor" {
          * Our current inputs
          * @type {Map<number, BaseItem>}
          */
-        inputSlots: Map<number, BaseItem>;
+        inputSlots: any;
         nextOutputSlot: number;
         /**
          * Current input count
@@ -2849,8 +2871,8 @@ declare module "shapez/game/components/storage" {
 declare module "shapez/game/components/underground_belt" {
     export type enumUndergroundBeltMode = string;
     export namespace enumUndergroundBeltMode {
-        const sender: string;
-        const receiver: string;
+        export const sender: string;
+        export const receiver: string;
     }
     /**
      * @typedef {{
@@ -2969,9 +2991,9 @@ declare module "shapez/core/stale_area_detector" {
 declare module "shapez/game/production_analytics" {
     export type enumAnalyticsDataSource = string;
     export namespace enumAnalyticsDataSource {
-        const produced: string;
-        const stored: string;
-        const delivered: string;
+        export const produced: string;
+        export const stored: string;
+        export const delivered: string;
     }
     export class ProductionAnalytics extends BasicSerializableObject {
         static getId(): string;
@@ -3027,56 +3049,56 @@ declare module "shapez/game/production_analytics" {
 }
 declare module "shapez/platform/achievement_provider" {
     export namespace ACHIEVEMENTS {
-        const belt500Tiles: string;
-        const blueprint100k: string;
-        const blueprint1m: string;
-        const completeLvl26: string;
-        const cutShape: string;
-        const darkMode: string;
-        const destroy1000: string;
-        const irrelevantShape: string;
-        const level100: string;
-        const level50: string;
-        const logoBefore18: string;
-        const mam: string;
-        const mapMarkers15: string;
-        const noBeltUpgradesUntilBp: string;
-        const noInverseRotater: string;
-        const oldLevel17: string;
-        const openWires: string;
-        const paintShape: string;
-        const place5000Wires: string;
-        const placeBlueprint: string;
-        const placeBp1000: string;
-        const play1h: string;
-        const play10h: string;
-        const play20h: string;
-        const produceLogo: string;
-        const produceMsLogo: string;
-        const produceRocket: string;
-        const rotateShape: string;
-        const speedrunBp30: string;
-        const speedrunBp60: string;
-        const speedrunBp120: string;
-        const stack4Layers: string;
-        const stackShape: string;
-        const store100Unique: string;
-        const storeShape: string;
-        const throughputBp25: string;
-        const throughputBp50: string;
-        const throughputLogo25: string;
-        const throughputLogo50: string;
-        const throughputRocket10: string;
-        const throughputRocket20: string;
-        const trash1000: string;
-        const unlockWires: string;
-        const upgradesTier5: string;
-        const upgradesTier8: string;
+        export const belt500Tiles: string;
+        export const blueprint100k: string;
+        export const blueprint1m: string;
+        export const completeLvl26: string;
+        export const cutShape: string;
+        export const darkMode: string;
+        export const destroy1000: string;
+        export const irrelevantShape: string;
+        export const level100: string;
+        export const level50: string;
+        export const logoBefore18: string;
+        export const mam: string;
+        export const mapMarkers15: string;
+        export const noBeltUpgradesUntilBp: string;
+        export const noInverseRotater: string;
+        export const oldLevel17: string;
+        export const openWires: string;
+        export const paintShape: string;
+        export const place5000Wires: string;
+        export const placeBlueprint: string;
+        export const placeBp1000: string;
+        export const play1h: string;
+        export const play10h: string;
+        export const play20h: string;
+        export const produceLogo: string;
+        export const produceMsLogo: string;
+        export const produceRocket: string;
+        export const rotateShape: string;
+        export const speedrunBp30: string;
+        export const speedrunBp60: string;
+        export const speedrunBp120: string;
+        export const stack4Layers: string;
+        export const stackShape: string;
+        export const store100Unique: string;
+        export const storeShape: string;
+        export const throughputBp25: string;
+        export const throughputBp50: string;
+        export const throughputLogo25: string;
+        export const throughputLogo50: string;
+        export const throughputRocket10: string;
+        export const throughputRocket20: string;
+        export const trash1000: string;
+        export const unlockWires: string;
+        export const upgradesTier5: string;
+        export const upgradesTier8: string;
     }
     export class AchievementProviderInterface {
         /** @param {Application} app */
         constructor(app: Application);
-        collection: AchievementCollection;
+        collection: AchievementCollection | undefined;
         app: Application;
         /**
          * Initializes the achievement provider.
@@ -3135,9 +3157,9 @@ declare module "shapez/platform/achievement_provider" {
         add(
             key: string,
             options?: {
-                init?: Function;
-                isValid?: Function;
-                signal?: string;
+                init: Function;
+                isValid: Function;
+                signal: string;
             }
         ): void;
         bulkUnlock(...args: any[]): void;
@@ -3256,37 +3278,37 @@ declare module "shapez/platform/achievement_provider" {
 declare module "shapez/game/components/wire" {
     export type enumWireType = string;
     export namespace enumWireType {
-        const forward: string;
-        const turn: string;
-        const split: string;
-        const cross: string;
+        export const forward: string;
+        export const turn: string;
+        export const split: string;
+        export const cross: string;
     }
     export type enumWireVariant = string;
     export namespace enumWireVariant {
-        const first: string;
-        const second: string;
+        export const first: string;
+        export const second: string;
     }
     export class WireComponent extends Component {
         /**
          * @param {object} param0
          * @param {enumWireType=} param0.type
-         * @param {enumWireVariant=} param0.variant
+         * @param {enumWireVariant=} param0.letiant
          */
         constructor({
             type,
-            variant,
+            letiant,
         }: {
             type?: enumWireType | undefined;
-            variant?: enumWireVariant | undefined;
+            letiant?: enumWireVariant | undefined;
         });
         type: string;
         /**
-         * The variant of the wire, different variants do not connect
+         * The letiant of the wire, different letiants do not connect
          * @type {enumWireVariant}
          */
-        variant: enumWireVariant;
+        letiant: enumWireVariant;
         /**
-         * @type {import("shapez/systems/wire").WireNetwork}
+         * @type {import("shapez/game/systems/wire").WireNetwork}
          */
         linkedNetwork: import("shapez/game/systems/wire").WireNetwork;
     }
@@ -3298,34 +3320,34 @@ declare module "shapez/game/tutorial_goals" {
      */
     export type enumHubGoalRewards = string;
     export namespace enumHubGoalRewards {
-        const reward_cutter_and_trash: string;
-        const reward_rotater: string;
-        const reward_painter: string;
-        const reward_mixer: string;
-        const reward_stacker: string;
-        const reward_balancer: string;
-        const reward_tunnel: string;
-        const reward_rotater_ccw: string;
-        const reward_rotater_180: string;
-        const reward_miner_chainable: string;
-        const reward_underground_belt_tier_2: string;
-        const reward_belt_reader: string;
-        const reward_splitter: string;
-        const reward_cutter_quad: string;
-        const reward_painter_double: string;
-        const reward_storage: string;
-        const reward_merger: string;
-        const reward_wires_painter_and_levers: string;
-        const reward_display: string;
-        const reward_constant_signal: string;
-        const reward_logic_gates: string;
-        const reward_virtual_processing: string;
-        const reward_filter: string;
-        const reward_demo_end: string;
-        const reward_blueprints: string;
-        const reward_freeplay: string;
-        const no_reward: string;
-        const no_reward_freeplay: string;
+        export const reward_cutter_and_trash: string;
+        export const reward_rotater: string;
+        export const reward_painter: string;
+        export const reward_mixer: string;
+        export const reward_stacker: string;
+        export const reward_balancer: string;
+        export const reward_tunnel: string;
+        export const reward_rotater_ccw: string;
+        export const reward_rotater_180: string;
+        export const reward_miner_chainable: string;
+        export const reward_underground_belt_tier_2: string;
+        export const reward_belt_reader: string;
+        export const reward_splitter: string;
+        export const reward_cutter_quad: string;
+        export const reward_painter_double: string;
+        export const reward_storage: string;
+        export const reward_merger: string;
+        export const reward_wires_painter_and_levers: string;
+        export const reward_display: string;
+        export const reward_constant_signal: string;
+        export const reward_logic_gates: string;
+        export const reward_virtual_processing: string;
+        export const reward_filter: string;
+        export const reward_demo_end: string;
+        export const reward_blueprints: string;
+        export const reward_freeplay: string;
+        export const no_reward: string;
+        export const no_reward_freeplay: string;
     }
 }
 declare module "shapez/core/draw_utils" {
@@ -3404,19 +3426,16 @@ declare module "shapez/game/buildings/wire" {
     };
     export type wireVariants = string;
     export namespace wireVariants {
-        const second: string;
+        export const second: string;
     }
-    export class MetaWireBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaWireBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/components/wire_tunnel" {
     export class WireTunnelComponent extends Component {
-        constructor();
         /**
          * Linked network, only if its not multiple directions
-         * @type {Array<import("shapez/systems/wire").WireNetwork>}
+         * @type {Array<import("shapez/game/systems/wire").WireNetwork>}
          */
         linkedNetworks: Array<import("shapez/game/systems/wire").WireNetwork>;
     }
@@ -3548,7 +3567,7 @@ declare module "shapez/game/map_chunk" {
          * Which entities this chunk contains, sorted by layer
          * @type {Record<Layer, Array<Entity>>}
          */
-        containedEntitiesByLayer: Record<Layer, Array<Entity>>;
+        containedEntitiesByLayer: Record<any, Array<Entity>>;
         /**
          * Store which patches we have so we can render them in the overview
          * @type {Array<{pos: Vector, item: BaseItem, size: number }>}
@@ -3634,7 +3653,7 @@ declare module "shapez/game/map_chunk" {
          * @param {Layer} layer
          * @returns {Entity=}
          */
-        getLayerContentFromWorldCoords(worldX: number, worldY: number, layer: Layer): Entity | undefined;
+        getLayerContentFromWorldCoords(worldX: number, worldY: number, layer: any): Entity | undefined;
         /**
          * Returns the contents of this chunk from the given world space coordinates
          * @param {number} worldX
@@ -3653,10 +3672,10 @@ declare module "shapez/game/map_chunk" {
          * Sets the chunks contents
          * @param {number} tileX
          * @param {number} tileY
-         * @param {Entity=} contents
+         * @param {Entity} contents
          * @param {Layer} layer
          */
-        setLayerContentFromWorldCords(tileX: number, tileY: number, contents: Entity, layer: Layer): void;
+        setLayerContentFromWorldCords(tileX: number, tileY: number, contents: Entity, layer: any): void;
     }
     import { GameRoot } from "shapez/game/root";
     import { BaseItem } from "shapez/game/base_item";
@@ -3693,6 +3712,13 @@ declare module "shapez/game/map_chunk_view" {
             tileSizePixels: number;
             overrideColor?: string | undefined;
         }): void;
+        /**
+         *
+         * @param {GameRoot} root
+         * @param {number} x
+         * @param {number} y
+         */
+        constructor(root: GameRoot, x: number, y: number);
         /**
          * Whenever something changes, we increase this number - so we know we need to redraw
          */
@@ -3748,6 +3774,7 @@ declare module "shapez/game/map_chunk_view" {
     import { MapChunk } from "shapez/game/map_chunk";
     import { DrawParameters } from "shapez/core/draw_parameters";
     import { Entity } from "shapez/game/entity";
+    import { GameRoot } from "shapez/game/root";
 }
 declare module "shapez/game/systems/wire" {
     export class WireNetwork {
@@ -3841,14 +3868,14 @@ declare module "shapez/game/systems/wire" {
          * @param {Vector} initialTile
          * @param {Array<enumDirection>} directions
          * @param {WireNetwork} network
-         * @param {enumWireVariant=} variantMask Only accept connections to this mask
+         * @param {enumWireVariant=} letiantMask Only accept connections to this mask
          * @returns {Array<any>}
          */
         findSurroundingWireTargets(
             initialTile: Vector,
             directions: Array<enumDirection>,
             network: WireNetwork,
-            variantMask?: enumWireVariant | undefined
+            letiantMask?: enumWireVariant | undefined
         ): Array<any>;
         /**
          * Returns the given tileset and opacity
@@ -3897,8 +3924,8 @@ declare module "shapez/game/systems/wire" {
 declare module "shapez/game/components/wired_pins" {
     export type enumPinSlotType = string;
     export namespace enumPinSlotType {
-        const logicalEjector: string;
-        const logicalAcceptor: string;
+        export const logicalEjector: string;
+        export const logicalAcceptor: string;
     }
     /** @typedef {{
      *   pos: Vector,
@@ -3910,7 +3937,7 @@ declare module "shapez/game/components/wired_pins" {
      *   type: enumPinSlotType,
      *   direction: enumDirection,
      *   value: BaseItem,
-     *   linkedNetwork: import("shapez/systems/wire").WireNetwork
+     *   linkedNetwork: import("shapez/game/systems/wire").WireNetwork
      * }} WirePinSlot */
     export class WiredPinsComponent extends Component {
         static getSchema(): {
@@ -3966,18 +3993,18 @@ declare module "shapez/game/components/constant_signal" {
 declare module "shapez/game/components/logic_gate" {
     export type enumLogicGateType = string;
     export namespace enumLogicGateType {
-        const and: string;
-        const not: string;
-        const xor: string;
-        const or: string;
-        const transistor: string;
-        const analyzer: string;
-        const rotater: string;
-        const unstacker: string;
-        const cutter: string;
-        const compare: string;
-        const stacker: string;
-        const painter: string;
+        export const and: string;
+        export const not: string;
+        export const xor: string;
+        export const or: string;
+        export const transistor: string;
+        export const analyzer: string;
+        export const rotater: string;
+        export const unstacker: string;
+        export const cutter: string;
+        export const compare: string;
+        export const stacker: string;
+        export const painter: string;
     }
     export class LogicGateComponent extends Component {
         /**
@@ -4005,20 +4032,21 @@ declare module "shapez/game/components/lever" {
     import { Component } from "shapez/game/component";
 }
 declare module "shapez/game/components/display" {
-    export class DisplayComponent extends Component {}
+    export class DisplayComponent extends Component {
+        constructor(...args: any[]);
+    }
     import { Component } from "shapez/game/component";
 }
 declare module "shapez/game/components/belt_reader" {
     export type enumBeltReaderType = string;
     export namespace enumBeltReaderType {
-        const wired: string;
-        const wireless: string;
+        export const wired: string;
+        export const wireless: string;
     }
     export class BeltReaderComponent extends Component {
         static getSchema(): {
             lastItem: import("shapez/savegame/serialization_data_types").TypeNullable;
         };
-        constructor();
         /**
          * Which items went through the reader, we only store the time
          * @type {Array<number>}
@@ -4055,7 +4083,6 @@ declare module "shapez/game/components/filter" {
             pendingItemsToLeaveThrough: import("shapez/savegame/serialization_data_types").TypeArray;
             pendingItemsToReject: import("shapez/savegame/serialization_data_types").TypeArray;
         };
-        constructor();
         duplicateWithoutContents(): FilterComponent;
         /**
          * Items in queue to leave through
@@ -4076,7 +4103,9 @@ declare module "shapez/game/components/filter" {
     import { BaseItem } from "shapez/game/base_item";
 }
 declare module "shapez/game/components/item_producer" {
-    export class ItemProducerComponent extends Component {}
+    export class ItemProducerComponent extends Component {
+        constructor(...args: any[]);
+    }
     import { Component } from "shapez/game/component";
 }
 declare module "shapez/game/components/goal_acceptor" {
@@ -4204,7 +4233,7 @@ declare module "shapez/game/entity" {
          * On which layer this entity is
          * @type {Layer}
          */
-        layer: Layer;
+        layer: any;
         /**
          * Internal entity unique id, set by the @see EntityManager
          */
@@ -4274,11 +4303,11 @@ declare module "shapez/game/meta_building" {
          * Returns the edit layer of the building
          * @returns {Layer}
          */
-        getLayer(): Layer;
+        getLayer(): any;
         /**
          * Should return the dimensions of the building
          */
-        getDimensions(variant?: string): Vector;
+        getDimensions(letiant?: string): Vector;
         /**
          * Returns whether the building has the direction lock switch available
          */
@@ -4291,23 +4320,23 @@ declare module "shapez/game/meta_building" {
          * Can return a special interlaved 9 elements overlay matrix for rendering
          * @param {number} rotation
          * @param {number} rotationVariant
-         * @param {string} variant
+         * @param {string} letiant
          * @param {Entity} entity
          * @returns {Array<number>|null}
          */
         getSpecialOverlayRenderMatrix(
             rotation: number,
             rotationVariant: number,
-            variant: string,
+            letiant: string,
             entity: Entity
         ): Array<number> | null;
         /**
          * Should return additional statistics about this building
          * @param {GameRoot} root
-         * @param {string} variant
+         * @param {string} letiant
          * @returns {Array<[string, string]>}
          */
-        getAdditionalStatistics(root: GameRoot, variant: string): Array<[string, string]>;
+        getAdditionalStatistics(root: GameRoot, letiant: string): Array<[string, string]>;
         /**
          * Returns whether this building can get replaced
          */
@@ -4323,9 +4352,9 @@ declare module "shapez/game/meta_building" {
         getShowWiresLayerPreview(): boolean;
         /**
          * Whether to rotate automatically in the dragging direction while placing
-         * @param {string} variant
+         * @param {string} letiant
          */
-        getRotateAutomaticallyWhilePlacing(variant: string): boolean;
+        getRotateAutomaticallyWhilePlacing(letiant: string): boolean;
         /**
          * Returns whether this building is removable
          * @param {GameRoot} root
@@ -4345,12 +4374,12 @@ declare module "shapez/game/meta_building" {
          * Returns a preview sprite
          * @returns {AtlasSprite}
          */
-        getPreviewSprite(rotationVariant?: number, variant?: string): AtlasSprite;
+        getPreviewSprite(rotationVariant?: number, letiant?: string): AtlasSprite;
         /**
          * Returns a sprite for blueprints
          * @returns {AtlasSprite}
          */
-        getBlueprintSprite(rotationVariant?: number, variant?: string): AtlasSprite;
+        getBlueprintSprite(rotationVariant?: number, letiant?: string): AtlasSprite;
         /**
          * Returns whether this building is rotateable
          * @returns {boolean}
@@ -4363,10 +4392,10 @@ declare module "shapez/game/meta_building" {
         getIsUnlocked(root: GameRoot): boolean;
         /**
          * Should return a silhouette color for the map overview or null if not set
-         * @param {string} variant
+         * @param {string} letiant
          * @param {number} rotationVariant
          */
-        getSilhouetteColor(variant: string, rotationVariant: number): any;
+        getSilhouetteColor(letiant: string, rotationVariant: number): any;
         /**
          * Should return false if the pins are already included in the sprite of the building
          * @returns {boolean}
@@ -4379,8 +4408,8 @@ declare module "shapez/game/meta_building" {
          * @param {Vector} param0.origin Origin tile
          * @param {number=} param0.rotation Rotation
          * @param {number} param0.originalRotation Original Rotation
-         * @param {number} param0.rotationVariant Rotation variant
-         * @param {string} param0.variant
+         * @param {number} param0.rotationVariant Rotation letiant
+         * @param {string} param0.letiant
          */
         createEntity({
             root,
@@ -4388,29 +4417,29 @@ declare module "shapez/game/meta_building" {
             rotation,
             originalRotation,
             rotationVariant,
-            variant,
+            letiant,
         }: {
             root: GameRoot;
             origin: Vector;
             rotation?: number | undefined;
             originalRotation: number;
             rotationVariant: number;
-            variant: string;
+            letiant: string;
         }): Entity;
         /**
-         * Returns the sprite for a given variant
+         * Returns the sprite for a given letiant
          * @param {number} rotationVariant
-         * @param {string} variant
+         * @param {string} letiant
          * @returns {AtlasSprite}
          */
-        getSprite(rotationVariant: number, variant: string): AtlasSprite;
+        getSprite(rotationVariant: number, letiant: string): AtlasSprite;
         /**
-         * Should compute the optimal rotation variant on the given tile
+         * Should compute the optimal rotation letiant on the given tile
          * @param {object} param0
          * @param {GameRoot} param0.root
          * @param {Vector} param0.tile
          * @param {number} param0.rotation
-         * @param {string} param0.variant
+         * @param {string} param0.letiant
          * @param {Layer} param0.layer
          * @return {{ rotation: number, rotationVariant: number, connectedEntities?: Array<Entity> }}
          */
@@ -4418,26 +4447,26 @@ declare module "shapez/game/meta_building" {
             root,
             tile,
             rotation,
-            variant,
+            letiant,
             layer,
         }: {
             root: GameRoot;
             tile: Vector;
             rotation: number;
-            variant: string;
-            layer: Layer;
+            letiant: string;
+            layer: any;
         }): {
             rotation: number;
             rotationVariant: number;
             connectedEntities?: Array<Entity>;
         };
         /**
-         * Should update the entity to match the given variants
+         * Should update the entity to match the given letiants
          * @param {Entity} entity
          * @param {number} rotationVariant
-         * @param {string} variant
+         * @param {string} letiant
          */
-        updateVariants(entity: Entity, rotationVariant: number, variant: string): void;
+        updateVariants(entity: Entity, rotationVariant: number, letiant: string): void;
         /**
          * Should setup the entity components
          * @param {Entity} entity
@@ -4451,9 +4480,7 @@ declare module "shapez/game/meta_building" {
     import { AtlasSprite } from "shapez/core/sprites";
 }
 declare module "shapez/game/buildings/item_producer" {
-    export class MetaItemProducerBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaItemProducerBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/core/globals" {
@@ -4471,7 +4498,7 @@ declare module "shapez/core/globals" {
 declare module "shapez/core/click_detector" {
     export const MAX_MOVE_DISTANCE_PX: 20 | 80;
     export namespace clickDetectorGlobals {
-        const lastTouchTime: number;
+        export const lastTouchTime: number;
     }
     /**
      * Click detector creation payload typehints
@@ -4647,287 +4674,287 @@ declare module "shapez/game/key_action_mapper" {
      */
     export function getStringForKeyCode(code: number): string;
     export namespace KEYMAPPINGS {
-        namespace general {
-            namespace confirm {
-                const keyCode: number;
+        export namespace general {
+            export namespace confirm {
+                export const keyCode: number;
             }
-            namespace back {
+            export namespace back {
                 const keyCode_1: number;
                 export { keyCode_1 as keyCode };
                 export const builtin: boolean;
             }
         }
-        namespace ingame {
-            namespace menuOpenShop {
+        export namespace ingame {
+            export namespace menuOpenShop {
                 const keyCode_2: any;
                 export { keyCode_2 as keyCode };
             }
-            namespace menuOpenStats {
+            export namespace menuOpenStats {
                 const keyCode_3: any;
                 export { keyCode_3 as keyCode };
             }
-            namespace menuClose {
+            export namespace menuClose {
                 const keyCode_4: any;
                 export { keyCode_4 as keyCode };
             }
-            namespace toggleHud {
+            export namespace toggleHud {
                 const keyCode_5: number;
                 export { keyCode_5 as keyCode };
             }
-            namespace exportScreenshot {
+            export namespace exportScreenshot {
                 const keyCode_6: number;
                 export { keyCode_6 as keyCode };
             }
-            namespace toggleFPSInfo {
+            export namespace toggleFPSInfo {
                 const keyCode_7: number;
                 export { keyCode_7 as keyCode };
             }
-            namespace switchLayers {
+            export namespace switchLayers {
                 const keyCode_8: any;
                 export { keyCode_8 as keyCode };
             }
-            namespace showShapeTooltip {
+            export namespace showShapeTooltip {
                 const keyCode_9: number;
                 export { keyCode_9 as keyCode };
             }
         }
-        namespace navigation {
-            namespace mapMoveUp {
+        export namespace navigation {
+            export namespace mapMoveUp {
                 const keyCode_10: any;
                 export { keyCode_10 as keyCode };
             }
-            namespace mapMoveRight {
+            export namespace mapMoveRight {
                 const keyCode_11: any;
                 export { keyCode_11 as keyCode };
             }
-            namespace mapMoveDown {
+            export namespace mapMoveDown {
                 const keyCode_12: any;
                 export { keyCode_12 as keyCode };
             }
-            namespace mapMoveLeft {
+            export namespace mapMoveLeft {
                 const keyCode_13: any;
                 export { keyCode_13 as keyCode };
             }
-            namespace mapMoveFaster {
+            export namespace mapMoveFaster {
                 const keyCode_14: number;
                 export { keyCode_14 as keyCode };
             }
-            namespace centerMap {
+            export namespace centerMap {
                 const keyCode_15: number;
                 export { keyCode_15 as keyCode };
             }
-            namespace mapZoomIn {
+            export namespace mapZoomIn {
                 const keyCode_16: number;
                 export { keyCode_16 as keyCode };
                 export const repeated: boolean;
             }
-            namespace mapZoomOut {
+            export namespace mapZoomOut {
                 const keyCode_17: number;
                 export { keyCode_17 as keyCode };
                 const repeated_1: boolean;
                 export { repeated_1 as repeated };
             }
-            namespace createMarker {
+            export namespace createMarker {
                 const keyCode_18: any;
                 export { keyCode_18 as keyCode };
             }
         }
-        namespace buildings {
-            namespace constant_producer {
+        export namespace buildings {
+            export namespace constant_producer {
                 const keyCode_19: any;
                 export { keyCode_19 as keyCode };
             }
-            namespace goal_acceptor {
+            export namespace goal_acceptor {
                 const keyCode_20: any;
                 export { keyCode_20 as keyCode };
             }
-            namespace block {
+            export namespace block {
                 const keyCode_21: any;
                 export { keyCode_21 as keyCode };
             }
-            namespace belt {
+            export namespace belt {
                 const keyCode_22: any;
                 export { keyCode_22 as keyCode };
             }
-            namespace balancer {
+            export namespace balancer {
                 const keyCode_23: any;
                 export { keyCode_23 as keyCode };
             }
-            namespace underground_belt {
+            export namespace underground_belt {
                 const keyCode_24: any;
                 export { keyCode_24 as keyCode };
             }
-            namespace miner {
+            export namespace miner {
                 const keyCode_25: any;
                 export { keyCode_25 as keyCode };
             }
-            namespace cutter {
+            export namespace cutter {
                 const keyCode_26: any;
                 export { keyCode_26 as keyCode };
             }
-            namespace rotater {
+            export namespace rotater {
                 const keyCode_27: any;
                 export { keyCode_27 as keyCode };
             }
-            namespace stacker {
+            export namespace stacker {
                 const keyCode_28: any;
                 export { keyCode_28 as keyCode };
             }
-            namespace mixer {
+            export namespace mixer {
                 const keyCode_29: any;
                 export { keyCode_29 as keyCode };
             }
-            namespace painter {
+            export namespace painter {
                 const keyCode_30: any;
                 export { keyCode_30 as keyCode };
             }
-            namespace trash {
+            export namespace trash {
                 const keyCode_31: any;
                 export { keyCode_31 as keyCode };
             }
-            namespace item_producer {
+            export namespace item_producer {
                 const keyCode_32: any;
                 export { keyCode_32 as keyCode };
             }
-            namespace storage {
+            export namespace storage {
                 const keyCode_33: any;
                 export { keyCode_33 as keyCode };
             }
-            namespace reader {
+            export namespace reader {
                 const keyCode_34: any;
                 export { keyCode_34 as keyCode };
             }
-            namespace lever {
+            export namespace lever {
                 const keyCode_35: any;
                 export { keyCode_35 as keyCode };
             }
-            namespace filter {
+            export namespace filter {
                 const keyCode_36: any;
                 export { keyCode_36 as keyCode };
             }
-            namespace display {
+            export namespace display {
                 const keyCode_37: any;
                 export { keyCode_37 as keyCode };
             }
-            namespace wire {
+            export namespace wire {
                 const keyCode_38: any;
                 export { keyCode_38 as keyCode };
             }
-            namespace wire_tunnel {
+            export namespace wire_tunnel {
                 const keyCode_39: any;
                 export { keyCode_39 as keyCode };
             }
-            namespace constant_signal {
+            export namespace constant_signal {
                 const keyCode_40: any;
                 export { keyCode_40 as keyCode };
             }
-            namespace logic_gate {
+            export namespace logic_gate {
                 const keyCode_41: any;
                 export { keyCode_41 as keyCode };
             }
-            namespace virtual_processor {
+            export namespace virtual_processor {
                 const keyCode_42: any;
                 export { keyCode_42 as keyCode };
             }
-            namespace analyzer {
+            export namespace analyzer {
                 const keyCode_43: any;
                 export { keyCode_43 as keyCode };
             }
-            namespace comparator {
+            export namespace comparator {
                 const keyCode_44: any;
                 export { keyCode_44 as keyCode };
             }
-            namespace transistor {
+            export namespace transistor {
                 const keyCode_45: any;
                 export { keyCode_45 as keyCode };
             }
         }
-        namespace placement {
-            namespace pipette {
+        export namespace placement {
+            export namespace pipette {
                 const keyCode_46: any;
                 export { keyCode_46 as keyCode };
             }
-            namespace rotateWhilePlacing {
+            export namespace rotateWhilePlacing {
                 const keyCode_47: any;
                 export { keyCode_47 as keyCode };
             }
-            namespace rotateInverseModifier {
+            export namespace rotateInverseModifier {
                 const keyCode_48: number;
                 export { keyCode_48 as keyCode };
             }
-            namespace rotateToUp {
+            export namespace rotateToUp {
                 export { KEYCODE_UP_ARROW as keyCode };
             }
-            namespace rotateToDown {
+            export namespace rotateToDown {
                 export { KEYCODE_DOWN_ARROW as keyCode };
             }
-            namespace rotateToRight {
+            export namespace rotateToRight {
                 export { KEYCODE_RIGHT_ARROW as keyCode };
             }
-            namespace rotateToLeft {
+            export namespace rotateToLeft {
                 export { KEYCODE_LEFT_ARROW as keyCode };
             }
-            namespace cycleBuildingVariants {
+            export namespace cycleBuildingVariants {
                 const keyCode_49: any;
                 export { keyCode_49 as keyCode };
             }
-            namespace cycleBuildings {
+            export namespace cycleBuildings {
                 const keyCode_50: number;
                 export { keyCode_50 as keyCode };
             }
-            namespace switchDirectionLockSide {
+            export namespace switchDirectionLockSide {
                 const keyCode_51: any;
                 export { keyCode_51 as keyCode };
             }
-            namespace copyWireValue {
+            export namespace copyWireValue {
                 const keyCode_52: any;
                 export { keyCode_52 as keyCode };
             }
         }
-        namespace massSelect {
-            namespace massSelectStart {
+        export namespace massSelect {
+            export namespace massSelectStart {
                 const keyCode_53: number;
                 export { keyCode_53 as keyCode };
             }
-            namespace massSelectSelectMultiple {
+            export namespace massSelectSelectMultiple {
                 const keyCode_54: number;
                 export { keyCode_54 as keyCode };
             }
-            namespace massSelectCopy {
+            export namespace massSelectCopy {
                 const keyCode_55: any;
                 export { keyCode_55 as keyCode };
             }
-            namespace massSelectCut {
+            export namespace massSelectCut {
                 const keyCode_56: any;
                 export { keyCode_56 as keyCode };
             }
-            namespace massSelectClear {
+            export namespace massSelectClear {
                 const keyCode_57: any;
                 export { keyCode_57 as keyCode };
             }
-            namespace confirmMassDelete {
+            export namespace confirmMassDelete {
                 const keyCode_58: number;
                 export { keyCode_58 as keyCode };
             }
-            namespace pasteLastBlueprint {
+            export namespace pasteLastBlueprint {
                 const keyCode_59: any;
                 export { keyCode_59 as keyCode };
             }
         }
-        namespace placementModifiers {
-            namespace lockBeltDirection {
+        export namespace placementModifiers {
+            export namespace lockBeltDirection {
                 const keyCode_60: number;
                 export { keyCode_60 as keyCode };
             }
-            namespace placementDisableAutoOrientation {
+            export namespace placementDisableAutoOrientation {
                 const keyCode_61: number;
                 export { keyCode_61 as keyCode };
             }
-            namespace placeMultiple {
+            export namespace placeMultiple {
                 const keyCode_62: number;
                 export { keyCode_62 as keyCode };
             }
-            namespace placeInverse {
+            export namespace placeInverse {
                 const keyCode_63: number;
                 export { keyCode_63 as keyCode };
             }
@@ -5171,16 +5198,16 @@ declare module "shapez/game/hud/base_hud_part" {
 declare module "shapez/game/game_mode" {
     export type enumGameModeIds = string;
     export namespace enumGameModeIds {
-        const puzzleEdit: string;
-        const puzzlePlay: string;
-        const regular: string;
+        export const puzzleEdit: string;
+        export const puzzlePlay: string;
+        export const regular: string;
     }
     export type enumGameModeTypes = string;
-    export namespace enumGameModeTypes {
-        const _default: string;
-        export { _default as default };
-        export const puzzle: string;
-    }
+    /** @enum {string} */
+    export const enumGameModeTypes: {
+        default: string;
+        puzzle: string;
+    };
     export class GameMode extends BasicSerializableObject {
         /** @returns {string} */
         static getId(): string;
@@ -5226,9 +5253,9 @@ declare module "shapez/game/game_mode" {
         getMinimumZoom(): number;
         /** @returns {number} */
         getMaximumZoom(): number;
-        /** @returns {Object<string, Array>} */
+        /** @returns {Object<string, Array<object>>} */
         getUpgrades(): {
-            [x: string]: any[];
+            [x: string]: Array<object>;
         };
         throughputDoesNotMatter(): boolean;
         /**
@@ -5265,9 +5292,7 @@ declare module "shapez/core/global_registries" {
     /**
      * @param {Object.<string, Array<Class<MetaBuilding>>>} buildings
      */
-    export function initBuildingsByCategory(buildings: {
-        [x: string]: Array<Class<import("shapez/game/meta_building").MetaBuilding>>;
-    }): void;
+    export function initBuildingsByCategory(buildings: { [x: string]: Array<any> }): void;
     /**
      * @typedef {import("shapez/game/time/base_game_speed").BaseGameSpeed} BaseGameSpeed
      * @typedef {import("shapez/game/component").Component} Component
@@ -5279,29 +5304,26 @@ declare module "shapez/core/global_registries" {
     // These factories are here to remove circular dependencies
 
     /** @type {SingletonFactoryTemplate<MetaBuilding>} */
-    export let gMetaBuildingRegistry: SingletonFactoryTemplate<
-        import("shapez/game/meta_building").MetaBuilding
-    >;
+    export let gMetaBuildingRegistry: any;
     /** @type {Object.<string, Array<Class<MetaBuilding>>>} */
     export let gBuildingsByCategory: {
-        [x: string]: Array<Class<import("shapez/game/meta_building").MetaBuilding>>;
+        [x: string]: Array<any>;
     };
     /** @type {FactoryTemplate<Component>} */
-    export let gComponentRegistry: FactoryTemplate<import("shapez/game/component").Component>;
+    export let gComponentRegistry: any;
     /** @type {FactoryTemplate<GameMode>} */
-    export let gGameModeRegistry: FactoryTemplate<import("shapez/game/game_mode").GameMode>;
+    export let gGameModeRegistry: any;
     /** @type {FactoryTemplate<BaseGameSpeed>} */
-    export let gGameSpeedRegistry: FactoryTemplate<import("shapez/game/time/base_game_speed").BaseGameSpeed>;
+    export let gGameSpeedRegistry: any;
     /** @type {FactoryTemplate<BaseItem>} */
-    export let gItemRegistry: FactoryTemplate<import("shapez/game/base_item").BaseItem>;
+    export let gItemRegistry: any;
     export type BaseGameSpeed = import("shapez/game/time/base_game_speed").BaseGameSpeed;
     export type Component = import("shapez/game/component").Component;
     export type BaseItem = import("shapez/game/base_item").BaseItem;
     export type GameMode = import("shapez/game/game_mode").GameMode;
     /**
      * // These factories are here to remove circular dependencies
-     *
-     * /**
+    /**
      */
     export type MetaBuilding = import("shapez/game/meta_building").MetaBuilding;
 }
@@ -5580,13 +5602,13 @@ declare module "shapez/core/modal_dialog_elements" {
          * Helper method to track clicks on an element
          * @param {Element} elem
          * @param {function():void} handler
-         * @param {import("shapez/click_detector").ClickDetectorConstructorArgs=} args
+         * @param {import("shapez/core/click_detector").ClickDetectorConstructorArgs=} args
          * @returns {ClickDetector}
          */
         trackClicks(
             elem: Element,
             handler: () => void,
-            args?: import("shapez/click_detector").ClickDetectorConstructorArgs | undefined
+            args?: import("shapez/core/click_detector").ClickDetectorConstructorArgs | undefined
         ): ClickDetector;
     }
     /**
@@ -5643,9 +5665,7 @@ declare module "shapez/core/modal_dialog_elements" {
     import { FormElement } from "shapez/core/modal_dialog_forms";
 }
 declare module "shapez/game/buildings/hub" {
-    export class MetaHubBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaHubBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/camera" {
@@ -5654,9 +5674,9 @@ declare module "shapez/game/camera" {
     export const USER_INTERACT_TOUCHEND: "touchend";
     export type enumMouseButton = string;
     export namespace enumMouseButton {
-        const left: string;
-        const middle: string;
-        const right: string;
+        export const left: string;
+        export const middle: string;
+        export const right: string;
     }
     export class Camera extends BasicSerializableObject {
         static getId(): string;
@@ -5692,9 +5712,9 @@ declare module "shapez/game/camera" {
         desiredZoom: number;
         /** @type {Vector} */
         touchPostMoveVelocity: Vector;
-        downPreHandler: TypedSignal<[Vector, string]>;
-        movePreHandler: TypedSignal<[Vector]>;
-        upPostHandler: TypedSignal<[Vector]>;
+        downPreHandler: any;
+        movePreHandler: any;
+        upPostHandler: any;
         addScreenShake(amount: any): void;
         /**
          * Sets a point in world space to focus on
@@ -5752,7 +5772,7 @@ declare module "shapez/game/camera" {
         /**
          * Returns effective world space viewport right
          */
-        getViewportRight(): number;
+        getViewportRight(): any;
         /**
          * Returns effective world space viewport top
          */
@@ -5760,7 +5780,7 @@ declare module "shapez/game/camera" {
         /**
          * Returns effective world space viewport bottom
          */
-        getViewportBottom(): number;
+        getViewportBottom(): any;
         /**
          * Returns the visible world space rect
          * @returns {Rectangle}
@@ -5980,7 +6000,7 @@ declare module "shapez/game/hud/dynamic_dom_attach" {
         timeToKeepSeconds: number;
         lastVisibleTime: number;
         attached: boolean;
-        internalIsClassAttached: boolean;
+        internalIsClassAttached: any;
         classAttachTimeout: number;
         /** @type {DOMRect} */
         lastComputedBounds: DOMRect;
@@ -6016,11 +6036,12 @@ declare module "shapez/game/hud/dynamic_dom_attach" {
 declare module "shapez/game/hud/parts/notifications" {
     export type enumNotificationType = string;
     export namespace enumNotificationType {
-        const saved: string;
-        const upgrade: string;
-        const success: string;
+        export const saved: string;
+        export const upgrade: string;
+        export const success: string;
     }
     export class HUDNotifications extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         /** @type {Array<{ element: HTMLElement, expireAt: number}>} */
         notificationElements: {
@@ -6037,13 +6058,22 @@ declare module "shapez/game/hud/parts/notifications" {
 }
 declare module "shapez/game/hud/parts/waypoints" {
     export class HUDWaypoints extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         hintElement: HTMLDivElement;
         waypointsListElement: HTMLDivElement;
         /**
          * Serializes the waypoints
          */
         serialize(): {
-            waypoints: Waypoint[];
+            waypoints: {
+                label: string | null;
+                center: {
+                    x: number;
+                    y: number;
+                };
+                zoomLevel: number;
+                layer: any;
+            }[];
         };
         /**
          * Deserializes the waypoints
@@ -6195,7 +6225,7 @@ declare module "shapez/game/hud/parts/waypoints" {
             y: number;
         };
         zoomLevel: number;
-        layer: Layer;
+        layer: any;
     };
     import { BaseHUDPart } from "shapez/game/hud/base_hud_part";
     import { DynamicDomAttach } from "shapez/game/hud/dynamic_dom_attach";
@@ -6322,10 +6352,21 @@ declare module "shapez/savegame/savegame_serializer" {
         deserialize(savegame: SerializedGame, root: GameRoot): ExplainedResult;
     }
     export type Component = import("shapez/game/component").Component;
-    export type StaticComponent = import("shapez/game/component").StaticComponent;
+    export type StaticComponent = typeof import("shapez/game/component").Component;
     export type Entity = import("shapez/game/entity").Entity;
     export type GameRoot = import("shapez/game/root").GameRoot;
-    export type SerializedGame = import("shapez/savegame/savegame_typedefs").SerializedGame;
+    export type SerializedGame = {
+        camera: any;
+        time: any;
+        entityMgr: any;
+        map: any;
+        gameMode: any;
+        hubGoals: any;
+        pinnedShapes: any;
+        waypoints: any;
+        entities: import("shapez/game/entity").Entity[];
+        beltPaths: any[];
+    };
     import { SerializerInternal } from "shapez/savegame/serializer_internal";
     import { ExplainedResult } from "shapez/core/explained_result";
 }
@@ -6368,143 +6409,77 @@ declare module "shapez/savegame/serialization" {
      * @returns {Schema}
      */
     export function extendSchema(base: Schema, newOne: Schema): Schema;
-    export namespace types {
-        export const int: TypeInteger;
-        export const uint: TypePositiveInteger;
-        export const float: TypeNumber;
-        export const ufloat: TypePositiveNumber;
-        export const string: TypeString;
-        export const entity: TypeEntity;
-        export const weakEntityRef: TypeEntityWeakref;
-        export const vector: TypeVector;
-        export const tileVector: TypeVector;
-        export const bool: TypeBoolean;
+    export const types: {
+        int: TypeInteger;
+        uint: TypePositiveInteger;
+        float: TypeNumber;
+        ufloat: TypePositiveNumber;
+        string: TypeString;
+        entity: TypeEntity;
+        weakEntityRef: TypeEntityWeakref;
+        vector: TypeVector;
+        tileVector: TypeVector;
+        bool: TypeBoolean;
         /**
          * @param {BaseDataType} wrapped
          */
-        export function nullable(wrapped: BaseDataType): TypeNullable;
-        /**
-         * @param {BaseDataType} wrapped
-         */
-        export function nullable(wrapped: BaseDataType): TypeNullable;
+        nullable(wrapped: BaseDataType): TypeNullable;
         /**
          * @param {FactoryTemplate<*>|SingletonFactoryTemplate<*>} registry
          */
-        export function classId(registry: any): TypeClassId;
-        /**
-         * @param {FactoryTemplate<*>|SingletonFactoryTemplate<*>} registry
-         */
-        export function classId(registry: any): TypeClassId;
+        classId(registry: any | any): TypeClassId;
         /**
          * @param {BaseDataType} valueType
          * @param {boolean=} includeEmptyValues
          */
-        export function keyValueMap(valueType: BaseDataType, includeEmptyValues?: boolean): TypeKeyValueMap;
-        /**
-         * @param {BaseDataType} valueType
-         * @param {boolean=} includeEmptyValues
-         */
-        export function keyValueMap(valueType: BaseDataType, includeEmptyValues?: boolean): TypeKeyValueMap;
+        keyValueMap(valueType: BaseDataType, includeEmptyValues?: boolean | undefined): TypeKeyValueMap;
         /**
          * @param {Object<string, any>} values
          */
-        function _enum(values: { [x: string]: any }): TypeEnum;
-        /**
-         * @param {Object<string, any>} values
-         */
-        export function _enum(values: { [x: string]: any }): TypeEnum;
-        export { _enum as enum };
+        enum(values: { [x: string]: any }): TypeEnum;
         /**
          * @param {FactoryTemplate<*>} registry
          * @param {(GameRoot, any) => object=} resolver
          */
-        export function obj(
-            registry: FactoryTemplate<any>,
-            resolver?: (GameRoot: any, any: any) => any
-        ): TypeClass;
-        /**
-         * @param {FactoryTemplate<*>} registry
-         * @param {(GameRoot, any) => object=} resolver
-         */
-        export function obj(
-            registry: FactoryTemplate<any>,
-            resolver?: (GameRoot: any, any: any) => any
-        ): TypeClass;
+        obj(registry: any, resolver?: (GameRoot: any, any: any) => object): TypeClass;
         /**
          * @param {FactoryTemplate<*>} registry
          */
-        export function objData(registry: FactoryTemplate<any>): TypeClassData;
-        /**
-         * @param {FactoryTemplate<*>} registry
-         */
-        export function objData(registry: FactoryTemplate<any>): TypeClassData;
+        objData(registry: any): TypeClassData;
         /**
          * @param {typeof BasicSerializableObject} cls
          */
-        export function knownType(cls: typeof BasicSerializableObject): TypeFixedClass;
-        /**
-         * @param {typeof BasicSerializableObject} cls
-         */
-        export function knownType(cls: typeof BasicSerializableObject): TypeFixedClass;
+        knownType(cls: typeof BasicSerializableObject): TypeFixedClass;
         /**
          * @param {BaseDataType} innerType
          */
-        export function array(innerType: BaseDataType): TypeArray;
+        array(innerType: BaseDataType): TypeArray;
         /**
          * @param {BaseDataType} innerType
          */
-        export function array(innerType: BaseDataType): TypeArray;
-        /**
-         * @param {BaseDataType} innerType
-         */
-        export function fixedSizeArray(innerType: BaseDataType): TypeArray;
-        /**
-         * @param {BaseDataType} innerType
-         */
-        export function fixedSizeArray(innerType: BaseDataType): TypeArray;
+        fixedSizeArray(innerType: BaseDataType): TypeArray;
         /**
          * @param {SingletonFactoryTemplate<*>} innerType
          */
-        export function classRef(registry: any): TypeMetaClass;
-        /**
-         * @param {SingletonFactoryTemplate<*>} innerType
-         */
-        export function classRef(registry: any): TypeMetaClass;
+        classRef(registry: any): TypeMetaClass;
         /**
          * @param {Object.<string, BaseDataType>} descriptor
          */
-        export function structured(descriptor: { [x: string]: BaseDataType }): TypeStructuredObject;
-        /**
-         * @param {Object.<string, BaseDataType>} descriptor
-         */
-        export function structured(descriptor: { [x: string]: BaseDataType }): TypeStructuredObject;
+        structured(descriptor: { [x: string]: BaseDataType }): TypeStructuredObject;
         /**
          * @param {BaseDataType} a
          * @param {BaseDataType} b
          */
-        export function pair(a: BaseDataType, b: BaseDataType): TypePair;
-        /**
-         * @param {BaseDataType} a
-         * @param {BaseDataType} b
-         */
-        export function pair(a: BaseDataType, b: BaseDataType): TypePair;
+        pair(a: BaseDataType, b: BaseDataType): TypePair;
         /**
          * @param {typeof BasicSerializableObject} classHandle
          * @param {SingletonFactoryTemplate<*>} registry
          */
-        export function classWithMetaclass(
+        classWithMetaclass(
             classHandle: typeof BasicSerializableObject,
-            registry: SingletonFactoryTemplate<any>
+            registry: any
         ): TypeClassFromMetaclass;
-        /**
-         * @param {typeof BasicSerializableObject} classHandle
-         * @param {SingletonFactoryTemplate<*>} registry
-         */
-        export function classWithMetaclass(
-            classHandle: typeof BasicSerializableObject,
-            registry: SingletonFactoryTemplate<any>
-        ): TypeClassFromMetaclass;
-    }
+    };
     export class BasicSerializableObject {
         static getId(): void;
         /**
@@ -6525,17 +6500,15 @@ declare module "shapez/savegame/serialization" {
         serialize(): object;
         /**
          * @param {any} data
-         * @param {import("shapez/savegame_serializer").GameRoot} root
+         * @param {import("shapez/savegame/savegame_serializer").GameRoot} root
          * @returns {string|void}
          */
-        deserialize(data: any, root?: import("shapez/savegame_serializer").GameRoot): string | void;
+        deserialize(data: any, root?: import("shapez/savegame/savegame_serializer").GameRoot): string | void;
     }
     /**
      * A full schema declaration
      */
-    export type Schema = {
-        [x: string]: BaseDataType;
-    };
+    export type Schema = any;
     import { TypeInteger } from "shapez/savegame/serialization_data_types";
     import { TypePositiveInteger } from "shapez/savegame/serialization_data_types";
     import { TypeNumber } from "shapez/savegame/serialization_data_types";
@@ -6560,11 +6533,15 @@ declare module "shapez/savegame/serialization" {
     import { TypeClassFromMetaclass } from "shapez/savegame/serialization_data_types";
 }
 declare module "shapez/game/time/regular_game_speed" {
-    export class RegularGameSpeed extends BaseGameSpeed {}
+    export class RegularGameSpeed extends BaseGameSpeed {
+        constructor(root: import("shapez/game/root").GameRoot);
+    }
     import { BaseGameSpeed } from "shapez/game/time/base_game_speed";
 }
 declare module "shapez/game/time/paused_game_speed" {
-    export class PausedGameSpeed extends BaseGameSpeed {}
+    export class PausedGameSpeed extends BaseGameSpeed {
+        constructor(root: import("shapez/game/root").GameRoot);
+    }
     import { BaseGameSpeed } from "shapez/game/time/base_game_speed";
 }
 declare module "shapez/game/time/game_time" {
@@ -6581,8 +6558,8 @@ declare module "shapez/game/time/game_time" {
         constructor(root: GameRoot);
         root: GameRoot;
         timeSeconds: number;
-        realtimeSeconds: number;
-        realtimeAdjust: number;
+        realtimeSeconds: any;
+        realtimeAdjust: any;
         /** @type {BaseGameSpeed} */
         speed: BaseGameSpeed;
         logicTimeBudget: number;
@@ -6694,7 +6671,7 @@ declare module "shapez/game/entity_manager" {
          *
          * @returns {Map<number, Entity>}
          */
-        getFrozenUidSearchMap(): Map<number, Entity>;
+        getFrozenUidSearchMap(): any;
         /**
          * Returns all entities having the given component
          * @param {typeof Component} componentHandle
@@ -6725,9 +6702,7 @@ declare module "shapez/game/buildings/belt" {
             [x: number]: number[];
         };
     };
-    export class MetaBeltBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaBeltBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/systems/belt" {
@@ -6866,6 +6841,7 @@ declare module "shapez/game/systems/item_ejector" {
 }
 declare module "shapez/game/systems/map_resources" {
     export class MapResourcesSystem extends GameSystem {
+        constructor(root: import("shapez/game/root").GameRoot);
         /**
          * Draws the map resources
          * @param {DrawParameters} parameters
@@ -7049,7 +7025,7 @@ declare module "shapez/game/systems/item_processor" {
      */
     export type ProcessorImplementationPayload = {
         entity: Entity;
-        items: Map<number, BaseItem>;
+        items: any;
         inputCount: number;
         outItems: Array<ProducedItem>;
     };
@@ -7077,11 +7053,11 @@ declare module "shapez/game/systems/underground_belt" {
         /**
          * Finds the receiver for a given sender
          * @param {Entity} entity
-         * @returns {import("shapez/components/underground_belt").LinkedUndergroundBelt}
+         * @returns {import("shapez/game/components/underground_belt").LinkedUndergroundBelt}
          */
         findRecieverForSender(
             entity: Entity
-        ): import("shapez/components/underground_belt").LinkedUndergroundBelt;
+        ): import("shapez/game/components/underground_belt").LinkedUndergroundBelt;
         /**
          *
          * @param {Entity} entity
@@ -7132,7 +7108,7 @@ declare module "shapez/game/systems/static_map_entity" {
     export class StaticMapEntitySystem extends GameSystem {
         constructor(root: any);
         /** @type {Set<number>} */
-        drawnUids: Set<number>;
+        drawnUids: any;
         /**
          * Clears the uid list when a new frame started
          */
@@ -7176,7 +7152,7 @@ declare module "shapez/game/systems/storage" {
          * Stores which uids were already drawn to avoid drawing entities twice
          * @type {Set<number>}
          */
-        drawnUids: Set<number>;
+        drawnUids: any;
         clearDrawnUids(): void;
         /**
          * @param {DrawParameters} parameters
@@ -7228,7 +7204,7 @@ declare module "shapez/game/systems/wired_pins" {
 declare module "shapez/game/systems/belt_underlays" {
     export class BeltUnderlaysSystem extends GameSystemWithFilter {
         constructor(root: any);
-        underlayBeltSprites: import("shapez/core/sprites").AtlasSprite[];
+        underlayBeltSprites: any[];
         staleArea: StaleAreaDetector;
         /**
          * Called when an area changed - Resets all caches in the given area
@@ -7252,12 +7228,12 @@ declare module "shapez/game/systems/belt_underlays" {
         /**
          * Computes the flag for a given tile
          * @param {Entity} entity
-         * @param {import("shapez/components/belt_underlays").BeltUnderlayTile} underlayTile
+         * @param {import("shapez/game/components/belt_underlays").BeltUnderlayTile} underlayTile
          * @returns {enumClippedBeltUnderlayType} The type of the underlay
          */
         computeBeltUnderlayType(
             entity: Entity,
-            underlayTile: import("shapez/components/belt_underlays").BeltUnderlayTile
+            underlayTile: import("shapez/game/components/belt_underlays").BeltUnderlayTile
         ): enumClippedBeltUnderlayType;
         /**
          * Draws a given chunk
@@ -7522,6 +7498,8 @@ declare module "shapez/game/systems/goal_acceptor" {
 }
 declare module "shapez/game/systems/zone" {
     export class ZoneSystem extends GameSystem {
+        /** @param {GameRoot} root */
+        constructor(root: GameRoot);
         drawn: boolean;
         /**
          *
@@ -7542,6 +7520,7 @@ declare module "shapez/game/systems/zone" {
     import { Vector } from "shapez/core/vector";
     import { DrawParameters } from "shapez/core/draw_parameters";
     import { MapChunkView } from "shapez/game/map_chunk_view";
+    import { GameRoot } from "shapez/game/root";
 }
 declare module "shapez/game/game_system_manager" {
     export class GameSystemManager {
@@ -7666,6 +7645,7 @@ declare module "shapez/game/achievement_proxy" {
 }
 declare module "shapez/game/hud/parts/beta_overlay" {
     export class HUDBetaOverlay extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
     }
     import { BaseHUDPart } from "shapez/game/hud/base_hud_part";
@@ -7687,7 +7667,7 @@ declare module "shapez/game/blueprint" {
          * Returns the layer of this blueprint
          * @returns {Layer}
          */
-        get layer(): Layer;
+        get layer(): any;
         /**
          * Returns the cost of this blueprint in shapes
          */
@@ -7729,10 +7709,11 @@ declare module "shapez/game/blueprint" {
 }
 declare module "shapez/game/hud/parts/blueprint_placer" {
     export class HUDBlueprintPlacer extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         costDisplayParent: HTMLDivElement;
         costDisplayText: HTMLDivElement;
         /** @type {TypedTrackedState<Blueprint?>} */
-        currentBlueprint: TypedTrackedState<Blueprint>;
+        currentBlueprint: any;
         /** @type {Blueprint?} */
         lastBlueprintUsed: Blueprint | null;
         domAttach: DynamicDomAttach;
@@ -7743,7 +7724,7 @@ declare module "shapez/game/hud/parts/blueprint_placer" {
          * Called when the layer was changed
          * @param {Layer} layer
          */
-        onEditModeChanged(layer: Layer): void;
+        onEditModeChanged(layer: any): void;
         /**
          * Called when the blueprint is now affordable or not
          * @param {boolean} canAfford
@@ -7788,98 +7769,75 @@ declare module "shapez/game/hud/parts/blueprint_placer" {
 declare module "shapez/game/buildings/cutter" {
     export type enumCutterVariants = string;
     export namespace enumCutterVariants {
-        const quad: string;
+        export const quad: string;
     }
-    export class MetaCutterBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaCutterBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/display" {
-    export class MetaDisplayBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaDisplayBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/filter" {
-    export class MetaFilterBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaFilterBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/lever" {
-    export class MetaLeverBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaLeverBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/miner" {
     export type enumMinerVariants = string;
     export namespace enumMinerVariants {
-        const chainable: string;
+        export const chainable: string;
     }
-    export class MetaMinerBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaMinerBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/mixer" {
-    export class MetaMixerBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaMixerBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/painter" {
     export type enumPainterVariants = string;
     export namespace enumPainterVariants {
-        const mirrored: string;
-        const double: string;
-        const quad: string;
+        export const mirrored: string;
+        export const double: string;
+        export const quad: string;
     }
-    export class MetaPainterBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaPainterBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/reader" {
-    export class MetaReaderBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaReaderBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/rotater" {
     export type enumRotaterVariants = string;
     export namespace enumRotaterVariants {
-        const ccw: string;
-        const rotate180: string;
+        export const ccw: string;
+        export const rotate180: string;
     }
-    export class MetaRotaterBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaRotaterBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/balancer" {
     export type enumBalancerVariants = string;
     export namespace enumBalancerVariants {
-        const merger: string;
-        const mergerInverse: string;
-        const splitter: string;
-        const splitterInverse: string;
+        export const merger: string;
+        export const mergerInverse: string;
+        export const splitter: string;
+        export const splitterInverse: string;
     }
-    export class MetaBalancerBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaBalancerBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/stacker" {
-    export class MetaStackerBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaStackerBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/trash" {
     export class MetaTrashBuilding extends MetaBuilding {
-        constructor();
         addAchievementReceiver(entity: any): void;
     }
     import { MetaBuilding } from "shapez/game/meta_building";
@@ -7890,33 +7848,26 @@ declare module "shapez/game/buildings/underground_belt" {
     export const arrayUndergroundRotationVariantToMode: string[];
     export type enumUndergroundBeltVariants = string;
     export namespace enumUndergroundBeltVariants {
-        const tier2: string;
+        export const tier2: string;
     }
     export const enumUndergroundBeltVariantToTier: {
         [x: string]: number;
         default: number;
     };
-    export class MetaUndergroundBeltBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaUndergroundBeltBuilding extends MetaBuilding {}
+    import { defaultBuildingVariant } from "shapez/game/meta_building";
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/block" {
-    export class MetaBlockBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaBlockBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/constant_producer" {
-    export class MetaConstantProducerBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaConstantProducerBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/goal_acceptor" {
-    export class MetaGoalAcceptorBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaGoalAcceptorBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/hud/parts/base_toolbar" {
@@ -7943,14 +7894,14 @@ declare module "shapez/game/hud/parts/base_toolbar" {
                 secondaryBuildings?: Array<typeof MetaBuilding> | undefined;
                 visibilityCondition: Function;
                 htmlElementId: string;
-                layer?: Layer | undefined;
+                layer?: any | undefined;
             }
         );
         primaryBuildings: typeof MetaBuilding[];
         secondaryBuildings: typeof MetaBuilding[];
         visibilityCondition: Function;
         htmlElementId: string;
-        layer: Layer;
+        layer: any;
         /** @type {Object.<string, {
          * metaBuilding: MetaBuilding,
          * unlocked: boolean,
@@ -8011,9 +7962,7 @@ declare module "shapez/game/hud/parts/base_toolbar" {
     import { GameRoot } from "shapez/game/root";
 }
 declare module "shapez/game/buildings/storage" {
-    export class MetaStorageBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaStorageBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/hud/parts/buildings_toolbar" {
@@ -8028,6 +7977,7 @@ declare module "shapez/game/hud/parts/building_placer_logic" {
      * of info boxes or drawing.
      */
     export class HUDBuildingPlacerLogic extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         /**
          * We use a fake entity to get information about how a building will look
          * once placed
@@ -8035,14 +7985,14 @@ declare module "shapez/game/hud/parts/building_placer_logic" {
          */
         fakeEntity: Entity;
         signals: {
-            variantChanged: Signal;
+            letiantChanged: Signal;
             draggingStarted: Signal;
         };
         /**
          * The current building
          * @type {TypedTrackedState<MetaBuilding?>}
          */
-        currentMetaBuilding: TypedTrackedState<MetaBuilding>;
+        currentMetaBuilding: any;
         /**
          * The current rotation
          * @type {number}
@@ -8061,17 +8011,17 @@ declare module "shapez/game/hud/parts/building_placer_logic" {
          */
         currentlyDragging: boolean;
         /**
-         * Current building variant
+         * Current building letiant
          * @type {TypedTrackedState<string>}
          */
-        currentVariant: TypedTrackedState<string>;
+        currentVariant: any;
         /**
          * Whether we are currently drag-deleting
          * @type {boolean}
          */
         currentlyDeleting: boolean;
         /**
-         * Stores which variants for each building we prefer, this is based on what
+         * Stores which letiants for each building we prefer, this is based on what
          * the user last selected
          * @type {Object.<string, string>}
          */
@@ -8101,7 +8051,7 @@ declare module "shapez/game/hud/parts/building_placer_logic" {
          * Called when the edit mode got changed
          * @param {Layer} layer
          */
-        onEditModeChanged(layer: Layer): void;
+        onEditModeChanged(layer: any): void;
         /**
          * Sets the base rotation for the current meta-building.
          * @param {number} rotation The new rotation/angle.
@@ -8163,14 +8113,14 @@ declare module "shapez/game/hud/parts/building_placer_logic" {
          */
         tryPlaceCurrentBuildingAt(tile: Vector): boolean;
         /**
-         * Cycles through the variants
+         * Cycles through the letiants
          */
         cycleVariants(): void;
         /**
-         * Sets the current variant to the given variant
-         * @param {string} variant
+         * Sets the current letiant to the given letiant
+         * @param {string} letiant
          */
-        setVariant(variant: string): void;
+        setVariant(letiant: string): void;
         /**
          * Performs the direction locked placement between two points after
          * releasing the mouse
@@ -8213,39 +8163,40 @@ declare module "shapez/game/hud/parts/building_placer_logic" {
     import { BaseHUDPart } from "shapez/game/hud/base_hud_part";
     import { Entity } from "shapez/game/entity";
     import { Signal } from "shapez/core/signal";
-    import { MetaBuilding } from "shapez/game/meta_building";
     import { Vector } from "shapez/core/vector";
+    import { MetaBuilding } from "shapez/game/meta_building";
     import { enumMouseButton } from "shapez/game/camera";
 }
 declare module "shapez/game/hud/parts/building_placer" {
     export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         buildingInfoElements: {};
-        variantsElement: HTMLDivElement;
+        letiantsElement: HTMLDivElement;
         domAttach: DynamicDomAttach;
-        variantsAttach: DynamicDomAttach;
+        letiantsAttach: DynamicDomAttach;
         currentInterpolatedCornerTile: Vector;
         lockIndicatorSprites: {};
         /**
-         * Stores the click detectors for the variants so we can clean them up later
+         * Stores the click detectors for the letiants so we can clean them up later
          * @type {Array<ClickDetector>}
          */
-        variantClickDetectors: Array<ClickDetector>;
+        letiantClickDetectors: Array<ClickDetector>;
         /**
          * Makes the lock indicator sprite for the given layer
          * @param {Layer} layer
          */
-        makeLockIndicatorSprite(layer: Layer): HTMLCanvasElement;
+        makeLockIndicatorSprite(layer: any): HTMLCanvasElement;
         /**
          * Rerenders the building info dialog
          */
         rerenderInfoDialog(): void;
         /**
-         * Cleans up all variant click detectors
+         * Cleans up all letiant click detectors
          */
         cleanupVariantClickDetectors(): void;
         /**
-         * Rerenders the variants displayed
+         * Rerenders the letiants displayed
          */
         rerenderVariants(): void;
         /**
@@ -8274,6 +8225,7 @@ declare module "shapez/game/hud/parts/building_placer" {
 }
 declare module "shapez/game/hud/parts/color_blind_helper" {
     export class HUDColorBlindHelper extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         belowTileIndicator: HTMLDivElement;
         trackedColorBelowTile: TrackedState;
         /**
@@ -8301,6 +8253,8 @@ declare module "shapez/game/hud/parts/debug_changes" {
      * }} DebugChange
      */
     export class HUDChangesDebugger extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
+        /** @type {Array<DebugChange>} */
         /** @type {Array<DebugChange>} */
         changes: Array<DebugChange>;
         /**
@@ -8328,6 +8282,7 @@ declare module "shapez/game/hud/parts/debug_changes" {
 }
 declare module "shapez/game/hud/parts/debug_info" {
     export class HUDDebugInfo extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         trackedTickRate: TrackedState;
         trackedTickDuration: TrackedState;
@@ -8356,14 +8311,18 @@ declare module "shapez/game/hud/parts/debug_info" {
          */
         cycleModes(): void;
     }
+    export type enumDebugOverlayMode = string;
+    /**
+     * Specifies which mode follows after which mode
+     */
+    export type enumDebugOverlayModeNext = string;
     import { BaseHUDPart } from "shapez/game/hud/base_hud_part";
     import { TrackedState } from "shapez/core/tracked_state";
     import { DynamicDomAttach } from "shapez/game/hud/dynamic_dom_attach";
-    type enumDebugOverlayMode = string;
     namespace enumDebugOverlayMode {
-        const disabled: string;
-        const regular: string;
-        const detailed: string;
+        export const disabled: string;
+        export const regular: string;
+        export const detailed: string;
     }
     export {};
 }
@@ -8372,6 +8331,7 @@ declare module "shapez/game/hud/parts/entity_debugger" {
      * Allows to inspect entities by pressing F8 while hovering them
      */
     export class HUDEntityDebugger extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         componentsElem: Element;
         /**
@@ -8437,6 +8397,7 @@ declare module "shapez/game/hud/parts/modal_dialogs" {
 }
 declare module "shapez/game/hud/parts/settings_menu" {
     export class HUDSettingsMenu extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         background: HTMLDivElement;
         menuElement: HTMLDivElement;
         statsElement: HTMLDivElement;
@@ -8456,6 +8417,7 @@ declare module "shapez/game/hud/parts/settings_menu" {
 }
 declare module "shapez/game/hud/parts/shape_tooltip" {
     export class HUDShapeTooltip extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         /** @type {Vector} */
         currentTile: Vector;
         /** @type {Entity} */
@@ -8469,6 +8431,7 @@ declare module "shapez/game/hud/parts/shape_tooltip" {
 }
 declare module "shapez/game/hud/parts/vignette_overlay" {
     export class HUDVignetteOverlay extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
     }
     import { BaseHUDPart } from "shapez/game/hud/base_hud_part";
@@ -8496,7 +8459,7 @@ declare module "shapez/game/hud/trailer_maker" {
         markers: any[];
         playbackMarkers: any[];
         currentPlaybackOrigin: Vector;
-        currentPlaybackZoom: number;
+        currentPlaybackZoom: any;
         update(): void;
     }
     import { GameRoot } from "shapez/game/root";
@@ -8514,15 +8477,15 @@ declare module "shapez/game/hud/hud" {
          */
         initialize(): void;
         signals: {
-            buildingSelectedForPlacement: TypedSignal<[MetaBuilding]>;
-            selectedPlacementBuildingChanged: TypedSignal<[MetaBuilding]>;
-            shapePinRequested: TypedSignal<[ShapeDefinition]>;
-            shapeUnpinRequested: TypedSignal<[string]>;
-            notification: TypedSignal<[string, string]>;
-            buildingsSelectedForCopy: TypedSignal<[number[]]>;
-            pasteBlueprintRequested: TypedSignal<[]>;
-            viewShapeDetailsRequested: TypedSignal<[ShapeDefinition]>;
-            unlockNotificationFinished: TypedSignal<[]>;
+            buildingSelectedForPlacement: any;
+            selectedPlacementBuildingChanged: any;
+            shapePinRequested: any;
+            shapeUnpinRequested: any;
+            notification: any;
+            buildingsSelectedForCopy: any;
+            pasteBlueprintRequested: any;
+            viewShapeDetailsRequested: any;
+            unlockNotificationFinished: any;
         };
         parts: {
             buildingsToolbar: HUDBuildingsToolbar;
@@ -8576,8 +8539,6 @@ declare module "shapez/game/hud/hud" {
         cleanup(): void;
     }
     import { GameRoot } from "shapez/game/root";
-    import { MetaBuilding } from "shapez/game/meta_building";
-    import { ShapeDefinition } from "shapez/game/shape_definition";
     import { HUDBuildingsToolbar } from "shapez/game/hud/parts/buildings_toolbar";
     import { HUDBlueprintPlacer } from "shapez/game/hud/parts/blueprint_placer";
     import { HUDBuildingPlacer } from "shapez/game/hud/parts/building_placer";
@@ -8656,11 +8617,11 @@ declare module "shapez/game/map" {
         /**
          * Mapping of 'X|Y' to chunk
          * @type {Map<string, MapChunkView>} */
-        chunksById: Map<string, MapChunkView>;
+        chunksById: any;
         /**
          * Mapping of 'X|Y' to chunk aggregate
          * @type {Map<string, MapChunkAggregate>} */
-        aggregatesById: Map<string, MapChunkAggregate>;
+        aggregatesById: any;
         /**
          * Returns the given chunk by index
          * @param {number} chunkX
@@ -8705,7 +8666,7 @@ declare module "shapez/game/map" {
          * @param {Layer} layer
          * @returns {Entity} Entity or null
          */
-        getTileContent(tile: Vector, layer: Layer): Entity;
+        getTileContent(tile: Vector, layer: any): Entity;
         /**
          * Returns the lower layers content of the given tile
          * @param {number} x
@@ -8720,7 +8681,7 @@ declare module "shapez/game/map" {
          * @param {Layer} layer
          * @returns {Entity} Entity or null
          */
-        getLayerContentXY(x: number, y: number, layer: Layer): Entity;
+        getLayerContentXY(x: number, y: number, layer: any): Entity;
         /**
          * Returns the tile contents of a given tile
          * @param {number} x
@@ -8734,7 +8695,7 @@ declare module "shapez/game/map" {
          * @param {Layer} layer
          * @returns {boolean}
          */
-        isTileUsed(tile: Vector, layer: Layer): boolean;
+        isTileUsed(tile: Vector, layer: any): boolean;
         /**
          * Checks if the tile is used
          * @param {number} x
@@ -8742,7 +8703,7 @@ declare module "shapez/game/map" {
          * @param {Layer} layer
          * @returns {boolean}
          */
-        isTileUsedXY(x: number, y: number, layer: Layer): boolean;
+        isTileUsedXY(x: number, y: number, layer: any): boolean;
         /**
          * Sets the tiles content
          * @param {Vector} tile
@@ -8768,7 +8729,6 @@ declare module "shapez/game/map" {
     import { BasicSerializableObject } from "shapez/savegame/serialization";
     import { GameRoot } from "shapez/game/root";
     import { MapChunkView } from "shapez/game/map_chunk_view";
-    import { MapChunkAggregate } from "shapez/game/map_chunk_aggregate";
     import { Vector } from "shapez/core/vector";
     import { Entity } from "shapez/game/entity";
     import { BaseItem } from "shapez/game/base_item";
@@ -8862,7 +8822,7 @@ declare module "shapez/core/state_manager" {
             [x: string]: new () => GameState;
         };
         /** @type {TypedSignal<[string, GameState]>} */
-        stateChanged: TypedSignal<[string, GameState]>;
+        stateChanged: any;
         /**
          * Registers a new state class, should be a GameState derived class
          * @param {object} stateClass
@@ -8890,7 +8850,7 @@ declare module "shapez/core/state_manager" {
 declare module "shapez/core/request_channel" {
     export const PROMISE_ABORTED: "promise-aborted";
     export class RequestChannel {
-        /** @type {Array<Promise>} */
+        /** @type {Array<Promise<any>>} */
         pendingPromises: Array<Promise<any>>;
         /**
          *
@@ -8942,12 +8902,12 @@ declare module "shapez/core/game_state" {
          * If you want to call another function wrap it inside a lambda.
          * @param {Element} element The element to track clicks on
          * @param {function():void} handler The handler to call
-         * @param {import("shapez/click_detector").ClickDetectorConstructorArgs=} args Click detector arguments
+         * @param {import("shapez/core/click_detector").ClickDetectorConstructorArgs=} args Click detector arguments
          */
         trackClicks(
             element: Element,
             handler: () => void,
-            args?: import("shapez/click_detector").ClickDetectorConstructorArgs | undefined
+            args?: import("shapez/core/click_detector").ClickDetectorConstructorArgs | undefined
         ): void;
         /**
          * Cancels all promises on the api as well as our async channel
@@ -9320,51 +9280,58 @@ declare module "shapez/savegame/savegame_interface" {
     }
 }
 declare module "shapez/savegame/schemas/1000" {
-    export class SavegameInterface_V1000 extends BaseSavegameInterface {}
+    export class SavegameInterface_V1000 extends BaseSavegameInterface {
+        constructor(data: any);
+    }
     import { BaseSavegameInterface } from "shapez/savegame/savegame_interface";
 }
 declare module "shapez/savegame/schemas/1001" {
     export class SavegameInterface_V1001 extends SavegameInterface_V1000 {
         /**
-         * @param {import("shapez/savegame_typedefs.js").SavegameData} data
+         * @param {import("shapez/savegame/savegame_typedefs").SavegameData} data
          */
-        static migrate1000to1001(data: import("shapez/savegame_typedefs.js").SavegameData): boolean;
+        static migrate1000to1001(data: import("shapez/savegame/savegame_typedefs").SavegameData): boolean;
+        constructor(data: any);
     }
     import { SavegameInterface_V1000 } from "shapez/savegame/schemas/1000";
 }
 declare module "shapez/savegame/schemas/1002" {
     export class SavegameInterface_V1002 extends SavegameInterface_V1001 {
         /**
-         * @param {import("shapez/savegame_typedefs.js").SavegameData} data
+         * @param {import("shapez/savegame/savegame_typedefs").SavegameData} data
          */
-        static migrate1001to1002(data: import("shapez/savegame_typedefs.js").SavegameData): boolean;
+        static migrate1001to1002(data: import("shapez/savegame/savegame_typedefs").SavegameData): boolean;
+        constructor(data: any);
     }
     import { SavegameInterface_V1001 } from "shapez/savegame/schemas/1001";
 }
 declare module "shapez/savegame/schemas/1003" {
     export class SavegameInterface_V1003 extends SavegameInterface_V1002 {
         /**
-         * @param {import("shapez/savegame_typedefs.js").SavegameData} data
+         * @param {import("shapez/savegame/savegame_typedefs").SavegameData} data
          */
-        static migrate1002to1003(data: import("shapez/savegame_typedefs.js").SavegameData): boolean;
+        static migrate1002to1003(data: import("shapez/savegame/savegame_typedefs").SavegameData): boolean;
+        constructor(data: any);
     }
     import { SavegameInterface_V1002 } from "shapez/savegame/schemas/1002";
 }
 declare module "shapez/savegame/schemas/1004" {
     export class SavegameInterface_V1004 extends SavegameInterface_V1003 {
         /**
-         * @param {import("shapez/savegame_typedefs.js").SavegameData} data
+         * @param {import("shapez/savegame/savegame_typedefs").SavegameData} data
          */
-        static migrate1003to1004(data: import("shapez/savegame_typedefs.js").SavegameData): boolean;
+        static migrate1003to1004(data: import("shapez/savegame/savegame_typedefs").SavegameData): boolean;
+        constructor(data: any);
     }
     import { SavegameInterface_V1003 } from "shapez/savegame/schemas/1003";
 }
 declare module "shapez/savegame/schemas/1005" {
     export class SavegameInterface_V1005 extends SavegameInterface_V1004 {
         /**
-         * @param {import("shapez/savegame_typedefs.js").SavegameData} data
+         * @param {import("shapez/savegame/savegame_typedefs").SavegameData} data
          */
-        static migrate1004to1005(data: import("shapez/savegame_typedefs.js").SavegameData): boolean;
+        static migrate1004to1005(data: import("shapez/savegame/savegame_typedefs").SavegameData): boolean;
+        constructor(data: any);
     }
     import { SavegameInterface_V1004 } from "shapez/savegame/schemas/1004";
 }
@@ -9397,14 +9364,15 @@ declare module "shapez/savegame/schemas/1006" {
             "sprites/blueprints/trash-storage.png": string;
         };
         /**
-         * @param {import("shapez/savegame_typedefs.js").SavegameData} data
+         * @param {import("shapez/savegame/savegame_typedefs").SavegameData} data
          */
-        static migrate1005to1006(data: import("shapez/savegame_typedefs.js").SavegameData): boolean;
+        static migrate1005to1006(data: import("shapez/savegame/savegame_typedefs").SavegameData): boolean;
         /**
          *
          * @param {Entity} entity
          */
         static migrateStaticComp1005to1006(entity: Entity): void;
+        constructor(data: any);
     }
     import { SavegameInterface_V1005 } from "shapez/savegame/schemas/1005";
     import { Entity } from "shapez/game/entity";
@@ -9412,33 +9380,33 @@ declare module "shapez/savegame/schemas/1006" {
 declare module "shapez/savegame/schemas/1007" {
     export class SavegameInterface_V1007 extends SavegameInterface_V1006 {
         /**
-         * @param {import("shapez/savegame_typedefs.js").SavegameData} data
+         * @param {import("shapez/savegame/savegame_typedefs").SavegameData} data
          */
-        static migrate1006to1007(data: import("shapez/savegame_typedefs.js").SavegameData): boolean;
+        static migrate1006to1007(data: import("shapez/savegame/savegame_typedefs").SavegameData): boolean;
+        constructor(data: any);
     }
     import { SavegameInterface_V1006 } from "shapez/savegame/schemas/1006";
 }
 declare module "shapez/savegame/schemas/1008" {
     export class SavegameInterface_V1008 extends SavegameInterface_V1007 {
         /**
-         * @param {import("shapez/savegame_typedefs.js").SavegameData} data
+         * @param {import("shapez/savegame/savegame_typedefs").SavegameData} data
          */
-        static migrate1007to1008(data: import("shapez/savegame_typedefs.js").SavegameData): boolean;
+        static migrate1007to1008(data: import("shapez/savegame/savegame_typedefs").SavegameData): boolean;
+        constructor(data: any);
     }
     import { SavegameInterface_V1007 } from "shapez/savegame/schemas/1007";
 }
 declare module "shapez/game/buildings/constant_signal" {
-    export class MetaConstantSignalBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaConstantSignalBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/logic_gate" {
     export type enumLogicGateVariants = string;
     export namespace enumLogicGateVariants {
-        const not: string;
-        const xor: string;
-        const or: string;
+        export const not: string;
+        export const xor: string;
+        export const or: string;
     }
     export type enumVariantToGate = string;
     /** @enum {string} */
@@ -9446,24 +9414,21 @@ declare module "shapez/game/buildings/logic_gate" {
         [x: string]: string;
         default: string;
     };
-    export class MetaLogicGateBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaLogicGateBuilding extends MetaBuilding {}
+    import { defaultBuildingVariant } from "shapez/game/meta_building";
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/wire_tunnel" {
-    export class MetaWireTunnelBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaWireTunnelBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/virtual_processor" {
     export type enumVirtualProcessorVariants = string;
     export namespace enumVirtualProcessorVariants {
-        const rotater: string;
-        const unstacker: string;
-        const stacker: string;
-        const painter: string;
+        export const rotater: string;
+        export const unstacker: string;
+        export const stacker: string;
+        export const painter: string;
     }
     export type enumVariantToGate = string;
     /** @enum {string} */
@@ -9471,31 +9436,24 @@ declare module "shapez/game/buildings/virtual_processor" {
         [x: string]: string;
         default: string;
     };
-    export class MetaVirtualProcessorBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaVirtualProcessorBuilding extends MetaBuilding {}
+    import { defaultBuildingVariant } from "shapez/game/meta_building";
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/transistor" {
     export type enumTransistorVariants = string;
     export namespace enumTransistorVariants {
-        const mirrored: string;
+        export const mirrored: string;
     }
-    export class MetaTransistorBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaTransistorBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/analyzer" {
-    export class MetaAnalyzerBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaAnalyzerBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/buildings/comparator" {
-    export class MetaComparatorBuilding extends MetaBuilding {
-        constructor();
-    }
+    export class MetaComparatorBuilding extends MetaBuilding {}
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/hud/parts/wires_toolbar" {
@@ -9508,19 +9466,20 @@ declare module "shapez/game/tutorial_goals_mappings" {
     /**
      * Stores which reward unlocks what
      */
-    export type enumHubGoalRewardsToContentUnlocked = [typeof MetaBuilding, string][] | null;
+    export type enumHubGoalRewardsToContentUnlocked = [typeof MetaBuilding, string][];
     /**
      * Stores which reward unlocks what
      * @enum {TutorialGoalReward?}
      */
     export const enumHubGoalRewardsToContentUnlocked: {
-        [x: string]: TutorialGoalReward;
+        [x: string]: [typeof MetaBuilding, string][];
     };
-    export type TutorialGoalReward = Array<[typeof MetaBuilding, string]>;
+    export type TutorialGoalReward = [typeof MetaBuilding, string][];
     import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/game/hud/parts/unlock_notification" {
     export class HUDUnlockNotification extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         visible: boolean;
         domAttach: DynamicDomAttach;
         buttonShowTimeout: number;
@@ -9544,6 +9503,7 @@ declare module "shapez/game/hud/parts/unlock_notification" {
 }
 declare module "shapez/game/hud/parts/mass_selector" {
     export class HUDMassSelector extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         currentSelectionStartWorld: Vector;
         currentSelectionEnd: Vector;
         selectedUids: any;
@@ -9586,6 +9546,7 @@ declare module "shapez/game/hud/parts/mass_selector" {
 }
 declare module "shapez/game/hud/parts/shop" {
     export class HUDShop extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         background: HTMLDivElement;
         dialogInner: HTMLDivElement;
         title: HTMLDivElement;
@@ -9609,8 +9570,8 @@ declare module "shapez/game/hud/parts/shop" {
 declare module "shapez/game/hud/parts/statistics_handle" {
     export type enumDisplayMode = string;
     export namespace enumDisplayMode {
-        const icons: string;
-        const detailed: string;
+        export const icons: string;
+        export const detailed: string;
     }
     /**
      * Stores how many seconds one unit is
@@ -9632,7 +9593,7 @@ declare module "shapez/game/hud/parts/statistics_handle" {
         definition: ShapeDefinition;
         root: GameRoot;
         intersectionObserver: IntersectionObserver;
-        visible: boolean;
+        visible: any;
         initElement(): void;
         element: HTMLDivElement;
         counter: HTMLSpanElement;
@@ -9681,6 +9642,7 @@ declare module "shapez/game/hud/parts/statistics_handle" {
 }
 declare module "shapez/game/hud/parts/statistics" {
     export class HUDStatistics extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         background: HTMLDivElement;
         dialogInner: HTMLDivElement;
         title: HTMLDivElement;
@@ -9743,16 +9705,17 @@ declare module "shapez/game/hud/parts/statistics" {
 }
 declare module "shapez/game/hud/parts/wire_info" {
     export class HUDWireInfo extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         spriteEmpty: import("shapez/core/sprites").AtlasSprite;
         spriteConflict: import("shapez/core/sprites").AtlasSprite;
         /**
          *
          *
-         * @param {import("shapez/../core/draw_utils").DrawParameters} parameters
+         * @param {import("shapez/core/draw_utils").DrawParameters} parameters
          * @param {WireNetwork} network
          */
         drawHighlightedNetwork(
-            parameters: import("shapez/../core/draw_utils").DrawParameters,
+            parameters: import("shapez/core/draw_utils").DrawParameters,
             network: WireNetwork
         ): void;
     }
@@ -9761,6 +9724,7 @@ declare module "shapez/game/hud/parts/wire_info" {
 }
 declare module "shapez/game/hud/parts/lever_toggle" {
     export class HUDLeverToggle extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         /**
          * @param {Vector} pos
          * @param {enumMouseButton} button
@@ -9773,6 +9737,7 @@ declare module "shapez/game/hud/parts/lever_toggle" {
 }
 declare module "shapez/game/hud/parts/screenshot_exporter" {
     export class HUDScreenshotExporter extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         startExport(): void;
         doExport(): void;
     }
@@ -9780,6 +9745,7 @@ declare module "shapez/game/hud/parts/screenshot_exporter" {
 }
 declare module "shapez/game/hud/parts/wires_overlay" {
     export class HUDWiresOverlay extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         currentAlpha: any;
         /**
          * Switches between layers
@@ -9800,6 +9766,7 @@ declare module "shapez/game/hud/parts/wires_overlay" {
 }
 declare module "shapez/game/hud/parts/shape_viewer" {
     export class HUDShapeViewer extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         background: HTMLDivElement;
         dialogInner: HTMLDivElement;
         title: HTMLDivElement;
@@ -9834,6 +9801,7 @@ declare module "shapez/game/hud/parts/layer_preview" {
      * Helper class which allows peaking through to the wires layer
      */
     export class HUDLayerPreview extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         previewOverlay: import("shapez/core/sprites").AtlasSprite;
         /**
          * (re) initializes the canvas
@@ -9851,12 +9819,12 @@ declare module "shapez/game/hud/parts/layer_preview" {
         prepareCanvasForPreview(worldPos: Vector, scale: number): HTMLCanvasElement;
         /**
          * Renders the preview at the given position
-         * @param {import("shapez/../core/draw_utils").DrawParameters} parameters
+         * @param {import("shapez/core/draw_utils").DrawParameters} parameters
          * @param {Vector} worldPos
          * @param {number} scale 1 / zoomLevel
          */
         renderPreview(
-            parameters: import("shapez/../core/draw_utils").DrawParameters,
+            parameters: import("shapez/core/draw_utils").DrawParameters,
             worldPos: Vector,
             scale: number
         ): void;
@@ -9868,24 +9836,28 @@ declare module "shapez/game/hud/parts/tutorial_video_offer" {
     /**
      * Offers to open the tutorial video after completing a level
      */
-    export class HUDTutorialVideoOffer extends BaseHUDPart {}
+    export class HUDTutorialVideoOffer extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
+    }
     import { BaseHUDPart } from "shapez/game/hud/base_hud_part";
 }
 declare module "shapez/game/hud/parts/miner_highlight" {
     export class HUDMinerHighlight extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         /**
          * Finds all connected miners to the given entity
          * @param {Entity} entity
          * @param {Set<number>} seenUids Which entities have already been processed
          * @returns {Array<Entity>} The connected miners
          */
-        findConnectedMiners(entity: Entity, seenUids?: Set<number>): Array<Entity>;
+        findConnectedMiners(entity: Entity, seenUids?: any): Array<Entity>;
     }
     import { BaseHUDPart } from "shapez/game/hud/base_hud_part";
     import { Entity } from "shapez/game/entity";
 }
 declare module "shapez/game/hud/parts/game_menu" {
     export class HUDGameMenu extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         /** @type {Array<{
          * badge: function,
@@ -9928,6 +9900,7 @@ declare module "shapez/game/hud/parts/game_menu" {
 }
 declare module "shapez/game/hud/parts/constant_signal_edit" {
     export class HUDConstantSignalEdit extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         /**
          * @param {Vector} pos
          * @param {enumMouseButton} button
@@ -9952,6 +9925,7 @@ declare module "shapez/game/hud/parts/keybinding_overlay" {
      * }} KeyBinding
      */
     export class HUDKeybindingOverlay extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         /**
          * HELPER / Returns if there is a building selected for placement
          * @returns {boolean}
@@ -10019,6 +9993,7 @@ declare module "shapez/game/hud/parts/keybinding_overlay" {
 }
 declare module "shapez/game/hud/parts/watermark" {
     export class HUDWatermark extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         linkElement: HTMLDivElement;
         domAttach: DynamicDomAttach;
@@ -10029,6 +10004,7 @@ declare module "shapez/game/hud/parts/watermark" {
 }
 declare module "shapez/game/hud/parts/standalone_advantages" {
     export class HUDStandaloneAdvantages extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         background: HTMLDivElement;
         dialogInner: HTMLDivElement;
         title: HTMLDivElement;
@@ -10045,6 +10021,7 @@ declare module "shapez/game/hud/parts/standalone_advantages" {
 }
 declare module "shapez/game/hud/parts/cat_memes" {
     export class HUDCatMemes extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         domAttach: DynamicDomAttach;
     }
@@ -10053,6 +10030,7 @@ declare module "shapez/game/hud/parts/cat_memes" {
 }
 declare module "shapez/game/hud/parts/tutorial_hints" {
     export class HUDPartTutorialHints extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         videoElement: HTMLVideoElement;
         videoAttach: DynamicDomAttach;
@@ -10080,6 +10058,7 @@ declare module "shapez/core/cachebust" {
 }
 declare module "shapez/game/hud/parts/interactive_tutorial" {
     export class HUDInteractiveTutorial extends BaseHUDPart {
+        constructor(root: GameRoot);
         element: HTMLDivElement;
         elementDescription: HTMLDivElement;
         elementGif: HTMLDivElement;
@@ -10090,16 +10069,19 @@ declare module "shapez/game/hud/parts/interactive_tutorial" {
     import { BaseHUDPart } from "shapez/game/hud/base_hud_part";
     import { DynamicDomAttach } from "shapez/game/hud/dynamic_dom_attach";
     import { TrackedState } from "shapez/core/tracked_state";
+    import { GameRoot } from "shapez/game/root";
 }
 declare module "shapez/core/query_parameters" {
     export namespace queryParamOptions {
-        const embedProvider: any;
-        const fullVersion: boolean;
-        const sandboxMode: boolean;
+        export const embedProvider: any;
+        export const fullVersion: boolean;
+        export const modVersion: boolean;
+        export const sandboxMode: boolean;
     }
 }
 declare module "shapez/game/hud/parts/sandbox_controller" {
     export class HUDSandboxController extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         giveBlueprints(): void;
         maxOutAll(): void;
@@ -10149,7 +10131,10 @@ declare module "shapez/game/modes/regular" {
      * }} LevelDefinition */
     export const rocketShape: "CbCuCbCu:Sr------:--CrSrCr:CwCwCwCw";
     export const finalGameShape: "RuCw--Cw:----Ru--";
-    export class RegularGameMode extends GameMode {}
+    export class RegularGameMode extends GameMode {
+        /** @param {GameRoot} root */
+        constructor(root: GameRoot);
+    }
     export type UpgradeRequirement = {
         shape: string;
         amount: number;
@@ -10159,7 +10144,11 @@ declare module "shapez/game/modes/regular" {
         improvement?: number;
         excludePrevious?: boolean;
     };
-    export type UpgradeTiers = Array<TierRequirement>;
+    export type UpgradeTiers = {
+        required: Array<UpgradeRequirement>;
+        improvement?: number;
+        excludePrevious?: boolean;
+    }[];
     export type LevelDefinition = {
         shape: string;
         required: number;
@@ -10167,23 +10156,26 @@ declare module "shapez/game/modes/regular" {
         throughputOnly?: boolean;
     };
     import { GameMode } from "shapez/game/game_mode";
+    import { GameRoot } from "shapez/game/root";
     import { enumHubGoalRewards } from "shapez/game/tutorial_goals";
 }
 declare module "shapez/savegame/schemas/1009" {
     export class SavegameInterface_V1009 extends SavegameInterface_V1008 {
         /**
-         * @param {import("shapez/savegame_typedefs.js").SavegameData} data
+         * @param {import("shapez/savegame/savegame_typedefs").SavegameData} data
          */
-        static migrate1008to1009(data: import("shapez/savegame_typedefs.js").SavegameData): boolean;
+        static migrate1008to1009(data: import("shapez/savegame/savegame_typedefs").SavegameData): boolean;
+        constructor(data: any);
     }
     import { SavegameInterface_V1008 } from "shapez/savegame/schemas/1008";
 }
 declare module "shapez/savegame/schemas/1010" {
     export class SavegameInterface_V1010 extends SavegameInterface_V1009 {
         /**
-         * @param {import("shapez/savegame_typedefs.js").SavegameData} data
+         * @param {import("shapez/savegame/savegame_typedefs").SavegameData} data
          */
-        static migrate1009to1010(data: import("shapez/savegame_typedefs.js").SavegameData): boolean;
+        static migrate1009to1010(data: import("shapez/savegame/savegame_typedefs").SavegameData): boolean;
+        constructor(data: any);
     }
     import { SavegameInterface_V1009 } from "shapez/savegame/schemas/1009";
 }
@@ -10204,10 +10196,10 @@ declare module "shapez/savegame/savegame" {
     /**
      * @typedef {import("shapez/application").Application} Application
      * @typedef {import("shapez/game/root").GameRoot} GameRoot
-     * @typedef {import("shapez/savegame_typedefs").SavegameData} SavegameData
-     * @typedef {import("shapez/savegame_typedefs").SavegameMetadata} SavegameMetadata
-     * @typedef {import("shapez/savegame_typedefs").SavegameStats} SavegameStats
-     * @typedef {import("shapez/savegame_typedefs").SerializedGame} SerializedGame
+     * @typedef {import("shapez/savegame/savegame_typedefs").SavegameData} SavegameData
+     * @typedef {import("shapez/savegame/savegame_typedefs").SavegameMetadata} SavegameMetadata
+     * @typedef {import("shapez/savegame/savegame_typedefs").SavegameStats} SavegameStats
+     * @typedef {import("shapez/savegame/savegame_typedefs").SerializedGame} SerializedGame
      */
     export class Savegame extends ReadWriteProxy {
         /**
@@ -10242,7 +10234,13 @@ declare module "shapez/savegame/savegame" {
             }
         );
         internalId: string;
-        metaDataRef: import("shapez/savegame/savegame_typedefs").SavegameMetadata;
+        metaDataRef: {
+            lastUpdate: number;
+            version: number;
+            internalId: string;
+            level: number;
+            name: string;
+        };
         /**
          * Returns if this game can be saved on disc
          * @returns {boolean}
@@ -10298,10 +10296,51 @@ declare module "shapez/savegame/savegame" {
     }
     export type Application = import("shapez/application").Application;
     export type GameRoot = import("shapez/game/root").GameRoot;
-    export type SavegameData = import("shapez/savegame/savegame_typedefs").SavegameData;
-    export type SavegameMetadata = import("shapez/savegame/savegame_typedefs").SavegameMetadata;
-    export type SavegameStats = import("shapez/savegame/savegame_typedefs").SavegameStats;
-    export type SerializedGame = import("shapez/savegame/savegame_typedefs").SerializedGame;
+    export type SavegameData = {
+        version: number;
+        dump: {
+            camera: any;
+            time: any;
+            entityMgr: any;
+            map: any;
+            gameMode: any;
+            hubGoals: any;
+            pinnedShapes: any;
+            waypoints: any;
+            entities: import("shapez/game/entity").Entity[];
+            beltPaths: any[];
+        };
+        stats: {
+            failedMam: boolean;
+            trashedCount: number;
+            usedInverseRotater: boolean;
+        };
+        lastUpdate: number;
+    };
+    export type SavegameMetadata = {
+        lastUpdate: number;
+        version: number;
+        internalId: string;
+        level: number;
+        name: string;
+    };
+    export type SavegameStats = {
+        failedMam: boolean;
+        trashedCount: number;
+        usedInverseRotater: boolean;
+    };
+    export type SerializedGame = {
+        camera: any;
+        time: any;
+        entityMgr: any;
+        map: any;
+        gameMode: any;
+        hubGoals: any;
+        pinnedShapes: any;
+        waypoints: any;
+        entities: import("shapez/game/entity").Entity[];
+        beltPaths: any[];
+    };
     import { ReadWriteProxy } from "shapez/core/read_write_proxy";
     import { BaseSavegameInterface } from "shapez/savegame/savegame_interface";
 }
@@ -10313,7 +10352,7 @@ declare module "shapez/core/buffer_maintainer" {
         constructor(root: GameRoot);
         root: GameRoot;
         /** @type {Map<string, Map<string, CacheEntry>>} */
-        cache: Map<string, Map<string, CacheEntry>>;
+        cache: any;
         iterationIndex: number;
         lastIteration: number;
         /**
@@ -10385,8 +10424,8 @@ declare module "shapez/core/buffer_maintainer" {
 declare module "shapez/game/automatic_save" {
     export type enumSavePriority = number;
     export namespace enumSavePriority {
-        const regular: number;
-        const asap: number;
+        export const regular: number;
+        export const asap: number;
     }
     export class AutomaticSave {
         constructor(root: any);
@@ -10606,7 +10645,7 @@ declare module "shapez/game/logic" {
      * Typing helper
      * @typedef {Array<{
      *  entity: Entity,
-     *  slot: import("shapez/components/item_ejector").ItemEjectorSlot,
+     *  slot: import("shapez/game/components/item_ejector").ItemEjectorSlot,
      *  fromTile: Vector,
      *  toDirection: enumDirection
      * }>} EjectorsAffectingTile
@@ -10615,7 +10654,7 @@ declare module "shapez/game/logic" {
      * Typing helper
      * @typedef {Array<{
      *  entity: Entity,
-     *  slot: import("shapez/components/item_acceptor").ItemAcceptorSlot,
+     *  slot: import("shapez/game/components/item_acceptor").ItemAcceptorSlot,
      *  toTile: Vector,
      *  fromDirection: enumDirection
      * }>} AcceptorsAffectingTile
@@ -10647,7 +10686,7 @@ declare module "shapez/game/logic" {
          * @param {number} param0.rotation
          * @param {number} param0.originalRotation
          * @param {number} param0.rotationVariant
-         * @param {string} param0.variant
+         * @param {string} param0.letiant
          * @param {MetaBuilding} param0.building
          * @returns {Entity}
          */
@@ -10656,14 +10695,14 @@ declare module "shapez/game/logic" {
             rotation,
             rotationVariant,
             originalRotation,
-            variant,
+            letiant,
             building,
         }: {
             origin: Vector;
             rotation: number;
             originalRotation: number;
             rotationVariant: number;
-            variant: string;
+            letiant: string;
             building: MetaBuilding;
         }): Entity;
         /**
@@ -10736,29 +10775,34 @@ declare module "shapez/game/logic" {
     /**
      * Typing helper
      */
-    export type EjectorsAffectingTile = Array<{
+    export type EjectorsAffectingTile = {
         entity: Entity;
         slot: import("shapez/game/components/item_ejector").ItemEjectorSlot;
         fromTile: Vector;
         toDirection: enumDirection;
-    }>;
+    }[];
     /**
      * Typing helper
      */
-    export type AcceptorsAffectingTile = Array<{
+    export type AcceptorsAffectingTile = {
         entity: Entity;
         slot: import("shapez/game/components/item_acceptor").ItemAcceptorSlot;
         toTile: Vector;
         fromDirection: enumDirection;
-    }>;
+    }[];
     export type AcceptorsAndEjectorsAffectingTile = {
         acceptors: {
             entity: Entity;
             slot: import("shapez/game/components/item_acceptor").ItemAcceptorSlot;
             toTile: Vector;
-            fromDirection: string;
+            fromDirection: enumDirection;
         }[];
-        ejectors: EjectorsAffectingTile;
+        ejectors: {
+            entity: Entity;
+            slot: import("shapez/game/components/item_ejector").ItemEjectorSlot;
+            fromTile: Vector;
+            toDirection: enumDirection;
+        }[];
     };
     import { GameRoot } from "shapez/game/root";
     import { Entity } from "shapez/game/entity";
@@ -10873,7 +10917,7 @@ declare module "shapez/game/shape_definition_manager" {
         ): ShapeDefinition;
         /**
          * Checks if we already have cached this definition, and if so throws it away and returns the already
-         * cached variant
+         * cached letiant
          * @param {ShapeDefinition} definition
          */
         registerOrReturnHandle(definition: ShapeDefinition): ShapeDefinition;
@@ -10994,11 +11038,10 @@ declare module "shapez/game/core" {
     import { Savegame } from "shapez/savegame/savegame";
 }
 declare module "shapez/states/ingame" {
-    export namespace gameCreationAction {
-        const _new: string;
-        export { _new as new };
-        export const resume: string;
-    }
+    export const gameCreationAction: {
+        new: string;
+        resume: string;
+    };
     export class GameCreationPayload {
         /** @type {boolean|undefined} */
         fastEnter: boolean | undefined;
@@ -11010,10 +11053,9 @@ declare module "shapez/states/ingame" {
         gameModeParameters: object | undefined;
     }
     export class InGameState extends GameState {
-        constructor();
         /** @type {GameCreationPayload} */
         creationPayload: GameCreationPayload;
-        stage: string;
+        stage: any;
         /** @type {GameCore} */
         core: GameCore;
         /** @type {KeyActionMapper} */
@@ -11116,7 +11158,7 @@ declare module "shapez/states/ingame" {
 }
 declare module "shapez/game/root" {
     /** @type {Array<Layer>} */
-    export const layers: Array<Layer>;
+    export const layers: Array<any>;
     /**
      * The game root is basically the whole game state at a given point,
      * combining all important classes. We don't have globals, but this
@@ -11186,36 +11228,36 @@ declare module "shapez/game/root" {
         /** @type {DynamicTickrate} */
         dynamicTickrate: DynamicTickrate;
         /** @type {Layer} */
-        currentLayer: Layer;
+        currentLayer: any;
         /** @type {GameMode} */
         gameMode: GameMode;
         signals: {
-            entityManuallyPlaced: TypedSignal<[Entity]>;
-            entityAdded: TypedSignal<[Entity]>;
-            entityChanged: TypedSignal<[Entity]>;
-            entityGotNewComponent: TypedSignal<[Entity]>;
-            entityComponentRemoved: TypedSignal<[Entity]>;
-            entityQueuedForDestroy: TypedSignal<[Entity]>;
-            entityDestroyed: TypedSignal<[Entity]>;
-            resized: TypedSignal<[number, number]>;
-            readyToRender: TypedSignal<[]>;
+            entityManuallyPlaced: any;
+            entityAdded: any;
+            entityChanged: any;
+            entityGotNewComponent: any;
+            entityComponentRemoved: any;
+            entityQueuedForDestroy: any;
+            entityDestroyed: any;
+            resized: any;
+            readyToRender: any;
             aboutToDestruct: Signal;
-            gameSaved: TypedSignal<[]>;
-            gameRestored: TypedSignal<[]>;
-            gameFrameStarted: TypedSignal<[]>;
-            storyGoalCompleted: TypedSignal<[number, string]>;
-            upgradePurchased: TypedSignal<[string]>;
-            postLoadHook: TypedSignal<[]>;
-            shapeDelivered: TypedSignal<[ShapeDefinition]>;
-            itemProduced: TypedSignal<[BaseItem]>;
-            bulkOperationFinished: TypedSignal<[]>;
-            immutableOperationFinished: TypedSignal<[]>;
-            editModeChanged: TypedSignal<[Layer]>;
-            prePlacementCheck: TypedSignal<[Entity, Vector]>;
-            freeEntityAreaBeforeBuild: TypedSignal<[Entity]>;
-            achievementCheck: TypedSignal<[string, any]>;
-            bulkAchievementCheck: TypedSignal<any[]>;
-            puzzleComplete: TypedSignal<[]>;
+            gameSaved: any;
+            gameRestored: any;
+            gameFrameStarted: any;
+            storyGoalCompleted: any;
+            upgradePurchased: any;
+            postLoadHook: any;
+            shapeDelivered: any;
+            itemProduced: any;
+            bulkOperationFinished: any;
+            immutableOperationFinished: any;
+            editModeChanged: any;
+            prePlacementCheck: any;
+            freeEntityAreaBeforeBuild: any;
+            achievementCheck: any;
+            bulkAchievementCheck: any;
+            puzzleComplete: any;
         };
         /** @type {Object.<string, Object.<string, RandomNumberGenerator>>} */
         rngs: {
@@ -11255,17 +11297,13 @@ declare module "shapez/game/root" {
     import { ProductionAnalytics } from "shapez/game/production_analytics";
     import { DynamicTickrate } from "shapez/game/dynamic_tickrate";
     import { GameMode } from "shapez/game/game_mode";
-    import { Entity } from "shapez/game/entity";
     import { Signal } from "shapez/core/signal";
-    import { ShapeDefinition } from "shapez/game/shape_definition";
-    import { BaseItem } from "shapez/game/base_item";
-    import { Vector } from "shapez/core/vector";
     import { RandomNumberGenerator } from "shapez/core/rng";
 }
 declare module "shapez/core/draw_parameters" {
     /**
      * @typedef {import("shapez/game/root").GameRoot} GameRoot
-     * @typedef {import("shapez/rectangle").Rectangle} Rectangle
+     * @typedef {import("shapez/core/rectangle").Rectangle} Rectangle
      */
     export class DrawParameters {
         constructor({
@@ -11495,9 +11533,23 @@ declare module "shapez/core/atlas_definitions" {
          * @param {SourceData} sourceData
          */
         constructor({ frames, meta }: SourceData);
-        meta: AtlasMeta;
+        meta: {
+            app: string;
+            version: string;
+            image: string;
+            format: string;
+            size: Size;
+            scale: string;
+            smartupdate: string;
+        };
         sourceData: {
-            [x: string]: SpriteDefinition;
+            [x: string]: {
+                frame: Position & Size;
+                rotated: boolean;
+                spriteSourceSize: Position & Size;
+                sourceSize: Size;
+                trimmed: boolean;
+            };
         };
         sourceFileName: string;
         getFullSourcePath(): string;
@@ -11545,7 +11597,7 @@ declare module "shapez/core/loader" {
     class LoaderImpl {
         app: import("shapez/application").Application;
         /** @type {Map<string, BaseSprite>} */
-        sprites: Map<string, BaseSprite>;
+        sprites: any;
         rawImages: any[];
         /**
          * @param {Application} app
@@ -11770,11 +11822,15 @@ declare module "shapez/platform/ad_provider" {
     import { Application } from "shapez/application";
 }
 declare module "shapez/platform/ad_providers/no_ad_provider" {
-    export class NoAdProvider extends AdProviderInterface {}
+    export class NoAdProvider extends AdProviderInterface {
+        constructor(app: import("shapez/application").Application);
+    }
     import { AdProviderInterface } from "shapez/platform/ad_provider";
 }
 declare module "shapez/platform/browser/no_achievement_provider" {
-    export class NoAchievementProvider extends AchievementProviderInterface {}
+    export class NoAchievementProvider extends AchievementProviderInterface {
+        constructor(app: import("shapez/application").Application);
+    }
     import { AchievementProviderInterface } from "shapez/platform/achievement_provider";
 }
 declare module "shapez/platform/analytics" {
@@ -11812,6 +11868,7 @@ declare module "shapez/platform/analytics" {
 }
 declare module "shapez/platform/browser/google_analytics" {
     export class GoogleAnalyticsImpl extends AnalyticsInterface {
+        constructor(app: any);
         lastUiClickTracked: number;
         /**
          * Tracks an event so GA keeps track of the user
@@ -11838,6 +11895,11 @@ declare module "shapez/platform/browser/sound" {
 declare module "shapez/platform/ad_providers/gamedistribution" {
     export class GamedistributionAdProvider extends AdProviderInterface {
         /**
+         *
+         * @param {Application} app
+         */
+        constructor(app: Application);
+        /**
          * The resolve function to finish the current video ad. Null if none is currently running
          * @type {Function}
          */
@@ -11852,15 +11914,19 @@ declare module "shapez/platform/ad_providers/gamedistribution" {
         lastVideoAdShowTime: number;
     }
     import { AdProviderInterface } from "shapez/platform/ad_provider";
+    import { Application } from "shapez/application";
 }
 declare module "shapez/platform/electron/steam_achievement_provider" {
     export class SteamAchievementProvider extends AchievementProviderInterface {
+        /** @param {Application} app */
+        constructor(app: Application);
         initialized: boolean;
         root: GameRoot;
         ipc: any;
     }
     import { AchievementProviderInterface } from "shapez/platform/achievement_provider";
     import { GameRoot } from "shapez/game/root";
+    import { Application } from "shapez/application";
 }
 declare module "shapez/platform/wrapper" {
     export class PlatformWrapperInterface {
@@ -11937,12 +12003,14 @@ declare module "shapez/platform/wrapper" {
 }
 declare module "shapez/platform/browser/storage" {
     export class StorageImplBrowser extends StorageInterface {
+        constructor(app: any);
         currentBusyFilename: boolean;
     }
     import { StorageInterface } from "shapez/platform/storage";
 }
 declare module "shapez/platform/browser/storage_indexed_db" {
     export class StorageImplBrowserIndexedDB extends StorageInterface {
+        constructor(app: any);
         currentBusyFilename: boolean;
         /** @type {IDBDatabase} */
         database: IDBDatabase;
@@ -11951,6 +12019,7 @@ declare module "shapez/platform/browser/storage_indexed_db" {
 }
 declare module "shapez/platform/browser/wrapper" {
     export class PlatformWrapperImplBrowser extends PlatformWrapperInterface {
+        constructor(app: any);
         recaptchaTokenCallback: any;
         embedProvider: {
             id: string;
@@ -11972,6 +12041,7 @@ declare module "shapez/platform/browser/wrapper" {
 }
 declare module "shapez/platform/electron/storage" {
     export class StorageImplElectron extends StorageInterface {
+        constructor(app: any);
         /** @type {Object.<number, {resolve:Function, reject: Function}>} */
         jobs: {
             [x: number]: {
@@ -11985,6 +12055,7 @@ declare module "shapez/platform/electron/storage" {
 }
 declare module "shapez/platform/electron/wrapper" {
     export class PlatformWrapperImplElectron extends PlatformWrapperImplBrowser {
+        constructor(app: any);
         dlcs: {
             puzzle: boolean;
         };
@@ -12126,10 +12197,10 @@ declare module "shapez/profile/application_settings" {
     export function getApplicationSettingById(id: any): any;
     export type enumCategories = string;
     export namespace enumCategories {
-        const general: string;
-        const userInterface: string;
-        const performance: string;
-        const advanced: string;
+        export const general: string;
+        export const userInterface: string;
+        export const performance: string;
+        export const advanced: string;
     }
     export const uiScales: {
         id: string;
@@ -12238,8 +12309,8 @@ declare module "shapez/profile/application_settings" {
 declare module "shapez/savegame/savegame_manager" {
     export type enumLocalSavegameStatus = string;
     export namespace enumLocalSavegameStatus {
-        const offline: string;
-        const synced: string;
+        export const offline: string;
+        export const synced: string;
     }
     export class SavegameManager extends ReadWriteProxy {
         constructor(app: any);
@@ -12294,8 +12365,26 @@ declare module "shapez/savegame/savegame_manager" {
         generateInternalId(): any;
         initialize(): Promise<any>;
     }
-    export type SavegamesData = import("shapez/savegame/savegame_typedefs").SavegamesData;
-    export type SavegameMetadata = import("shapez/savegame/savegame_typedefs").SavegameMetadata;
+    export type SavegamesData = {
+        version: number;
+        /**
+         * @returns {SavegamesData}
+         */
+        savegames: {
+            lastUpdate: number;
+            version: number;
+            internalId: string;
+            level: number;
+            name: string;
+        }[];
+    };
+    export type SavegameMetadata = {
+        lastUpdate: number;
+        version: number;
+        internalId: string;
+        level: number;
+        name: string;
+    };
     import { ReadWriteProxy } from "shapez/core/read_write_proxy";
     import { Savegame } from "shapez/savegame/savegame";
 }
@@ -12305,6 +12394,7 @@ declare module "shapez/core/textual_game_state" {
      * scrollable content.
      */
     export class TextualGameState extends GameState {
+        constructor(key: string);
         /**
          * Should return the states HTML content.
          */
@@ -12339,9 +12429,7 @@ declare module "shapez/core/textual_game_state" {
     import { HUDModalDialogs } from "shapez/game/hud/parts/modal_dialogs";
 }
 declare module "shapez/states/about" {
-    export class AboutState extends TextualGameState {
-        constructor();
-    }
+    export class AboutState extends TextualGameState {}
     import { TextualGameState } from "shapez/core/textual_game_state";
 }
 declare module "shapez/changelog" {
@@ -12361,14 +12449,11 @@ declare module "shapez/changelog" {
     )[];
 }
 declare module "shapez/states/changelog" {
-    export class ChangelogState extends TextualGameState {
-        constructor();
-    }
+    export class ChangelogState extends TextualGameState {}
     import { TextualGameState } from "shapez/core/textual_game_state";
 }
 declare module "shapez/states/keybindings" {
     export class KeybindingsState extends TextualGameState {
-        constructor();
         editKeybinding(id: any): void;
         updateKeybindings(): void;
         resetKeybinding(id: any): void;
@@ -12382,7 +12467,6 @@ declare module "shapez/states/main_menu" {
      * @typedef {import("shapez/profile/setting_types").EnumSetting} EnumSetting
      */
     export class MainMenuState extends GameState {
-        constructor();
         /**
          * Asks the user to import a savegame
          */
@@ -12398,7 +12482,13 @@ declare module "shapez/states/main_menu" {
         onChangelogClicked(): void;
         onRedditClicked(): void;
         onLanguageChooseClicked(): void;
-        get savedGames(): import("shapez/savegame/savegame_typedefs").SavegameMetadata[];
+        get savedGames(): {
+            lastUpdate: number;
+            version: number;
+            internalId: string;
+            level: number;
+            name: string;
+        }[];
         renderSavegames(): void;
         /**
          * @param {SavegameMetadata} game
@@ -12426,15 +12516,19 @@ declare module "shapez/states/main_menu" {
         onWegameRatingClicked(): void;
         onContinueButtonClicked(): void;
     }
-    export type SavegameMetadata = import("shapez/savegame/savegame_typedefs").SavegameMetadata;
+    export type SavegameMetadata = {
+        lastUpdate: number;
+        version: number;
+        internalId: string;
+        level: number;
+        name: string;
+    };
     export type EnumSetting = import("shapez/profile/setting_types").EnumSetting;
     import { GameState } from "shapez/core/game_state";
     import { HUDModalDialogs } from "shapez/game/hud/parts/modal_dialogs";
 }
 declare module "shapez/states/mobile_warning" {
-    export class MobileWarningState extends GameState {
-        constructor();
-    }
+    export class MobileWarningState extends GameState {}
     import { GameState } from "shapez/core/game_state";
 }
 declare module "shapez/game/hints" {
@@ -12445,7 +12539,6 @@ declare module "shapez/game/hints" {
 }
 declare module "shapez/states/preload" {
     export class PreloadState extends GameState {
-        constructor();
         dialogs: HUDModalDialogs;
         /** @type {HTMLElement} */
         statusText: HTMLElement;
@@ -12470,7 +12563,6 @@ declare module "shapez/states/preload" {
 }
 declare module "shapez/states/settings" {
     export class SettingsState extends TextualGameState {
-        constructor();
         getCategoryButtonsHtml(): string;
         getSettingsHtml(): string;
         renderBuildText(): void;
@@ -12525,6 +12617,7 @@ declare module "shapez/platform/game_analytics" {
 }
 declare module "shapez/platform/browser/game_analytics" {
     export class ShapezGameAnalytics extends GameAnalyticsInterface {
+        constructor(app: any);
         get environment():
             | "dev"
             | "steam-sandbox"
@@ -12628,7 +12721,6 @@ declare module "shapez/core/restriction_manager" {
 }
 declare module "shapez/states/puzzle_menu" {
     export class PuzzleMenuState extends TextualGameState {
-        constructor();
         loading: boolean;
         activeCategory: string;
         /**
@@ -12794,7 +12886,6 @@ declare module "shapez/platform/api" {
 }
 declare module "shapez/states/login" {
     export class LoginState extends GameState {
-        constructor();
         payload: {
             nextStateId: string;
         };
@@ -12812,9 +12903,7 @@ declare module "shapez/states/login" {
     import { HUDModalDialogs } from "shapez/game/hud/parts/modal_dialogs";
 }
 declare module "shapez/states/wegame_splash" {
-    export class WegameSplashState extends GameState {
-        constructor();
-    }
+    export class WegameSplashState extends GameState {}
     import { GameState } from "shapez/core/game_state";
 }
 declare module "shapez/modloader/mod" {
@@ -12827,7 +12916,7 @@ declare module "shapez/modloader/mod" {
      * }} ModInfo
      */
     /**
-     * Creates a new Mod.
+     * Creates a new Mod instance.
      * @class
      */
     export class Mod {
@@ -12839,13 +12928,18 @@ declare module "shapez/modloader/mod" {
          */
         constructor(id: string, info: ModInfo, enabled?: boolean);
         id: string;
-        info: ModInfo;
+        info: {
+            name: string;
+            description: string;
+            authors: Array<string>;
+            version: string;
+        };
         enabled: boolean;
         signals: {
             enable: Signal;
             disable: Signal;
         };
-        modManager: import("modloader/mod_manager").ModManager;
+        modManager: import("shapez/modloader/mod_manager").ModManager;
         /**
          * Register new translations for language
          * @param {string} language
@@ -12860,16 +12954,16 @@ declare module "shapez/modloader/mod" {
          */
         registerIcon(id: string, icon: string): void;
         /**
-         * Registers a new variant
+         * Registers a new letiant
          * @param {number} code
          * @param {typeof MetaBuilding} meta
-         * @param {string} variant
+         * @param {string} letiant
          * @param {number} rotationVariant
          */
         registerBuildingVariant(
             code: number,
             meta: typeof MetaBuilding,
-            variant?: string,
+            letiant?: string,
             rotationVariant?: number
         ): void;
         /**
@@ -12897,6 +12991,7 @@ declare module "shapez/game/component_registry" {
 }
 declare module "shapez/game/hud/parts/puzzle_back_to_menu" {
     export class HUDPuzzleBackToMenu extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         button: HTMLButtonElement;
         back(): void;
@@ -12905,6 +13000,7 @@ declare module "shapez/game/hud/parts/puzzle_back_to_menu" {
 }
 declare module "shapez/game/hud/parts/puzzle_dlc_logo" {
     export class HUDPuzzleDLCLogo extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         next(): void;
     }
@@ -12912,16 +13008,18 @@ declare module "shapez/game/hud/parts/puzzle_dlc_logo" {
 }
 declare module "shapez/game/modes/puzzle" {
     export class PuzzleGameMode extends GameMode {
-        /** @returns {object} */
-        static getSchema(): object;
+        /** @param {GameRoot} root */
+        constructor(root: GameRoot);
         zoneWidth: any;
         zoneHeight: any;
         getSaveData(): any;
     }
     import { GameMode } from "shapez/game/game_mode";
+    import { GameRoot } from "shapez/game/root";
 }
 declare module "shapez/game/hud/parts/puzzle_editor_controls" {
     export class HUDPuzzleEditorControls extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         titleElement: HTMLDivElement;
     }
@@ -12932,9 +13030,9 @@ declare module "shapez/savegame/puzzle_serializer" {
         /**
          * Serializes the game root into a dump
          * @param {GameRoot} root
-         * @returns {import("shapez/savegame_typedefs").PuzzleGameData}
+         * @returns {import("shapez/savegame/savegame_typedefs").PuzzleGameData}
          */
-        generateDumpFromGameRoot(root: GameRoot): import("shapez/savegame_typedefs").PuzzleGameData;
+        generateDumpFromGameRoot(root: GameRoot): import("shapez/savegame/savegame_typedefs").PuzzleGameData;
         /**
          * Tries to parse a signal code
          * @param {GameRoot} root
@@ -12944,9 +13042,12 @@ declare module "shapez/savegame/puzzle_serializer" {
         parseItemCode(root: GameRoot, code: string): BaseItem;
         /**
          * @param {GameRoot} root
-         * @param {import("shapez/savegame_typedefs").PuzzleGameData} puzzle
+         * @param {import("shapez/savegame/savegame_typedefs").PuzzleGameData} puzzle
          */
-        deserializePuzzle(root: GameRoot, puzzle: import("shapez/savegame_typedefs").PuzzleGameData): string;
+        deserializePuzzle(
+            root: GameRoot,
+            puzzle: import("shapez/savegame/savegame_typedefs").PuzzleGameData
+        ): string;
     }
     import { GameRoot } from "shapez/game/root";
     import { BaseItem } from "shapez/game/base_item";
@@ -12965,6 +13066,7 @@ declare module "shapez/game/hud/parts/puzzle_editor_review" {
 }
 declare module "shapez/game/hud/parts/puzzle_editor_settings" {
     export class HUDPuzzleEditorSettings extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         zone: HTMLDivElement;
         clearItems(): void;
@@ -12980,11 +13082,15 @@ declare module "shapez/game/hud/parts/puzzle_editor_settings" {
 declare module "shapez/game/modes/puzzle_edit" {
     export class PuzzleEditGameMode extends PuzzleGameMode {
         static getSchema(): {};
+        /** @param {GameRoot} root */
+        constructor(root: GameRoot);
     }
     import { PuzzleGameMode } from "shapez/game/modes/puzzle";
+    import { GameRoot } from "shapez/game/root";
 }
 declare module "shapez/game/hud/parts/puzzle_play_metadata" {
     export class HUDPuzzlePlayMetadata extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         titleElement: HTMLDivElement;
         puzzleNameElement: HTMLDivElement;
         element: HTMLDivElement;
@@ -12995,6 +13101,7 @@ declare module "shapez/game/hud/parts/puzzle_play_metadata" {
 }
 declare module "shapez/game/hud/parts/puzzle_complete_notification" {
     export class HUDPuzzleCompleteNotification extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         visible: boolean;
         domAttach: DynamicDomAttach;
         userDidLikePuzzle: any;
@@ -13018,6 +13125,7 @@ declare module "shapez/game/hud/parts/puzzle_complete_notification" {
 }
 declare module "shapez/game/hud/parts/puzzle_play_settings" {
     export class HUDPuzzlePlaySettings extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         clearItems(): void;
         resetPuzzle(): void;
@@ -13027,6 +13135,7 @@ declare module "shapez/game/hud/parts/puzzle_play_settings" {
 }
 declare module "shapez/game/hud/parts/HUDPuzzleNextPuzzle" {
     export class HUDPuzzleNextPuzzle extends BaseHUDPart {
+        constructor(root: import("shapez/game/root").GameRoot);
         element: HTMLDivElement;
         button: HTMLButtonElement;
         nextPuzzle(): void;
@@ -13051,7 +13160,56 @@ declare module "shapez/game/modes/puzzle_play" {
                 nextPuzzles: Array<number> | undefined;
             }
         );
-        puzzle: import("shapez/savegame/savegame_typedefs").PuzzleFullData;
+        puzzle: {
+            meta: {
+                id: number;
+                shortKey: string;
+                likes: number;
+                downloads: number;
+                completions: number;
+                difficulty: number;
+                averageTime: number;
+                title: string;
+                author: string;
+                completed: boolean;
+            };
+            game: {
+                version: number;
+                bounds: {
+                    w: number;
+                    h: number;
+                };
+                buildings: (
+                    | {
+                          type: "emitter";
+                          item: string;
+                          pos: {
+                              x: number;
+                              y: number;
+                              r: number;
+                          };
+                      }
+                    | {
+                          type: "goal";
+                          item: string;
+                          pos: {
+                              x: number;
+                              y: number;
+                              r: number;
+                          };
+                      }
+                    | {
+                          type: "block";
+                          pos: {
+                              x: number;
+                              y: number;
+                              r: number;
+                          };
+                      }
+                )[];
+                excludedBuildings: string[];
+            };
+        };
         /**
          * @type {Array<number>}
          */
@@ -13079,11 +13237,18 @@ declare module "shapez/game/item_registry" {
     export function initItemRegistry(): void;
 }
 declare module "shapez/game/time/fast_forward_game_speed" {
-    export class FastForwardGameSpeed extends BaseGameSpeed {}
+    export class FastForwardGameSpeed extends BaseGameSpeed {
+        constructor(root: import("shapez/game/root").GameRoot);
+    }
     import { BaseGameSpeed } from "shapez/game/time/base_game_speed";
 }
 declare module "shapez/platform/ad_providers/adinplay" {
     export class AdinplayAdProvider extends AdProviderInterface {
+        /**
+         *
+         * @param {Application} app
+         */
+        constructor(app: Application);
         /** @type {ClickDetector} */
         getOnSteamClickDetector: ClickDetector;
         /** @type {Element} */
@@ -13104,9 +13269,12 @@ declare module "shapez/platform/ad_providers/adinplay" {
     }
     import { AdProviderInterface } from "shapez/platform/ad_provider";
     import { ClickDetector } from "shapez/core/click_detector";
+    import { Application } from "shapez/application";
 }
 declare module "shapez/platform/browser/no_game_analytics" {
-    export class NoGameAnalytics extends GameAnalyticsInterface {}
+    export class NoGameAnalytics extends GameAnalyticsInterface {
+        constructor(app: any);
+    }
     import { GameAnalyticsInterface } from "shapez/platform/game_analytics";
 }
 
@@ -13205,11 +13373,11 @@ declare module "shapez/application" {
         /** @type {GameAnalyticsInterface} */
         gameAnalytics: GameAnalyticsInterface;
         focused: boolean;
-        pageVisible: boolean;
+        pageVisible: any;
         applicationPaused: boolean;
         /** @type {TypedTrackedState<boolean>} */
-        trackedIsRenderable: TypedTrackedState<boolean>;
-        screenWidth: number;
+        trackedIsRenderable: any;
+        screenWidth: any;
         screenHeight: number;
         lastResizeCheck: number;
         /** @type {Vector|null} */
@@ -13252,7 +13420,7 @@ declare module "shapez/application" {
         /**
          * Returns if the app is currently visible
          */
-        isRenderable(): boolean;
+        isRenderable(): any;
         onAppRenderableStateChanged(renderable: any): void;
         /**
          * Internal unload handler
@@ -13313,61 +13481,3 @@ declare module "shapez/application" {
     import { AnalyticsInterface } from "shapez/platform/analytics";
     import { Vector } from "shapez/core/vector";
 }
-declare interface FactoryTemplate<T> {
-    entries: Array<Class<T>>;
-    entryIds: Array<string>;
-    idToEntry: any;
-
-    getId(): string;
-    getAllIds(): Array<string>;
-    register(entry: Class<T>): void;
-    hasId(id: string): boolean;
-    findById(id: string): Class<T>;
-    getEntries(): Array<Class<T>>;
-    getNumEntries(): number;
-}
-
-declare interface SingletonFactoryTemplate<T> {
-    entries: Array<T>;
-    idToEntry: any;
-
-    getId(): string;
-    getAllIds(): Array<string>;
-    register(classHandle: Class<T>): void;
-    hasId(id: string): boolean;
-    findById(id: string): T;
-    findByClass(classHandle: Class<T>): T;
-    getEntries(): Array<T>;
-    getNumEntries(): number;
-}
-
-declare interface SignalTemplate0 {
-    add(receiver: () => string | void, scope: null | any);
-    dispatch(): string | void;
-    remove(receiver: () => string | void);
-    removeAll();
-}
-
-declare class TypedTrackedState<T> {
-    constructor(callbackMethod?: (value: T) => void, callbackScope?: any);
-
-    set(value: T, changeHandler?: (value: T) => void, changeScope?: any): void;
-
-    setSilent(value: any): void;
-    get(): T;
-}
-
-declare const STOP_PROPAGATION = "stop_propagation";
-
-declare interface TypedSignal<T extends Array<any>> {
-    add(receiver: (...args: T) => /* STOP_PROPAGATION */ string | void, scope?: object);
-    addToTop(receiver: (...args: T) => /* STOP_PROPAGATION */ string | void, scope?: object);
-    remove(receiver: (...args: T) => /* STOP_PROPAGATION */ string | void);
-
-    dispatch(...args: T): /* STOP_PROPAGATION */ string | void;
-
-    removeAll();
-}
-
-declare type Layer = "regular" | "wires";
-declare type ItemType = "shape" | "color" | "boolean";
