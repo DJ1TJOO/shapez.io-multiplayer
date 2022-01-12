@@ -41,8 +41,6 @@ gulp.task("utils.cleanShapezBuildFolder", () => {
 
 gulp.task("utils.cleanup", gulp.series("utils.cleanBuildFolder", "utils.cleanShapezBuildFolder"));
 
-// TODO: download latest mod build of shapez.io
-
 // Serve
 gulp.task("main.serve.shapez", function (cb) {
     browserSync.init({
