@@ -90,7 +90,7 @@ export class ModManager {
 
     /**
      * Has mod loaded
-     * @param {string} id Mod id
+     * @param {number} id Mod id
      * @returns {boolean}
      */
     hasMod(id) {
@@ -99,7 +99,7 @@ export class ModManager {
 
     /**
      * Get mod by id
-     * @param {string} id Mod id
+     * @param {number} id Mod id
      * @returns {Mod}
      */
     getMod(id) {
@@ -108,7 +108,7 @@ export class ModManager {
 
     /**
      * Enables a mod
-     * @param {string} id Mod id
+     * @param {number} id Mod id
      * @returns {boolean}
      */
     enableMod(id) {
@@ -123,7 +123,7 @@ export class ModManager {
 
     /**
      * Disables a mod
-     * @param {string} id Mod id
+     * @param {number} id Mod id
      * @returns {boolean}
      */
     disableMod(id) {
