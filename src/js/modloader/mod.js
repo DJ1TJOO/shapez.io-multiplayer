@@ -1,9 +1,10 @@
 import { GameState } from "../core/game_state";
 import { GLOBAL_APP } from "../core/globals";
-import { gMetaBuildingRegistry } from "../core/global_registries";
+import { gGameModeRegistry, gMetaBuildingRegistry } from "../core/global_registries";
 import { Loader } from "../core/loader";
 import { Signal } from "../core/signal";
 import { addBuildingCodeCache, gBuildingVariants, registerBuildingVariant } from "../game/building_codes";
+import { GameMode } from "../game/game_mode";
 import { defaultBuildingVariant, MetaBuilding } from "../game/meta_building";
 import { THEMES } from "../game/theme";
 import { LANGUAGES } from "../languages";
@@ -38,7 +39,7 @@ import { overwriteDataRecursive, updateApplicationLanguageMods } from "../transl
 export class Mod {
     /**
      * Creates a Mod
-     * @param {string} id Id of mod
+     * @param {Number} id Id of mod
      * @param {ModInfo} info Information about the mod
      * @param {ModSettings} settings Mod settings, defauts to {}
      * @param {boolean} enabled Starts mod enabled, defauts to true
@@ -170,13 +171,20 @@ export class Mod {
     }
 
     /**
-     * Registers a new icon
-     * @param {string} id
-     * @param {string} icon
+     * Registers a new state class, should be a GameState derived class
+     * @param {typeof GameState} stateClass
      */
-    registerIcon(id, icon) {
-        // Add icon style
-        this.registerCss(`[data-icon="${id}.png"] { background-image: url(${icon}) !important; }`);
+    registerState(stateClass) {
+        this.modManager.app.stateMgr.register(stateClass);
+    }
+
+    /**
+     * Registers a new game mode, should be a GaeMode derived class
+     * @param {typeof GameMode} gameMode
+     */
+    registerGameMode(gameMode) {
+        // TODO: choose gamemode when creating/editing game
+        gGameModeRegistry.register(gameMode);
     }
 
     /**
@@ -195,7 +203,7 @@ export class Mod {
         // Register variant
         registerBuildingVariant(this.id, code, meta, variant, rotationVariant);
 
-        const variantCode = `${this.id}:${code}`;
+        const variantCode = this.id + code;
         const buildingVariant = gBuildingVariants[variantCode];
 
         // Propagate instance
@@ -214,13 +222,5 @@ export class Mod {
 
         // Add cache for building code
         addBuildingCodeCache(variantCode);
-    }
-
-    /**
-     * Registers a new state class, should be a GameState derived class
-     * @param {typeof GameState} stateClass
-     */
-    registerState(stateClass) {
-        this.modManager.app.stateMgr.register(stateClass);
     }
 }

@@ -38,6 +38,7 @@ import { ShapeDefinitionManager } from "./shape_definition_manager";
 import { AchievementProxy } from "./achievement_proxy";
 import { SoundProxy } from "./sound_proxy";
 import { GameTime } from "./time/game_time";
+import { Signal } from "../core/signal";
 
 const logger = createLogger("ingame/core");
 
@@ -58,6 +59,10 @@ export class GameCore {
 
         /** @type {GameRoot} */
         this.root = null;
+
+        this.signals = {
+            initializedCanvas: new Signal(),
+        };
 
         /**
          * Set to true at the beginning of a logic update and cleared when its finished.
@@ -256,6 +261,8 @@ export class GameCore {
         this.root.context = context;
 
         registerCanvas(canvas, context);
+
+        this.signals.initializedCanvas.dispatch();
     }
 
     /**

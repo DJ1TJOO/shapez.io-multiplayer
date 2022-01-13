@@ -269,22 +269,21 @@ import * as import_272 from "../savegame/schemas/1006";
 import * as import_273 from "../savegame/schemas/1007";
 import * as import_274 from "../savegame/schemas/1008";
 import * as import_275 from "../savegame/schemas/1009";
-import * as import_276 from "../savegame/schemas/1010";
-import * as import_277 from "../savegame/serialization_data_types";
-import * as import_278 from "../savegame/serialization";
-import * as import_279 from "../savegame/serializer_internal";
-import * as import_280 from "../states/about";
-import * as import_281 from "../states/changelog";
-import * as import_282 from "../states/ingame";
-import * as import_283 from "../states/keybindings";
-import * as import_284 from "../states/login";
-import * as import_285 from "../states/main_menu";
-import * as import_286 from "../states/mobile_warning";
-import * as import_287 from "../states/preload";
-import * as import_288 from "../states/puzzle_menu";
-import * as import_289 from "../states/settings";
-import * as import_290 from "../states/wegame_splash";
-import * as import_291 from "../translations";
+import * as import_276 from "../savegame/serialization_data_types";
+import * as import_277 from "../savegame/serialization";
+import * as import_278 from "../savegame/serializer_internal";
+import * as import_279 from "../states/about";
+import * as import_280 from "../states/changelog";
+import * as import_281 from "../states/ingame";
+import * as import_282 from "../states/keybindings";
+import * as import_283 from "../states/login";
+import * as import_284 from "../states/main_menu";
+import * as import_285 from "../states/mobile_warning";
+import * as import_286 from "../states/preload";
+import * as import_287 from "../states/puzzle_menu";
+import * as import_288 from "../states/settings";
+import * as import_289 from "../states/wegame_splash";
+import * as import_290 from "../translations";
 
 export const exports = {
     "application": import_0,
@@ -558,22 +557,21 @@ export const exports = {
     "savegame/schemas/1007": import_273,
     "savegame/schemas/1008": import_274,
     "savegame/schemas/1009": import_275,
-    "savegame/schemas/1010": import_276,
-    "savegame/serialization_data_types": import_277,
-    "savegame/serialization": import_278,
-    "savegame/serializer_internal": import_279,
-    "states/about": import_280,
-    "states/changelog": import_281,
-    "states/ingame": import_282,
-    "states/keybindings": import_283,
-    "states/login": import_284,
-    "states/main_menu": import_285,
-    "states/mobile_warning": import_286,
-    "states/preload": import_287,
-    "states/puzzle_menu": import_288,
-    "states/settings": import_289,
-    "states/wegame_splash": import_290,
-    "translations": import_291,
+    "savegame/serialization_data_types": import_276,
+    "savegame/serialization": import_277,
+    "savegame/serializer_internal": import_278,
+    "states/about": import_279,
+    "states/changelog": import_280,
+    "states/ingame": import_281,
+    "states/keybindings": import_282,
+    "states/login": import_283,
+    "states/main_menu": import_284,
+    "states/mobile_warning": import_285,
+    "states/preload": import_286,
+    "states/puzzle_menu": import_287,
+    "states/settings": import_288,
+    "states/wegame_splash": import_289,
+    "translations": import_290,
 };
 
 export function setExports() {

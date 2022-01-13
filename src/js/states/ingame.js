@@ -9,6 +9,7 @@ import { Savegame } from "../savegame/savegame";
 import { GameCore } from "../game/core";
 import { MUSIC } from "../platform/sound";
 import { enumGameModeIds } from "../game/game_mode";
+import { Signal } from "../core/signal";
 
 const logger = createLogger("state/ingame");
 
@@ -60,6 +61,9 @@ export class InGameState extends GameState {
 
         // Stores current stage
         this.stage = "";
+        this.signals = {
+            stage: /** @type {TypedSignal<[string, string]>} */ (new Signal()),
+        };
 
         /** @type {GameCore} */
         this.core = null;
@@ -90,6 +94,10 @@ export class InGameState extends GameState {
         assert(stage, "Got empty stage");
         if (stage !== this.stage) {
             this.stage = stage;
+            this.signals.stage.dispatch(
+                Object.keys(stages).find(key => stages[key] === stage),
+                stage
+            );
             logger.log(this.stage);
             return true;
         } else {

@@ -53,9 +53,11 @@ export class BackgroundResourcesLoader {
         this.bareGameReady = false;
         this.additionalReady = false;
 
-        this.signalMainMenuLoaded = new Signal();
-        this.signalBareGameLoaded = new Signal();
-        this.signalAdditionalLoaded = new Signal();
+        this.signals = {
+            mainMenuLoaded: new Signal(),
+            bareGameLoaded: new Signal(),
+            additionalLoaded: new Signal(),
+        };
 
         this.numAssetsLoaded = 0;
         this.numAssetsToLoadTotal = 0;
@@ -87,7 +89,7 @@ export class BackgroundResourcesLoader {
         }
 
         return new Promise(resolve => {
-            this.signalMainMenuLoaded.add(resolve);
+            this.signals.mainMenuLoaded.add(resolve);
         });
     }
 
@@ -97,7 +99,7 @@ export class BackgroundResourcesLoader {
         }
 
         return new Promise(resolve => {
-            this.signalBareGameLoaded.add(resolve);
+            this.signals.bareGameLoaded.add(resolve);
         });
     }
 
@@ -114,7 +116,7 @@ export class BackgroundResourcesLoader {
             .then(() => {
                 logger.log("⏰ Finish load: main menu");
                 this.mainMenuReady = true;
-                this.signalMainMenuLoaded.dispatch();
+                this.signals.mainMenuLoaded.dispatch();
                 this.internalStartLoadingEssentialsForBareGame();
             });
     }
@@ -134,7 +136,7 @@ export class BackgroundResourcesLoader {
                 logger.log("⏰ Finish load: bare game");
                 this.bareGameReady = true;
                 initBuildingCodesAfterResourcesLoaded();
-                this.signalBareGameLoaded.dispatch();
+                this.signals.bareGameLoaded.dispatch();
                 this.internalStartLoadingAdditionalGameAssets();
             });
     }
@@ -160,7 +162,7 @@ export class BackgroundResourcesLoader {
             .then(() => {
                 logger.log("⏰ Finish load: additional assets");
                 this.additionalReady = true;
-                this.signalAdditionalLoaded.dispatch();
+                this.signals.additionalLoaded.dispatch();
             });
     }
 

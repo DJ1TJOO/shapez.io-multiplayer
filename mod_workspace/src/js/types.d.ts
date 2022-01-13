@@ -133,6 +133,7 @@ declare module "shapez/translations" {
     export function autoDetectLanguageId(): string;
     export function matchDataRecursive(dest: any, src: any): void;
     export function overwriteDataRecursive(dest: any, src: any): void;
+    export function fillDataRecursive(dest: any, src: any): void;
     /**
      * Updates application language
      * @param {import('./application').Application} app
@@ -142,7 +143,15 @@ declare module "shapez/translations" {
         app: import("shapez/application").Application,
         id: string
     ): void;
-    export function updateApplicationLanguageMods(app: any, id: any): void;
+    /**
+     * Updates application language
+     * @param {import('./application').Application} app
+     * @param {string} id
+     */
+    export function updateApplicationLanguageMods(
+        app: import("shapez/application").Application,
+        id: string
+    ): void;
     export let T: any;
 }
 declare module "shapez/core/utils" {
@@ -1665,14 +1674,14 @@ declare module "shapez/platform/sound" {
 declare module "shapez/game/building_codes" {
     /**
      * Registers a new letiant
-     * @param {string} group
+     * @param {number} group
      * @param {number} code
      * @param {typeof MetaBuilding} meta
      * @param {string} letiant
      * @param {number} rotationVariant
      */
     export function registerBuildingVariant(
-        group: string,
+        group: number,
         code: number,
         meta: typeof MetaBuilding,
         letiant?: string,
@@ -1680,31 +1689,31 @@ declare module "shapez/game/building_codes" {
     ): void;
     /**
      *
-     * @param {string} code
+     * @param {number} code
      * @returns {BuildingVariantIdentifier}
      */
-    export function getBuildingDataFromCode(code: string): BuildingVariantIdentifier;
+    export function getBuildingDataFromCode(code: number): BuildingVariantIdentifier;
     /**
      * Builds the cache for the codes
      */
     export function buildBuildingCodeCache(): void;
     /**
      * Add cache for a code
-     * @param {string} code
+     * @param {number} code
      */
-    export function addBuildingCodeCache(code: string): void;
+    export function addBuildingCodeCache(code: number): void;
     /**
      * Finds the code for a given letiant
      * @param {MetaBuilding} metaBuilding
      * @param {string} letiant
      * @param {number} rotationVariant
-     * @returns {string}
+     * @returns {number}
      */
     export function getCodeFromBuildingData(
         metaBuilding: MetaBuilding,
         letiant: string,
         rotationVariant: number
-    ): string;
+    ): number;
     /**
      * @typedef {{
      *   metaClass: typeof MetaBuilding,
@@ -1744,7 +1753,7 @@ declare module "shapez/game/components/static_map_entity" {
             origin: import("shapez/savegame/serialization_data_types").TypeVector;
             rotation: import("shapez/savegame/serialization_data_types").TypeNumber;
             originalRotation: import("shapez/savegame/serialization_data_types").TypeNumber;
-            code: import("shapez/savegame/serialization_data_types").TypeString;
+            code: import("shapez/savegame/serialization_data_types").TypePositiveInteger;
         };
         /**
          *
@@ -1753,7 +1762,7 @@ declare module "shapez/game/components/static_map_entity" {
          * @param {Vector=} param0.tileSize Size of the entity in tiles
          * @param {number=} param0.rotation Rotation in degrees. Must be multiple of 90
          * @param {number=} param0.originalRotation Original Rotation in degrees. Must be multiple of 90
-         * @param {string=} param0.code Building code
+         * @param {number=} param0.code Building code
          */
         constructor({
             origin,
@@ -1766,7 +1775,7 @@ declare module "shapez/game/components/static_map_entity" {
             tileSize?: Vector | undefined;
             rotation?: number | undefined;
             originalRotation?: number | undefined;
-            code?: string | undefined;
+            code?: number | undefined;
         });
         /**
          * Returns the effective tile size
@@ -1805,7 +1814,7 @@ declare module "shapez/game/components/static_map_entity" {
         getRotationVariant(): number;
         origin: Vector;
         rotation: number;
-        code: string;
+        code: number;
         originalRotation: number;
         /**
          * Returns the effective rectangle of this entity in tile space
@@ -9518,30 +9527,30 @@ declare module "shapez/savegame/schemas/1005" {
 declare module "shapez/savegame/schemas/1006" {
     export class SavegameInterface_V1006 extends SavegameInterface_V1005 {
         static computeSpriteMapping(): {
-            "sprites/blueprints/belt_top.png": string;
-            "sprites/blueprints/belt_left.png": string;
-            "sprites/blueprints/belt_right.png": string;
-            "sprites/blueprints/splitter.png": string;
-            "sprites/blueprints/splitter-compact.png": string;
-            "sprites/blueprints/splitter-compact-inverse.png": string;
-            "sprites/blueprints/underground_belt_entry.png": string;
-            "sprites/blueprints/underground_belt_exit.png": string;
-            "sprites/blueprints/underground_belt_entry-tier2.png": string;
-            "sprites/blueprints/underground_belt_exit-tier2.png": string;
-            "sprites/blueprints/miner.png": string;
-            "sprites/blueprints/miner-chainable.png": string;
-            "sprites/blueprints/cutter.png": string;
-            "sprites/blueprints/cutter-quad.png": string;
-            "sprites/blueprints/rotater.png": string;
-            "sprites/blueprints/rotater-ccw.png": string;
-            "sprites/blueprints/stacker.png": string;
-            "sprites/blueprints/mixer.png": string;
-            "sprites/blueprints/painter.png": string;
-            "sprites/blueprints/painter-mirrored.png": string;
-            "sprites/blueprints/painter-double.png": string;
-            "sprites/blueprints/painter-quad.png": string;
-            "sprites/blueprints/trash.png": string;
-            "sprites/blueprints/trash-storage.png": string;
+            "sprites/blueprints/belt_top.png": number;
+            "sprites/blueprints/belt_left.png": number;
+            "sprites/blueprints/belt_right.png": number;
+            "sprites/blueprints/splitter.png": number;
+            "sprites/blueprints/splitter-compact.png": number;
+            "sprites/blueprints/splitter-compact-inverse.png": number;
+            "sprites/blueprints/underground_belt_entry.png": number;
+            "sprites/blueprints/underground_belt_exit.png": number;
+            "sprites/blueprints/underground_belt_entry-tier2.png": number;
+            "sprites/blueprints/underground_belt_exit-tier2.png": number;
+            "sprites/blueprints/miner.png": number;
+            "sprites/blueprints/miner-chainable.png": number;
+            "sprites/blueprints/cutter.png": number;
+            "sprites/blueprints/cutter-quad.png": number;
+            "sprites/blueprints/rotater.png": number;
+            "sprites/blueprints/rotater-ccw.png": number;
+            "sprites/blueprints/stacker.png": number;
+            "sprites/blueprints/mixer.png": number;
+            "sprites/blueprints/painter.png": number;
+            "sprites/blueprints/painter-mirrored.png": number;
+            "sprites/blueprints/painter-double.png": number;
+            "sprites/blueprints/painter-quad.png": number;
+            "sprites/blueprints/trash.png": number;
+            "sprites/blueprints/trash-storage.png": number;
         };
         /**
          * @param {import("shapez/savegame/savegame_typedefs").SavegameData} data
@@ -10349,16 +10358,6 @@ declare module "shapez/savegame/schemas/1009" {
     }
     import { SavegameInterface_V1008 } from "shapez/savegame/schemas/1008";
 }
-declare module "shapez/savegame/schemas/1010" {
-    export class SavegameInterface_V1010 extends SavegameInterface_V1009 {
-        /**
-         * @param {import("shapez/savegame/savegame_typedefs").SavegameData} data
-         */
-        static migrate1009to1010(data: import("shapez/savegame/savegame_typedefs").SavegameData): boolean;
-        constructor(data: any);
-    }
-    import { SavegameInterface_V1009 } from "shapez/savegame/schemas/1009";
-}
 declare module "shapez/savegame/savegame_interface_registry" {
     /**
      * Returns if the given savegame has any supported interface
@@ -11165,6 +11164,9 @@ declare module "shapez/game/core" {
         app: Application;
         /** @type {GameRoot} */
         root: GameRoot;
+        signals: {
+            initializedCanvas: Signal;
+        };
         /**
          * Set to true at the beginning of a logic update and cleared when its finished.
          * This is to prevent doing a recursive logic update which can lead to unexpected
@@ -11215,6 +11217,7 @@ declare module "shapez/game/core" {
     }
     import { Application } from "shapez/application";
     import { GameRoot } from "shapez/game/root";
+    import { Signal } from "shapez/core/signal";
     import { Savegame } from "shapez/savegame/savegame";
 }
 declare module "shapez/states/ingame" {
@@ -11236,6 +11239,9 @@ declare module "shapez/states/ingame" {
         /** @type {GameCreationPayload} */
         creationPayload: GameCreationPayload;
         stage: any;
+        signals: {
+            stage: any;
+        };
         /** @type {GameCore} */
         core: GameCore;
         /** @type {KeyActionMapper} */
@@ -11816,9 +11822,10 @@ declare module "shapez/core/loader" {
         /**
          * Preloads an atlas
          * @param {AtlasDefinition} atlas
+         * @param {HTMLImageElement|null} image
          * @returns {Promise<void>}
          */
-        preloadAtlas(atlas: AtlasDefinition): Promise<void>;
+        preloadAtlas(atlas: AtlasDefinition, image?: HTMLImageElement | null): Promise<void>;
         /**
          *
          * @param {AtlasDefinition} atlas
@@ -11851,6 +11858,11 @@ declare module "shapez/game/meta_building_registry" {
 }
 declare module "shapez/core/background_resources_loader" {
     export function getLogoSprite(): "logo_wegame.png" | "logo_cn.png" | "logo.png";
+    /**
+     * @typedef {AtlasDefinition & {
+     *  image?: HTMLImageElement
+     * }} AtlasDefinitionImage
+     */
     export class BackgroundResourcesLoader {
         /**
          *
@@ -11862,13 +11874,21 @@ declare module "shapez/core/background_resources_loader" {
         mainMenuReady: boolean;
         bareGameReady: boolean;
         additionalReady: boolean;
-        signalMainMenuLoaded: Signal;
-        signalBareGameLoaded: Signal;
-        signalAdditionalLoaded: Signal;
+        signals: {
+            mainMenuLoaded: Signal;
+            bareGameLoaded: Signal;
+            additionalLoaded: Signal;
+        };
         numAssetsLoaded: number;
         numAssetsToLoadTotal: number;
         spritesLoaded: any[];
         soundsLoaded: any[];
+        /** @type {Array<string>} */
+        additionalGameSprites: Array<string>;
+        /** @type {Array<string>} */
+        additionalGameSounds: Array<string>;
+        /** @type {Array<AtlasDefinitionImage>} */
+        additionalAtlases: Array<AtlasDefinitionImage>;
         getNumAssetsLoaded(): number;
         getNumAssetsTotal(): number;
         getPromiseForMainMenu(): any;
@@ -11881,15 +11901,18 @@ declare module "shapez/core/background_resources_loader" {
         /**
          * @param {Array<string>} sprites
          * @param {Array<string>} sounds
-         * @param {Array<AtlasDefinition>} atlases
+         * @param {Array<AtlasDefinitionImage>} atlases
          * @returns {Promise<void>}
          */
         internalLoadSpritesAndSounds(
             sprites: Array<string>,
             sounds: Array<string>,
-            atlases?: Array<AtlasDefinition>
+            atlases?: Array<AtlasDefinitionImage>
         ): Promise<void>;
     }
+    export type AtlasDefinitionImage = AtlasDefinition & {
+        image?: HTMLImageElement;
+    };
     import { Application } from "shapez/application";
     import { Signal } from "shapez/core/signal";
     import { AtlasDefinition } from "shapez/core/atlas_definitions";
@@ -12270,9 +12293,9 @@ declare module "shapez/profile/setting_types" {
         /**
          * Validates the set value
          * @param {any} value
-         * @returns {boolean | string}
+         * @returns {boolean | string | number | object}
          */
-        validate(value: any): boolean | string;
+        validate(value: any): boolean | string | number | object;
         /** @type {Application} */
         app: Application;
         element: HTMLElement;
@@ -13125,13 +13148,13 @@ declare module "shapez/modloader/mod" {
     export class Mod {
         /**
          * Creates a Mod
-         * @param {string} id Id of mod
+         * @param {Number} id Id of mod
          * @param {ModInfo} info Information about the mod
          * @param {ModSettings} settings Mod settings, defauts to {}
          * @param {boolean} enabled Starts mod enabled, defauts to true
          */
-        constructor(id: string, info: ModInfo, settings?: ModSettings, enabled?: boolean);
-        id: string;
+        constructor(id: number, info: ModInfo, settings?: ModSettings, enabled?: boolean);
+        id: number;
         info: {
             name: string;
             description: string;
@@ -13152,13 +13175,26 @@ declare module "shapez/modloader/mod" {
             enable: Signal;
             disable: Signal;
         };
+        /**
+         * @type {Array<{
+         *  language: string,
+         *  data: object
+         * }>}
+         */
+        translations: {
+            language: string;
+            data: object;
+        }[];
         modManager: import("shapez/modloader/mod_manager").ModManager;
         /**
          * Registers a new atlas
          * @param {string} src
-         * @param {import("shapez/core/loader").AtlasDefinition} sourceData
+         * @param {import("shapez/core/background_resources_loader").AtlasDefinitionImage} sourceData
          */
-        registerAtlas(src: string, sourceData: import("shapez/core/loader").AtlasDefinition): void;
+        registerAtlas(
+            src: string,
+            sourceData: import("shapez/core/background_resources_loader").AtlasDefinitionImage
+        ): void;
         /**
          * Registers a new theme
          * @param {import("shapez/game/theme").Theme} theme
@@ -13185,11 +13221,15 @@ declare module "shapez/modloader/mod" {
         ): void;
         registerCss(css: any): void;
         /**
-         * Registers a new icon
-         * @param {string} id
-         * @param {string} icon
+         * Registers a new state class, should be a GameState derived class
+         * @param {typeof GameState} stateClass
          */
-        registerIcon(id: string, icon: string): void;
+        registerState(stateClass: typeof GameState): void;
+        /**
+         * Registers a new game mode, should be a GaeMode derived class
+         * @param {typeof GameMode} gameMode
+         */
+        registerGameMode(gameMode: typeof GameMode): void;
         /**
          * Registers a new letiant
          * @param {number} code
@@ -13203,11 +13243,6 @@ declare module "shapez/modloader/mod" {
             letiant?: string,
             rotationVariant?: number
         ): void;
-        /**
-         * Registers a new state class, should be a GameState derived class
-         * @param {typeof GameState} stateClass
-         */
-        registerState(stateClass: typeof GameState): void;
     }
     export type ModInfo = {
         name: string;
@@ -13225,8 +13260,9 @@ declare module "shapez/modloader/mod" {
         };
     };
     import { Signal } from "shapez/core/signal";
-    import { MetaBuilding } from "shapez/game/meta_building";
     import { GameState } from "shapez/core/game_state";
+    import { GameMode } from "shapez/game/game_mode";
+    import { MetaBuilding } from "shapez/game/meta_building";
 }
 declare module "shapez/core/config.local.template" {
     let _default: {};
@@ -13535,16 +13571,6 @@ declare module "shapez/modloader/mod_manager" {
          * @type {Array<Mod>}
          */
         mods: Array<Mod>;
-        /**
-         * @type {Array<{
-         *  language: string,
-         *  data: object
-         * }>}
-         */
-        translations: {
-            language: string;
-            data: object;
-        }[];
         initialize(): any;
         /**
          * @param {Mod} mod

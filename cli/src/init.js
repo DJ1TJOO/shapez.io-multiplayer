@@ -31,7 +31,7 @@ function parseArgumentsIntoOptions(rawArgs) {
 
 async function promptForMissingOptions(options) {
     const defaultName = "shapezio-mod";
-    const defaultModId = "mod";
+    const defaultModId = 1000;
     const defaultDescription = "";
     const defaultAuthor = "";
     const defaultVesion = "1.0.0";
@@ -63,6 +63,7 @@ async function promptForMissingOptions(options) {
     });
 
     questions.push({
+        type: "number",
         name: "modId",
         message: "Mod ID:",
         default: defaultModId,

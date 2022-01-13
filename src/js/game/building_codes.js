@@ -27,13 +27,13 @@ export const gBuildingVariants = {
 
 /**
  * Mapping from 'metaBuildingId/variant/rotationVariant' to building code
- * @type {Map<string, string>}
+ * @type {Map<string, number>}
  */
 const variantsCache = new Map();
 
 /**
  * Registers a new variant
- * @param {string} group
+ * @param {number} group
  * @param {number} code
  * @param {typeof MetaBuilding} meta
  * @param {string} variant
@@ -46,8 +46,8 @@ export function registerBuildingVariant(
     variant = "default" /* @TODO: Circular dependency, actually its defaultBuildingVariant */,
     rotationVariant = 0
 ) {
-    assert(!gBuildingVariants[`${group}:${code}`], "Duplicate id: " + code);
-    gBuildingVariants[`${group}:${code}`] = {
+    assert(!gBuildingVariants[group + code], "Duplicate id: " + (group + code));
+    gBuildingVariants[group + code] = {
         metaClass: meta,
         variant,
         rotationVariant,
@@ -58,7 +58,7 @@ export function registerBuildingVariant(
 
 /**
  *
- * @param {string} code
+ * @param {number} code
  * @returns {BuildingVariantIdentifier}
  */
 export function getBuildingDataFromCode(code) {
@@ -73,13 +73,13 @@ export function buildBuildingCodeCache() {
     for (const code in gBuildingVariants) {
         const data = gBuildingVariants[code];
         const hash = data.metaInstance.getId() + "/" + data.variant + "/" + data.rotationVariant;
-        variantsCache.set(hash, code);
+        variantsCache.set(hash, +code);
     }
 }
 
 /**
  * Add cache for a code
- * @param {string} code
+ * @param {number} code
  */
 export function addBuildingCodeCache(code) {
     const data = gBuildingVariants[code];
@@ -92,7 +92,7 @@ export function addBuildingCodeCache(code) {
  * @param {MetaBuilding} metaBuilding
  * @param {string} variant
  * @param {number} rotationVariant
- * @returns {string}
+ * @returns {number}
  */
 export function getCodeFromBuildingData(metaBuilding, variant, rotationVariant) {
     const hash = metaBuilding.getId() + "/" + variant + "/" + rotationVariant;
