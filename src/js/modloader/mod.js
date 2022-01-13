@@ -5,9 +5,10 @@ import { Loader } from "../core/loader";
 import { Signal } from "../core/signal";
 import { addBuildingCodeCache, gBuildingVariants, registerBuildingVariant } from "../game/building_codes";
 import { defaultBuildingVariant, MetaBuilding } from "../game/meta_building";
+import { THEMES } from "../game/theme";
 import { LANGUAGES } from "../languages";
-import { allApplicationSettings, createLanguageEnum } from "../profile/application_settings";
-import { updateApplicationLanguageMods } from "../translations";
+import { allApplicationSettings, createLanguageEnum, createThemeEnum } from "../profile/application_settings";
+import { overwriteDataRecursive, updateApplicationLanguageMods } from "../translations";
 
 /**
  * @typedef {{
@@ -54,6 +55,14 @@ export class Mod {
             disable: new Signal(),
         };
 
+        /**
+         * @type {Array<{
+         *  language: string,
+         *  data: object
+         * }>}
+         */
+        this.translations = [];
+
         // Register mod
         this.modManager = GLOBAL_APP.modManager.registerMod(this);
     }
@@ -61,15 +70,41 @@ export class Mod {
     /**
      * Registers a new atlas
      * @param {string} src
-     * @param {import("../core/loader").AtlasDefinition} sourceData
+     * @param {import("../core/background_resources_loader").AtlasDefinitionImage} sourceData
      */
     registerAtlas(src, sourceData) {
         const sourceImage = new Image();
         sourceImage.crossOrigin = "anonymous";
         sourceImage.onload = () => {
-            Loader.internalParseAtlas(sourceData, sourceImage);
+            const bareGameReady = this.modManager.app.backgroundResourceLoader.bareGameReady;
+            const additionalReady = this.modManager.app.backgroundResourceLoader.additionalReady;
+
+            sourceData.image = sourceImage;
+            if (!bareGameReady) {
+                this.modManager.app.backgroundResourceLoader.additionalAtlases.push(sourceData);
+            } else if (!additionalReady) {
+                this.modManager.app.backgroundResourceLoader.additionalAtlases.push(sourceData);
+            } else {
+                Loader.internalParseAtlas(sourceData, sourceImage);
+            }
         };
         sourceImage.src = src;
+    }
+
+    /**
+     * Registers a new theme
+     * @param {import("../game/theme").Theme} theme
+     */
+    registerTheme(theme) {
+        if (THEMES[theme.uiStyle]) {
+            console.log(THEMES[theme.uiStyle]);
+            overwriteDataRecursive(THEMES[theme.uiStyle], theme);
+        } else {
+            THEMES[theme.uiStyle] = theme;
+        }
+
+        allApplicationSettings[allApplicationSettings.findIndex(x => x.id === "theme")] =
+            createThemeEnum(THEMES);
     }
 
     /**
@@ -89,12 +124,12 @@ export class Mod {
             allApplicationSettings[allApplicationSettings.findIndex(x => x.id === "language")] =
                 createLanguageEnum(LANGUAGES);
 
-            this.modManager.translations.push({
+            this.translations.push({
                 language,
                 data: translations,
             });
         } else {
-            this.modManager.translations.push({
+            this.translations.push({
                 language,
                 data: translations,
             });

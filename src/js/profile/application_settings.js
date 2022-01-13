@@ -134,15 +134,48 @@ if (G_IS_DEV) {
     refreshRateOptions.push("10000");
 }
 
-export function createLanguageEnum(LANGUAGES) {
+export function createLanguageEnum(languages) {
     return new EnumSetting("language", {
-        options: Object.keys(LANGUAGES),
+        options: Object.keys(languages),
         valueGetter: key => key,
-        textGetter: key => LANGUAGES[key].name,
+        textGetter: key => languages[key].name,
         category: enumCategories.general,
         restartRequired: true,
         changeCb: (app, id) => null,
         magicValue: "auto-detect",
+        validate: function (value) {
+            if (value === this.magicValue) {
+                return true;
+            }
+
+            const availableValues = this.options.map(option => this.valueGetter(option));
+            if (availableValues.indexOf(value) < 0) {
+                return this.magicValue;
+            }
+            return true;
+        },
+    });
+}
+
+export function createThemeEnum(themes) {
+    return new EnumSetting("theme", {
+        options: Object.keys(themes),
+        valueGetter: theme => theme,
+        textGetter: theme => T.settings.labels.theme.themes[theme],
+        category: enumCategories.userInterface,
+        restartRequired: false,
+        magicValue: THEMES.light,
+        changeCb:
+            /**
+             * @param {Application} app
+             */
+            (app, id) => {
+                applyGameTheme(id);
+                document.documentElement.setAttribute("data-theme", id);
+            },
+        enabledCb: /**
+         * @param {Application} app
+         */ app => app.restrictionMgr.getHasExtendedSettings(),
         validate: function (value) {
             if (value === this.magicValue) {
                 return true;
@@ -218,24 +251,7 @@ export const allApplicationSettings = [
 
     new BoolSetting("offerHints", enumCategories.userInterface, (app, value) => {}),
 
-    new EnumSetting("theme", {
-        options: Object.keys(THEMES),
-        valueGetter: theme => theme,
-        textGetter: theme => T.settings.labels.theme.themes[theme],
-        category: enumCategories.userInterface,
-        restartRequired: false,
-        changeCb:
-            /**
-             * @param {Application} app
-             */
-            (app, id) => {
-                applyGameTheme(id);
-                document.documentElement.setAttribute("data-theme", id);
-            },
-        enabledCb: /**
-         * @param {Application} app
-         */ app => app.restrictionMgr.getHasExtendedSettings(),
-    }),
+    createThemeEnum(THEMES),
 
     new EnumSetting("autosaveInterval", {
         options: autosaveIntervals,
@@ -538,7 +554,7 @@ export class ApplicationSettings extends ReadWriteProxy {
             const setting = allApplicationSettings[i];
             const storedValue = settings[setting.id];
             const validated = setting.validate(storedValue);
-            if (typeof validated === "string") {
+            if (typeof validated !== "boolean") {
                 data.settings[setting.id] = validated;
             } else if (!validated) {
                 return ExplainedResult.bad(

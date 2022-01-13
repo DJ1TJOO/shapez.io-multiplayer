@@ -11,3 +11,9 @@ mods:
         installedmods: Installed mods
         exploreMods: Explore mods
         exploreModpacks: Explore modpacks
+
+settings:
+    labels:
+        theme:
+            themes:
+                red: red

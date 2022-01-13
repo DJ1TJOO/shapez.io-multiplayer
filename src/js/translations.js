@@ -97,7 +97,7 @@ export function autoDetectLanguageId() {
     return "en";
 }
 
-function matchDataRecursive(dest, src) {
+export function matchDataRecursive(dest, src) {
     if (typeof dest !== "object" || typeof src !== "object") {
         return;
     }
@@ -118,7 +118,7 @@ function matchDataRecursive(dest, src) {
     }
 }
 
-function overwriteDataRecursive(dest, src) {
+export function overwriteDataRecursive(dest, src) {
     if (typeof dest !== "object" || typeof src !== "object") {
         return;
     }
@@ -132,6 +132,26 @@ function overwriteDataRecursive(dest, src) {
         } else if (typeof data === "string" || typeof data === "number") {
             // console.log("match string", key);
             dest[key] = src[key];
+        } else {
+            logger.log("Unknown type:", typeof data, "in key", key);
+        }
+    }
+}
+
+export function fillDataRecursive(dest, src) {
+    if (typeof dest !== "object" || typeof src !== "object") {
+        return;
+    }
+
+    for (const key in src) {
+        // console.log("copy", key);
+        const data = src[key];
+        if (typeof data === "object") {
+            if (!dest[key]) dest[key] = {};
+            fillDataRecursive(dest[key], src[key]);
+        } else if (typeof data === "string" || typeof data === "number") {
+            // console.log("match string", key);
+            if (!dest[key]) dest[key] = src[key];
         } else {
             logger.log("Unknown type:", typeof data, "in key", key);
         }
@@ -163,9 +183,27 @@ export function updateApplicationLanguage(app, id) {
     }
 }
 
+/**
+ * Updates application language
+ * @param {import('./application').Application} app
+ * @param {string} id
+ */
 export function updateApplicationLanguageMods(app, id) {
     logger.log("Applying mod translations ...");
-    for (const translation of app.modManager.translations.filter(x => x.language === id)) {
-        overwriteDataRecursive(T, translation.data);
+    for (const mod of app.modManager.mods) {
+        let baseLang = "en";
+        const hasBase = mod.translations.findIndex(x => x.language === baseLang) > -1 ? true : false;
+        if (!hasBase) {
+            baseLang = mod.translations[0].language;
+        }
+
+        const base = mod.translations
+            .filter(x => x.language === baseLang)
+            .reduce((a, b) => (b ? { ...a, ...b } : a));
+        fillDataRecursive(T, base.data);
+
+        for (const translation of mod.translations.filter(x => x.language === id)) {
+            overwriteDataRecursive(T, translation.data);
+        }
     }
 }

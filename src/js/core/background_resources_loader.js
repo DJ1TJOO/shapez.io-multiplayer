@@ -34,9 +34,11 @@ const essentialBareGameAtlases = atlasFiles;
 const essentialBareGameSprites = G_ALL_UI_IMAGES.filter(src => src.indexOf(".gif") < 0);
 const essentialBareGameSounds = [MUSIC.theme];
 
-const additionalGameSprites = [];
-// @ts-ignore
-const additionalGameSounds = [...Object.values(SOUNDS), ...Object.values(MUSIC)];
+/**
+ * @typedef {AtlasDefinition & {
+ *  image?: HTMLImageElement
+ * }} AtlasDefinitionImage
+ */
 
 export class BackgroundResourcesLoader {
     /**
@@ -61,6 +63,14 @@ export class BackgroundResourcesLoader {
         // Avoid loading stuff twice
         this.spritesLoaded = [];
         this.soundsLoaded = [];
+
+        // Additional
+        /** @type {Array<string>} */
+        this.additionalGameSprites = [];
+        /** @type {Array<string>} */
+        this.additionalGameSounds = [...Object.values(SOUNDS), ...Object.values(MUSIC)];
+        /** @type {Array<AtlasDefinitionImage>} */
+        this.additionalAtlases = [];
     }
 
     getNumAssetsLoaded() {
@@ -130,9 +140,20 @@ export class BackgroundResourcesLoader {
     }
 
     internalStartLoadingAdditionalGameAssets() {
-        const additionalAtlases = [];
-        logger.log("⏰ Start load: additional assets (", additionalAtlases.length, "images)");
-        this.internalLoadSpritesAndSounds(additionalGameSprites, additionalGameSounds, additionalAtlases)
+        logger.log(
+            "⏰ Start load: additional assets (",
+            this.additionalAtlases.length,
+            "images,",
+            this.additionalGameSounds.length,
+            "sounds,",
+            this.additionalGameSprites.length,
+            "sprites)"
+        );
+        this.internalLoadSpritesAndSounds(
+            this.additionalGameSprites,
+            this.additionalGameSounds,
+            this.additionalAtlases
+        )
             .catch(err => {
                 logger.warn("⏰ Failed to load additional assets:", err);
             })
@@ -161,7 +182,7 @@ export class BackgroundResourcesLoader {
     /**
      * @param {Array<string>} sprites
      * @param {Array<string>} sounds
-     * @param {Array<AtlasDefinition>} atlases
+     * @param {Array<AtlasDefinitionImage>} atlases
      * @returns {Promise<void>}
      */
     internalLoadSpritesAndSounds(sprites, sounds, atlases = []) {
@@ -208,8 +229,9 @@ export class BackgroundResourcesLoader {
 
         for (let i = 0; i < atlases.length; ++i) {
             const atlas = atlases[i];
+            const image = atlas.image ? atlas.image : null;
             promises.push(
-                Loader.preloadAtlas(atlas)
+                Loader.preloadAtlas(atlas, image)
                     .catch(err => {
                         logger.warn("Failed to load atlas:", atlas.sourceFileName);
                     })

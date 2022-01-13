@@ -131,6 +131,8 @@ declare module "shapez/translations" {
      * @returns {string}
      */
     export function autoDetectLanguageId(): string;
+    export function matchDataRecursive(dest: any, src: any): void;
+    export function overwriteDataRecursive(dest: any, src: any): void;
     /**
      * Updates application language
      * @param {import('./application').Application} app
@@ -1983,11 +1985,188 @@ declare module "shapez/game/colors" {
 }
 declare module "shapez/game/theme" {
     export function applyGameTheme(id: any): void;
-    export namespace THEMES {
-        export const dark: any;
-        export const light: any;
+    /**
+     * @typedef {{
+     *  "uiStyle": string,
+     *  "map": {
+     *      "background": string,
+     *      "grid": string,
+     *      "gridLineWidth": number,
+     *      "selectionOverlay": string,
+     *      "selectionOutline": string,
+     *      "selectionBackground": string,
+     *      "chunkBorders": string,
+     *      "directionLock": {
+     *          "regular": {
+     *               "color": string,
+     *               "background": string
+     *          },
+     *          "wires": {
+     *               "color": string,
+     *               "background": string
+     *          }
+     *      },
+     *      "colorBlindPickerTile": string,
+     *      "resources": {
+     *          "shape": string,
+     *          "red": string,
+     *          "green": string,
+     *          "blue": string
+     *      },
+     *      "chunkOverview": {
+     *          "empty": string,
+     *          "filled": string,
+     *          "beltColor": string
+     *      },
+     *      "wires": {
+     *          "overlayColor": string,
+     *          "previewColor": string,
+     *          "highlightColor": string
+     *      },
+     *      "connectedMiners": {
+     *          "overlay": string,
+     *          "textColor": string,
+     *          "textColorCapped": string,
+     *          "background": string
+     *      },
+     *      "zone": {
+     *          "borderSolid": string,
+     *          "outerColor": string
+     *      }
+     *   },
+     *  "items": {
+     *      "outline": string,
+     *      "outlineWidth": number,
+     *      "circleBackground": string
+     *   },
+     *  "shapeTooltip": {
+     *      "background": string,
+     *      "outline": string
+     *   }
+     * }} Theme
+     */
+    /**
+     * @type {Object.<string, Theme>}
+     */
+    export const THEMES: {
+        [x: string]: Theme;
+    };
+    export namespace THEME {
+        export const uiStyle: string;
+        export const map: {
+            background: string;
+            grid: string;
+            gridLineWidth: number;
+            selectionOverlay: string;
+            selectionOutline: string;
+            selectionBackground: string;
+            chunkBorders: string;
+            directionLock: {
+                regular: {
+                    color: string;
+                    background: string;
+                };
+                wires: {
+                    color: string;
+                    background: string;
+                };
+            };
+            colorBlindPickerTile: string;
+            resources: {
+                shape: string;
+                red: string;
+                green: string;
+                blue: string;
+            };
+            chunkOverview: {
+                empty: string;
+                filled: string;
+                beltColor: string;
+            };
+            wires: {
+                overlayColor: string;
+                previewColor: string;
+                highlightColor: string;
+            };
+            connectedMiners: {
+                overlay: string;
+                textColor: string;
+                textColorCapped: string;
+                background: string;
+            };
+            zone: {
+                borderSolid: string;
+                outerColor: string;
+            };
+        };
+        export const items: {
+            outline: string;
+            outlineWidth: number;
+            circleBackground: string;
+        };
+        export const shapeTooltip: {
+            background: string;
+            outline: string;
+        };
     }
-    export let THEME: any;
+    export type Theme = {
+        uiStyle: string;
+        map: {
+            background: string;
+            grid: string;
+            gridLineWidth: number;
+            selectionOverlay: string;
+            selectionOutline: string;
+            selectionBackground: string;
+            chunkBorders: string;
+            directionLock: {
+                regular: {
+                    color: string;
+                    background: string;
+                };
+                wires: {
+                    color: string;
+                    background: string;
+                };
+            };
+            colorBlindPickerTile: string;
+            resources: {
+                shape: string;
+                red: string;
+                green: string;
+                blue: string;
+            };
+            chunkOverview: {
+                empty: string;
+                filled: string;
+                beltColor: string;
+            };
+            wires: {
+                overlayColor: string;
+                previewColor: string;
+                highlightColor: string;
+            };
+            connectedMiners: {
+                overlay: string;
+                textColor: string;
+                textColorCapped: string;
+                background: string;
+            };
+            zone: {
+                borderSolid: string;
+                outerColor: string;
+            };
+        };
+        items: {
+            outline: string;
+            outlineWidth: number;
+            circleBackground: string;
+        };
+        shapeTooltip: {
+            background: string;
+            outline: string;
+        };
+    };
 }
 declare module "shapez/game/shape_definition" {
     /**
@@ -12075,17 +12254,25 @@ declare module "shapez/profile/setting_types" {
          * @param {string} categoryId
          * @param {function(Application, any):void} changeCb
          * @param {function(Application) : boolean=} enabledCb
+         * @param {function(any) : boolean=} validate
          */
         constructor(
             id: string,
             categoryId: string,
             changeCb: (arg0: Application, arg1: any) => void,
-            enabledCb?: ((arg0: Application) => boolean) | undefined
+            enabledCb?: ((arg0: Application) => boolean) | undefined,
+            validate?: ((arg0: any) => boolean) | undefined
         );
         id: string;
         categoryId: string;
         changeCb: (arg0: Application, arg1: any) => void;
         enabledCb: (arg0: Application) => boolean;
+        /**
+         * Validates the set value
+         * @param {any} value
+         * @returns {boolean | string}
+         */
+        validate(value: any): boolean | string;
         /** @type {Application} */
         app: Application;
         element: HTMLElement;
@@ -12121,12 +12308,6 @@ declare module "shapez/profile/setting_types" {
          * Shows the dialog that a restart is required
          */
         showRestartRequiredDialog(): void;
-        /**
-         * Validates the set value
-         * @param {any} value
-         * @returns {boolean}
-         */
-        validate(value: any): boolean;
     }
     export class EnumSetting extends BaseSetting {
         constructor(
@@ -12142,6 +12323,7 @@ declare module "shapez/profile/setting_types" {
                 changeCb,
                 magicValue,
                 enabledCb,
+                validate,
             }: {
                 options: any;
                 valueGetter: any;
@@ -12153,6 +12335,7 @@ declare module "shapez/profile/setting_types" {
                 changeCb?: any;
                 magicValue?: any;
                 enabledCb?: any;
+                validate?: any;
             }
         );
         options: any;
@@ -12195,6 +12378,8 @@ declare module "shapez/profile/setting_types" {
     import { Application } from "shapez/application";
 }
 declare module "shapez/profile/application_settings" {
+    export function createLanguageEnum(languages: any): EnumSetting;
+    export function createThemeEnum(themes: any): EnumSetting;
     export function getApplicationSettingById(id: any): any;
     export type enumCategories = string;
     export namespace enumCategories {
@@ -12270,6 +12455,7 @@ declare module "shapez/profile/application_settings" {
          */
         resetKeybindingOverrides(): Promise<void>;
     }
+    import { EnumSetting } from "shapez/profile/setting_types";
     import { BaseSetting } from "shapez/profile/setting_types";
     import { ReadWriteProxy } from "shapez/core/read_write_proxy";
     import { Signal } from "shapez/core/signal";
@@ -12969,16 +13155,34 @@ declare module "shapez/modloader/mod" {
         modManager: import("shapez/modloader/mod_manager").ModManager;
         /**
          * Registers a new atlas
-         * @param {string} data
+         * @param {string} src
          * @param {import("shapez/core/loader").AtlasDefinition} sourceData
          */
-        registerAtlas(data: string, sourceData: import("shapez/core/loader").AtlasDefinition): void;
+        registerAtlas(src: string, sourceData: import("shapez/core/loader").AtlasDefinition): void;
+        /**
+         * Registers a new theme
+         * @param {import("shapez/game/theme").Theme} theme
+         */
+        registerTheme(theme: import("shapez/game/theme").Theme): void;
         /**
          * Register new translations for language
          * @param {string} language
          * @param {object} translations
+         * @param {{
+         *  name: string
+         *  code: string,
+         *  region: string,
+         * }} translation
          */
-        registerTranslation(language: string, translations: object): void;
+        registerTranslation(
+            language: string,
+            translations: object,
+            translation?: {
+                name: string;
+                code: string;
+                region: string;
+            }
+        ): void;
         registerCss(css: any): void;
         /**
          * Registers a new icon
@@ -13341,6 +13545,7 @@ declare module "shapez/modloader/mod_manager" {
             language: string;
             data: object;
         }[];
+        initialize(): any;
         /**
          * @param {Mod} mod
          */
@@ -13391,6 +13596,7 @@ declare module "shapez/modloader/mod_manager" {
 declare module "shapez/application" {
     export class Application {
         unloaded: boolean;
+        modManager: ModManager;
         settings: ApplicationSettings;
         ticker: AnimationFrame;
         stateMgr: StateManager;
@@ -13398,7 +13604,6 @@ declare module "shapez/application" {
         inputMgr: InputDistributor;
         backgroundResourceLoader: BackgroundResourcesLoader;
         clientApi: ClientAPI;
-        modManager: ModManager;
         restrictionMgr: RestrictionManager;
         /** @type {StorageInterface} */
         storage: StorageInterface;
@@ -13509,6 +13714,7 @@ declare module "shapez/application" {
     export type GameAnalyticsInterface = import("shapez/platform/game_analytics").GameAnalyticsInterface;
     export type SoundInterface = import("shapez/platform/sound").SoundInterface;
     export type StorageInterface = import("shapez/platform/storage").StorageInterface;
+    import { ModManager } from "shapez/modloader/mod_manager";
     import { ApplicationSettings } from "shapez/profile/application_settings";
     import { AnimationFrame } from "shapez/core/animation_frame";
     import { StateManager } from "shapez/core/state_manager";
@@ -13516,7 +13722,6 @@ declare module "shapez/application" {
     import { InputDistributor } from "shapez/core/input_distributor";
     import { BackgroundResourcesLoader } from "shapez/core/background_resources_loader";
     import { ClientAPI } from "shapez/platform/api";
-    import { ModManager } from "shapez/modloader/mod_manager";
     import { RestrictionManager } from "shapez/core/restriction_manager";
     import { PlatformWrapperInterface } from "shapez/platform/wrapper";
     import { AdProviderInterface } from "shapez/platform/ad_provider";
@@ -13538,4 +13743,7 @@ declare const ATLASES: {
         src: string;
         atlasData: import("shapez/core/loader").AtlasDefinition;
     };
+};
+declare const TRANSLATIONS: {
+    [x: string]: object;
 };

@@ -142,14 +142,21 @@ class LoaderImpl {
     /**
      * Preloads an atlas
      * @param {AtlasDefinition} atlas
+     * @param {HTMLImageElement|null} image
      * @returns {Promise<void>}
      */
-    preloadAtlas(atlas) {
-        return this.internalPreloadImage(atlas.getFullSourcePath()).then(image => {
-            // @ts-ignore
-            image.label = atlas.sourceFileName;
-            return this.internalParseAtlas(atlas, image);
-        });
+    preloadAtlas(atlas, image = null) {
+        if (image) {
+            return new Promise(resolve => {
+                resolve(this.internalParseAtlas(atlas, image));
+            });
+        } else {
+            return this.internalPreloadImage(atlas.getFullSourcePath()).then(image => {
+                // @ts-ignore
+                image.label = atlas.sourceFileName;
+                return this.internalParseAtlas(atlas, image);
+            });
+        }
     }
 
     /**

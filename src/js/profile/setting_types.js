@@ -111,7 +111,7 @@ export class BaseSetting {
     /**
      * Validates the set value
      * @param {any} value
-     * @returns {boolean | string}
+     * @returns {boolean | string | number | object}
      */
     validate(value) {
         abstract;

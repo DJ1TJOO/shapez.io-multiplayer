@@ -15,6 +15,7 @@ function gulptasksJS($, gulp, folders) {
                         injectCss: argv["no-css"] === undefined,
                         injectAtlas: argv["no-atlas"] === undefined,
                         injectTranslations: argv["no-translations"] === undefined,
+                        injectThemes: argv["no-themes"] === undefined,
                     })
                 )
             )
@@ -27,10 +28,11 @@ function gulptasksJS($, gulp, folders) {
         gulp.src("../src/js/main.js")
             .pipe(
                 $.webpackStream(
-                    requireUncached("./webpack.production.config.js")({
+                    requireUncached("./webpack.config.js")({
                         injectCss: argv["no-css"] === undefined,
                         injectAtlas: argv["no-atlas"] === undefined,
                         injectTranslations: argv["no-translations"] === undefined,
+                        injectThemes: argv["no-themes"] === undefined,
                     })
                 )
             )

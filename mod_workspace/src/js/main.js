@@ -25,4 +25,4 @@ mod.modManager.app.stateMgr.stateChanged.add(
     }
 );
 
-console.log(mod);
+console.log(mod);

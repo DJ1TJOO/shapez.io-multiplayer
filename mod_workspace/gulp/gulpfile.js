@@ -125,20 +125,27 @@ function getGlobs(folder, customExtenstions = null) {
     );
 }
 
+gulp.task("main.watch.trigger", function (cb) {
+    const main = path.relative(__dirname, path.join(folders.src, "js", "main.js"));
+    fs.appendFileSync(main, "//gulp-reload!");
+    setTimeout(() => {
+        const mainFile = fs.readFileSync(main, "utf-8").replace(/[\n]?\/\/gulp-reload![\n]?/g, "");
+        fs.writeFileSync(main, mainFile);
+    }, 1000);
+
+    return cb();
+});
+
+gulp.task("main.watch.themes", function () {
+    // Watch the source folder and reload when anything changed
+    const src = getGlobs(folders.src, ["json"]);
+    return gulp.watch(src, gulp.series("main.watch.trigger", "main.serve.shapez.reload"));
+});
+
 gulp.task("main.watch.translations", function () {
     // Watch the source folder and reload when anything changed
     const src = getGlobs(folders.src, ["yaml"]);
-    return gulp.watch(
-        src,
-        gulp.series(
-            "translations",
-            function rebuild(cb) {
-                exec("touch " + path.relative(__dirname, path.join(folders.src, "js", "main.js")));
-                cb();
-            },
-            "main.serve.shapez.reload"
-        )
-    );
+    return gulp.watch(src, gulp.series("translations", "main.watch.trigger", "main.serve.shapez.reload"));
 });
 
 gulp.task("main.watch.atlas", function () {
@@ -146,31 +153,14 @@ gulp.task("main.watch.atlas", function () {
     const src = getGlobs(folders.src, ["png"]);
     return gulp.watch(
         src,
-        gulp.series(
-            "atlas.allOptimized",
-            function rebuild(cb) {
-                exec("touch " + path.relative(__dirname, path.join(folders.src, "js", "main.js")));
-                cb();
-            },
-            "main.serve.shapez.reload"
-        )
+        gulp.series("atlas.allOptimized", "main.watch.trigger", "main.serve.shapez.reload")
     );
 });
 
 gulp.task("main.watch.scss", function () {
     // Watch the source folder and reload when anything changed
     const src = getGlobs(folders.src, ["scss"]);
-    return gulp.watch(
-        src,
-        gulp.series(
-            "css.dev",
-            function rebuild(cb) {
-                exec("touch " + path.relative(__dirname, path.join(folders.src, "js", "main.js")));
-                cb();
-            },
-            "main.serve.shapez.reload"
-        )
-    );
+    return gulp.watch(src, gulp.series("css.dev", "main.watch.trigger", "main.serve.shapez.reload"));
 });
 
 gulp.task("main.watch.js", function () {
@@ -193,6 +183,7 @@ gulp.task(
         "main.watch.js",
         "main.watch.atlas",
         "main.watch.translations",
+        "main.watch.themes",
         "main.watch.shapezBuildFolder"
     )
 );
@@ -205,6 +196,7 @@ gulp.task(
         "main.serve.mod",
         "main.watch.scss",
         "main.watch.translations",
+        "main.watch.themes",
         "main.watch.js",
         "main.watch.atlas"
     )
